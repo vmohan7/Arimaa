@@ -3,6 +3,7 @@ Arimaa
 
 CS 229 Project
 
-Vivek is just checking this out.
-Woopdiedoo?
-Youhoo.
+How to run the starter code:
+- Open Eclipse and import project into workspace
+- Run ArimaaEngine.java using these VM arguments: -Xmx500000000
+- Profit???
