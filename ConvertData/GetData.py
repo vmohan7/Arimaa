@@ -1,4 +1,5 @@
 import urllib2 
+import sys
 from HTMLParser import HTMLParser
 from zipfile import ZipFile
 from StringIO import StringIO
@@ -24,10 +25,18 @@ html = f.read()
 p = MyHTMLParser()
 p.feed(html)
 store = 'TextData/'
+
+numLinks = len(p.links)
+count = 1
+print "Extracting data from " + str(numLinks) + " links..."
+
 for l in p.links:
 	ziploc = link + l
+	sys.stdout.write("(" + str(count) + "/" + str(numLinks) +")" + " Pulling data from " + link + l + " ... ")
 	zipfile = urllib2.urlopen(ziploc).read()
 	result = ZipFile(StringIO(zipfile))
 	result.extractall(store)
+	print("done!")
+	count += 1
 
 p.close()
