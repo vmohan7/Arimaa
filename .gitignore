@@ -4,6 +4,7 @@ ArimaaBot/bin/
 target/
 ArimaaBot/CVS/
 ConvertData/TextData
+ConvertData/games.sql
  
 # OS Files #
 .DS_Store
