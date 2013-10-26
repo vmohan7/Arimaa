@@ -11,7 +11,7 @@ How to run the starter code:
 Migrating Data:
 - Get zip from Google Drive
 - Unzip
-- Copy the following lines of code:
+- Copy the following lines of code with ConvertData as the pwd:
 
 <pre><code>
 mysqladmin create Arimaa           # create database
