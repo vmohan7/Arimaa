@@ -16,3 +16,6 @@ Migrating Data:
 mysqladmin create Arimaa           # create database
 cat FastSQLLoad/*.sql | mysql Arimaa   # create tables in database
 mysqlimport Arimaa FastSQLLoad/*.txt   # load data into tables
+
+Other items: 
+- Use MySQL5.5
