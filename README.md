@@ -16,7 +16,7 @@ Migrating Data:
 <pre><code>
 mysqladmin create Arimaa           # create database; may need to use 'sudo'
 cat FastSQLLoad/*.sql | mysql -u root Arimaa   # create tables in database
-mysqlimport --local -u root Arimaa FastSQLLoad/*.txt   # load data into tables
+mysqlimport --local -u root Arimaa FastSQLLoad/*.txt   # load data into tables; may need to specify full path
 </code></pre>
 
 Other items: 
