@@ -13,9 +13,11 @@ Migrating Data:
 - Unzip
 - Copy the following lines of code:
 
+<pre><code>
 mysqladmin create Arimaa           # create database
 cat FastSQLLoad/*.sql | mysql Arimaa   # create tables in database
 mysqlimport Arimaa FastSQLLoad/*.txt   # load data into tables
+</code></pre>
 
 Other items: 
 - Use MySQL5.5
