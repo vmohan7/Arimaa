@@ -14,9 +14,9 @@ Migrating Data:
 - Copy the following lines of code with ConvertData as the pwd:
 
 <pre><code>
-mysqladmin create Arimaa           # create database
+mysqladmin create Arimaa           # create database; may need to use 'sudo'
 cat FastSQLLoad/*.sql | mysql -u root Arimaa   # create tables in database
-mysqlimport -u root Arimaa FastSQLLoad/*.txt   # load data into tables
+mysqlimport --local -u root Arimaa FastSQLLoad/*.txt   # load data into tables
 </code></pre>
 
 Other items: 
