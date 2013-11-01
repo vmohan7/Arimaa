@@ -3,6 +3,8 @@ package arimaa3;
 import ai_util.*;
 import java.util.*;
 
+import utilities.MyDB;
+
 public class ArimaaEngine extends ArimaaBaseClass implements Runnable {
   public ArimaaEngine() {
   }
@@ -1321,6 +1323,8 @@ public class ArimaaEngine extends ArimaaBaseClass implements Runnable {
       MoveInfo info = engine.genMove(position, 10000);
       System.out.println("*" + info.move_text + "*");
     }
+    
+    MyDB.close();
 
   }
 
