@@ -32,3 +32,4 @@ mysqlimport --local -u root Arimaa FastSQLLoad/*.txt   # load data into tables; 
 
 Other items: 
 - Use MySQL5.5
+- For reference on Arimaa move notation, see: http://arimaa.com/arimaa/learn/notation.html
