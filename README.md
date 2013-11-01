@@ -4,9 +4,12 @@ Arimaa
 CS 229 Project
 
 How to run the starter code:
-- Open Eclipse and import project into workspace
-- Run ArimaaEngine.java using these VM arguments: -Xmx500000000
-- Profit???
+- Clone / pull latest code
+- Open Eclipse and select File -> New -> Java Project
+- Uncheck "Use Default Location" and browse for the "ArimaaBot" directory in this git repo
+- Right click on the directory in the project browser -> Run as... -> Run Configurations
+- Click the "Arguments" tab, enter these VM arguments, and hit apply: -Xmx500000000
+- Run ArimaaEngine.java
 
 Migrating Data:
 - Get zip from Google Drive
