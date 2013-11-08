@@ -30,6 +30,12 @@ public class GameState extends ArimaaBaseClass {
 
   // This is the entire gamestate
   // Stuff everybody can use
+  /**
+   * piece_bb holds 12 bit-boards for each piece (black and white together).
+   * The indices correspond to the enumeration above. Each long is 64 bits
+   * so each bit represents a square on the board. 1 means that piece is
+   * present and 0 means absent.
+   */
   public long piece_bb[] = new long[12];
   public long colour_bb[] = new long[2];
   public long stronger_enemy_bb[] = new long[12];
