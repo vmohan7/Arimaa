@@ -46,7 +46,7 @@ Vocabulary:
 
 
 Feature Vector Mapping:
-This is in order of David Wu's features.
+It shows which features (from David Wu's paper) correspond to which bits of our feature vector (i.e. BitSet).
 
 | Feature | Range of Bits |
 | ------ |:---:|
