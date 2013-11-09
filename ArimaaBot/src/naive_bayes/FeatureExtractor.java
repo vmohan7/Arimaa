@@ -1,8 +1,16 @@
 package naive_bayes;
+import java.util.BitSet;
+
 import ai_util.LogFile;
 import arimaa3.*;
 
 public class FeatureExtractor{
+	
+	private static final int NUM_FEATURES = 1040; //TODO update this as you add more features
+	private static final int NUM_SRC_MVMT = 512;
+	private static final int NUM_LOCATIONS = 32;
+	private static final int NUM_PIECE_TYPES = 8;
+	private static final int DEFAULT_CAPTURE_LOCATION = 32;
 	
 	/* Game state resulting from a move that we are extracting feature vectors for */
 	private GameState curr;
@@ -19,22 +27,85 @@ public class FeatureExtractor{
 	 * is of piece type 4 for the current GameState. */
 	private byte piece_types[];
 	
+	private BitSet featureVector;
+	
+	/* Move that changed prev to curr */
+	private ArimaaMove current_move;
+	
 	public FeatureExtractor(GameState prev, ArimaaMove expert_move) {
 		this.expert_move = expert_move;
 		this.prev = prev;
 		prev_prev = null;
 		curr = null;
+		featureVector = null;
+		current_move = null;
 		piece_types = new byte[12];
 	}
 	
-	public void extractFeatures(GameState current_board){
+	/*
+	 * Extracts features for the resulting board after playing a possible legal move.
+	 * current_board is the resulting board after playing current_move on prev game state
+	 */
+	public BitSet extractFeatures(GameState current_board, ArimaaMove current_move){
+		featureVector = new BitSet(NUM_FEATURES);
 		curr = current_board;
+		this.current_move = current_move;
 		calculatePieceTypes();
 		// feature extraction subroutine calls here
 		
+		generateMovementFeatures();
+		return featureVector;
 	}
 	
 
+	private void generateMovementFeatures() {
+		
+		long[] move_bb = current_move.piece_bb;
+		for(int i = 0; i < 12; i++) {
+			long source = curr.piece_bb[i] & move_bb[i];
+			long dest = source ^ move_bb[i];
+			updateBitSetMovementFeatures(source, dest, i);
+		}
+	}
+
+	private void updateBitSetMovementFeatures(long source, long dest, int piece_id) {
+		//TODO captures
+		int player = (piece_id%2==0) ? 0 : 1; //white if even
+		//higher rows are at the most significant bits
+		for(int i = 0; i < Long.SIZE; i++) {
+			if((source & (1L << i)) > 0) {
+				setSrcMovementFeature(player, piece_types[piece_id], getLocation(i));
+			}
+			if((dest & (1L << i)) > 0) {
+				setDestMovementFeature(player, piece_types[piece_id], getLocation(i));
+			}
+			if(countOneBits(source) > countOneBits(dest)) {
+				setDestMovementFeature(player, piece_types[piece_id], DEFAULT_CAPTURE_LOCATION);
+			}
+		}
+	}
+	
+	private int getLocation(int index) {
+		int row = index >> 3;
+		index = index & 0x07; //reduces all rows to the same indices as first row
+		index = (index > 3) ? 7 - index : index;
+		return index + row << 2;
+	}
+
+	private void setSrcMovementFeature(int player, int piece_type, int location) {
+		int index = player*NUM_PIECE_TYPES*NUM_LOCATIONS + piece_type*NUM_LOCATIONS + location;
+		featureVector.set(index);
+	}
+	
+	private void setDestMovementFeature(int player, int piece_type, int location) {
+		int index = NUM_SRC_MVMT + player*NUM_PIECE_TYPES*(NUM_LOCATIONS+1) + piece_type*(NUM_LOCATIONS+1) + location;
+		featureVector.set(index);
+	}
+	
+	/*
+	 * This moves forward one move in the training data by passing in the actual move played
+	 * (expert_move) and the resulting board.
+	 */
 	public void incrementMove(GameState new_board, ArimaaMove expert_move){
 		this.expert_move = expert_move;
 		prev_prev = prev;
@@ -99,7 +170,7 @@ public class FeatureExtractor{
 	    for (String text : tests) {
 		      GameState position = new GameState(text);
 		      System.out.println(position.toBoardString());
-		      fe.extractFeatures(position);
+//		      fe.extractFeatures(position);
 	    }
 	}
 	
