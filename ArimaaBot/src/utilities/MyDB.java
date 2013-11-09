@@ -11,8 +11,8 @@ import java.util.ArrayList;
 
 public class MyDB {
 	
-	private static final String MYSQL_USERNAME = "root";
-	private static final String MYSQL_PASSWORD = "";
+	private static final String MYSQL_USERNAME = "arimaa";
+	private static final String MYSQL_PASSWORD = "arimaa";
 	private static final String MYSQL_DATABASE_SERVER = "localhost";
 	private static final String MYSQL_DATABASE_NAME = "Arimaa";
 
