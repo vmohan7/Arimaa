@@ -38,3 +38,8 @@ Other items:
 Style Conventions: consistent with Jeff Bacher's starter code
 - Method names: camelCase
 - Variables: lower case separated by _
+
+Vocabulary:
+- Piece id's are Jeff Bacher's piece_types (0-11)
+- Piece_types are David Wu's piece_types (0-7)
+- A turn/move is made up of at most 4 steps
