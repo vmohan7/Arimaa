@@ -3,6 +3,7 @@
 ArimaaBot/bin/
 target/
 ArimaaBot/CVS/
+ArimaaBot/src/utilities/MyDB.java
 ConvertData/TextData
 ConvertData/games.sql
 ConvertData/FastSQLLoad/*
