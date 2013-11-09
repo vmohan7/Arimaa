@@ -7,7 +7,6 @@ ConvertData/TextData
 ConvertData/games.sql
 ConvertData/FastSQLLoad/*
 ConvertData/FastSQLLoad.zip
-ArimaaBot/src/utilities/MyDB.java 
 
 # OS Files #
 .DS_Store
