@@ -10,6 +10,7 @@ public class FeatureExtractor{
 	private static final int NUM_SRC_MVMT = 512;
 	private static final int NUM_LOCATIONS = 32;
 	private static final int NUM_PIECE_TYPES = 8;
+	private static final int DEFAULT_CAPTURE_LOCATION = 32;
 	
 	/* Game state resulting from a move that we are extracting feature vectors for */
 	private GameState curr;
@@ -73,6 +74,9 @@ public class FeatureExtractor{
 			}
 			if((dest & (1L << i)) > 0) {
 				setDestMovementFeature(player, piece_types[piece_id], getLocation(i));
+			}
+			if(countOneBits(source) > countOneBits(dest)) {
+				setDestMovementFeature(player, piece_types[piece_id], DEFAULT_CAPTURE_LOCATION);
 			}
 		}
 	}
