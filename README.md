@@ -8,7 +8,7 @@ How to run the starter code:
 - Open Eclipse and select File -> New -> Java Project
 - Uncheck "Use Default Location" and browse for the "ArimaaBot" directory in this git repo
 - Click finish.
-- Right click on the directory in the project browser -> Run as... -> Run Configurations
+- Right click on the directory in the project browser -> Run as... -> Run Configurations (you may need to run ArimaaEngine.java to get Eclipse to recognize this as an application for which you can change the VM arguments as below)
 - Click the "Arguments" tab and enter these VM arguments to expand the program's usable heap space: -Xmx500000000
 - Set up JDBC as per the instructions below
 - Run ArimaaEngine.java 
@@ -46,7 +46,7 @@ Vocabulary:
 
 
 Feature Vector Mapping:
-This is in order of David Wu's features.
+It shows which features (from David Wu's paper) correspond to which bits of our feature vector (i.e. BitSet).
 
 | Feature | Range of Bits |
 | ------ |:---:|

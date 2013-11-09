@@ -11,8 +11,8 @@ import java.util.ArrayList;
 
 public class MyDB {
 	
-	private static final String MYSQL_USERNAME = "root";
-	private static final String MYSQL_PASSWORD = "";
+	private static final String MYSQL_USERNAME = "arimaa";
+	private static final String MYSQL_PASSWORD = "arimaa";
 	private static final String MYSQL_DATABASE_SERVER = "localhost";
 	private static final String MYSQL_DATABASE_NAME = "Arimaa";
 
@@ -23,7 +23,7 @@ public class MyDB {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://" + MYSQL_DATABASE_SERVER + "/" + MYSQL_DATABASE_NAME;
-			con = DriverManager.getConnection(url, MYSQL_USERNAME, "");
+			con = DriverManager.getConnection(url, MYSQL_USERNAME, MYSQL_PASSWORD);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.err.println("Update the MySQL constants to correct values!");
