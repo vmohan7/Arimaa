@@ -6,7 +6,7 @@ import arimaa3.*;
 
 public class FeatureExtractor{
 	
-	private static final int NUM_FEATURES = 1040;
+	private static final int NUM_FEATURES = 1040; //TODO update this as you add more features
 	private static final int NUM_SRC_MVMT = 512;
 	private static final int NUM_LOCATIONS = 32;
 	private static final int NUM_PIECE_TYPES = 8;
@@ -42,6 +42,10 @@ public class FeatureExtractor{
 		piece_types = new byte[12];
 	}
 	
+	/*
+	 * Extracts features for the resulting board after playing a possible legal move.
+	 * current_board is the resulting board after playing current_move on prev game state
+	 */
 	public BitSet extractFeatures(GameState current_board, ArimaaMove current_move){
 		featureVector = new BitSet(NUM_FEATURES);
 		curr = current_board;
@@ -97,7 +101,11 @@ public class FeatureExtractor{
 		int index = NUM_SRC_MVMT + player*NUM_PIECE_TYPES*(NUM_LOCATIONS+1) + piece_type*(NUM_LOCATIONS+1) + location;
 		featureVector.set(index);
 	}
-
+	
+	/*
+	 * This moves forward one move in the training data by passing in the actual move played
+	 * (expert_move) and the resulting board.
+	 */
 	public void incrementMove(GameState new_board, ArimaaMove expert_move){
 		this.expert_move = expert_move;
 		prev_prev = prev;
