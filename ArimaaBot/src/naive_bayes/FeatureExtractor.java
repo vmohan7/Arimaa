@@ -1,5 +1,5 @@
 package naive_bayes;
-import ai_util.LogFile;
+//import ai_util.LogFile;
 import arimaa3.*;
 
 public class FeatureExtractor{
