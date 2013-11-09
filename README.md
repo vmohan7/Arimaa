@@ -48,7 +48,6 @@ Vocabulary:
 Feature Vector Mapping:
 This is in order of David Wu's features.
 
-<WHAT IS THIS? Explain more/better>
 | Feature | Range of Bits |
 | ------ |:---:|
 | Position + Movement | 0 - 1039 |
