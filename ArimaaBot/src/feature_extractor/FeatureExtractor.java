@@ -1,6 +1,6 @@
-package naive_bayes;
+package feature_extractor;
 import java.util.BitSet;
-
+import feature_extractor.FeatureConstants.TrapStatus;
 import ai_util.LogFile;
 import arimaa3.*;
 
