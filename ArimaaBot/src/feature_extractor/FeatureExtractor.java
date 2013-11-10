@@ -4,13 +4,9 @@ import feature_extractor.FeatureConstants.TrapStatus;
 import ai_util.LogFile;
 import arimaa3.*;
 
-public class FeatureExtractor{
+public class FeatureExtractor {
 	
 	private static final int NUM_FEATURES = 1040; //TODO update this as you add more features
-	private static final int NUM_SRC_MVMT = 512;
-	private static final int NUM_LOCATIONS = 32;
-	private static final int NUM_PIECE_TYPES = 8;
-	private static final int DEFAULT_CAPTURE_LOCATION = 32;
 	
 	/* Move for which we are extracting features. This changes every time extractFeatures() is called. */
 	private ArimaaMove current_move;
@@ -59,53 +55,15 @@ public class FeatureExtractor{
 
 		// feature extraction subroutine calls here
 		
-		generateMovementFeatures();
+		(new PositionMovementExtractor(prev, curr, current_move, piece_types)).updateBitSet(featureVector);
 		return featureVector;
-	}
-	
-
-	private void generateMovementFeatures() {
-		
-		long[] move_bb = current_move.piece_bb;
-		for(int i = 0; i < 12; i++) {
-			long source = prev.piece_bb[i] & move_bb[i]; // this long encodes all the source locations of pieces that moved this turn
-			long dest = source ^ move_bb[i]; // this long encodes all destination locations of pieces that moved this turn
-			int player = (i % 2==0) ? 0 : 1; // player is 0 (white) if piece_id is even
-			updateBitSetMovementFeatures(source, dest, piece_types[i], player);
-		}
-	}
-
-	private void updateBitSetMovementFeatures(long source, long dest, byte piece_type, int player) {
-		// higher rows are at the most significant bits		
-		// Loop across each of the 64 bits in source and dest, and set features on featureVector accordingly. 
-		for(int i = 0; i < Long.SIZE; i++) {
-			if((source & (1L << i)) > 0) { // a piece moved from location 'i'
-				setSrcMovementFeature(player, piece_type, getLocation(i));
-			}
-			if((dest & (1L << i)) > 0) { // a piece moved to location 'i'
-				setDestMovementFeature(player, piece_type, getLocation(i));
-			}
-		}
-		if(countOneBits(source) > countOneBits(dest)) { // piece has been captured
-			setDestMovementFeature(player, piece_type, DEFAULT_CAPTURE_LOCATION);
-		}
-	}
-	
-	private void setSrcMovementFeature(int player, int piece_type, int location) {
-		int index = player*NUM_PIECE_TYPES*NUM_LOCATIONS + piece_type*NUM_LOCATIONS + location;
-		featureVector.set(index);
-	}
-	
-	private void setDestMovementFeature(int player, int piece_type, int location) {
-		int index = NUM_SRC_MVMT + player*NUM_PIECE_TYPES*(NUM_LOCATIONS+1) + piece_type*(NUM_LOCATIONS+1) + location;
-		featureVector.set(index);
 	}
 	
 	/*
 	 * Maps from board index between 0-63 to board index between 0-31, leveraging 
 	 * the vertical symmetry of the board. 
 	 */
-	private static int getLocation(int index) {
+	public static int getLocation(int index) {
 		int row = index >> 3;
 		index = index & 0x07; //reduces all rows to the same indices as first row
 		index = (index > 3) ? 7 - index : index;
@@ -137,7 +95,7 @@ public class FeatureExtractor{
 		}
 	}
 	
-	private static byte countOneBits(long n) {
+	public static byte countOneBits(long n) {
 		// Algorithm adapted from http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
 		byte c; // c accumulates the total bits set in v
 		for (c = 0; n != 0; c++)
