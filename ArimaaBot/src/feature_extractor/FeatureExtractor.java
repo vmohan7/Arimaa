@@ -39,8 +39,6 @@ public class FeatureExtractor {
 	/*
 	 * Extracts features for the resulting board after playing a possible legal move.
 	 * current_board is the resulting board after playing current_move on prev game state.
-	 * 
-	 * NOTE: none of this has been tested
 	 */
 	public BitSet extractFeatures(ArimaaMove current_move){
 		featureVector = new BitSet(NUM_FEATURES);
@@ -103,13 +101,11 @@ public class FeatureExtractor {
 		return c;
 	}
 	
-	
 	private static String tests[] = {
 		"12w %13 +-----------------+%138|                 |%137|                 |%136|   R             |%135|                 |%134|                 |%133|         D   r   |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
 		"12w %13 +-----------------+%138|                 |%137|                 |%136|   R             |%135|                 |%134|                 |%133|             r   |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
 		"2w %13 +-----------------+%138| r r   H r r r r |%137|   e   C r   r   |%136|   d X     X     |%135|   d R M c       |%134|       R         |%133|     X     X     |%132|                 |%131|       R       R |%13 +-----------------+%13   a b c d e f g h%13",
 	};
-
 
 	private static void testMovementFeatures1() {
 		
@@ -130,12 +126,6 @@ public class FeatureExtractor {
 	    
 	    System.out.println(startState.toBoardString());
 	    System.out.println(fe.curr.toBoardString());
-	    
-//	    for (String text : tests) {
-//		      GameState position = new GameState(text);
-//		      System.out.println(position.toBoardString());
-////		      fe.extractFeatures(position);
-//	    }
 	}
 	
 	private static void testMovementFeatures2() {
