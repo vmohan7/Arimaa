@@ -33,6 +33,13 @@ public interface FeatureConstants {
 		public static final byte FOUR     = 7;
 		/** The number of possible TrapStatus-es for a given player and trap */
 		public static final byte NUM_STATUSES = 8;
+		
+		public static byte convertToStatus(byte numAdjacent, boolean elephant) {
+			if (numAdjacent == 0) return ZERO;
+			if (numAdjacent == 4) return FOUR;
+			
+			return (byte)(2 * numAdjacent - (elephant ? 0 : 1));
+		}
 	}
 	
 	public static class FeatureRange {

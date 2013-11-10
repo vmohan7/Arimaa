@@ -58,8 +58,18 @@ public class TrapExtractor extends AbstractExtractor {
 	 * @param playerNum PL_WHITE, PL_BLACK */
 	private byte getTrapStatus(GameState state, int trapNum, int playerNum) {
 		long player_trap_bb = TOUCH_TRAP[trapNum] & state.colour_bb[playerNum]; // all white or black pieces touching trap #trapNum
+		byte numPieces = FeatureExtractor.countOneBits(player_trap_bb);
+		assert(numPieces <= 4); //shouldn't be more than 4 pieces touching a trap...
 		
-		
-		return 0;
+		boolean elephant = isElephantTouchingTrap(state, trapNum, playerNum);
+		return TrapStatus.convertToStatus(numPieces, elephant);
+	}
+	
+	/** Returns whether an elephant for the given player (in the current game state)
+	 * is on any of the four spaces adjacent to the given trap. */
+	private boolean isElephantTouchingTrap(GameState state, int trapNum, int playerNum) {
+		int boardNum = playerNum == PL_WHITE ? PT_WHITE_ELEPHANT : PT_BLACK_ELEPHANT;
+		long elephant_bb = state.piece_bb[boardNum];
+		return (elephant_bb & TOUCH_TRAP[trapNum]) != 0;
 	}
 }
