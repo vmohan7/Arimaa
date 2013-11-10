@@ -1,4 +1,4 @@
-package naive_bayes;
+package feature_extractor;
 
 public interface FeatureConstants {
 	
