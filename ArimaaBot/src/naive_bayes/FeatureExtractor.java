@@ -1,5 +1,6 @@
 package naive_bayes;
-//import ai_util.LogFile;
+import naive_bayes.FeatureConstants.TrapStatus;
+import ai_util.LogFile;
 import arimaa3.*;
 
 public class FeatureExtractor{
@@ -35,7 +36,6 @@ public class FeatureExtractor{
 		curr = current_board;
 		calculatePieceTypes();
 		// feature extraction subroutine calls here
-		
 	}
 	
 
