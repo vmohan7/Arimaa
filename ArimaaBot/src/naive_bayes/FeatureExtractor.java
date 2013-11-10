@@ -12,21 +12,23 @@ public class FeatureExtractor{
 	private static final int NUM_PIECE_TYPES = 8;
 	private static final int DEFAULT_CAPTURE_LOCATION = 32;
 	
-	/* Move that changed prev to curr */
+	/* Move for which we are extracting features. This changes every time extractFeatures() is called. */
 	private ArimaaMove current_move;
 	
-	/* Game state resulting from a move that we are extracting feature vectors for */
+	/* Game state resulting from current_move. This changes every time extractFeatures() is called. */
 	private GameState curr;
 	
-	/* Original game state that is one move behind curr (i.e. before trying all possible moves from prev) */
+	/* Starting game state from which we play current_move */
 	private GameState prev;
 	
 	private GameState prev_prev;
 	
-	/* Piece category --> type mapping in curr GameState. E.g. if piece_types[3] = 4, this means that "black cat" 
-	 * is of piece type 4 for the current GameState. */
+	/* Piece id to type mapping for the current game state (curr). E.g. if piece_types[3] = 4, this means
+	 * that piece id 3 (black cat) is of piece type 4 for the current GameState. This changes every time 
+	 * extractFeatures() is called. */
 	private byte piece_types[];
 	
+	/* The feature vector corresponding to current_move. */ 
 	private BitSet featureVector;
 		
 	public FeatureExtractor(GameState prev, GameState prev_prev) {
@@ -75,16 +77,16 @@ public class FeatureExtractor{
 
 	private void updateBitSetMovementFeatures(long source, long dest, byte piece_type, int player) {
 		// higher rows are at the most significant bits		
-		// Loop across each of 64 bits in source and dest, and set features on featureVector accordingly. 
+		// Loop across each of the 64 bits in source and dest, and set features on featureVector accordingly. 
 		for(int i = 0; i < Long.SIZE; i++) {
-			if((source & (1L << i)) > 0) {
+			if((source & (1L << i)) > 0) { // a piece moved from location 'i'
 				setSrcMovementFeature(player, piece_type, getLocation(i));
 			}
-			if((dest & (1L << i)) > 0) {
+			if((dest & (1L << i)) > 0) { // a piece moved to location 'i'
 				setDestMovementFeature(player, piece_type, getLocation(i));
 			}
 		}
-		if(countOneBits(source) > countOneBits(dest)) { // a piece of type "piece_id" has been captured
+		if(countOneBits(source) > countOneBits(dest)) { // piece has been captured
 			setDestMovementFeature(player, piece_type, DEFAULT_CAPTURE_LOCATION);
 		}
 	}
@@ -103,14 +105,14 @@ public class FeatureExtractor{
 	 * Maps from board index between 0-63 to board index between 0-31, leveraging 
 	 * the vertical symmetry of the board. 
 	 */
-	private int getLocation(int index) {
+	private static int getLocation(int index) {
 		int row = index >> 3;
 		index = index & 0x07; //reduces all rows to the same indices as first row
 		index = (index > 3) ? 7 - index : index;
 		return index + row << 2;
 	}
 
-	// Calculates the piece type (e.g. 3) for each piece category (e.g. black dog).
+	// Calculates the piece type (e.g. 3) for each piece category (e.g. black dog) for the current game state.
 	private void calculatePieceTypes(){
 		
 		for (int i = 0; i < 2; i++){ // calculate for rabbits 
@@ -147,7 +149,6 @@ public class FeatureExtractor{
 	private static String tests[] = {
 		"12w %13 +-----------------+%138|                 |%137|                 |%136|   R             |%135|                 |%134|                 |%133|         D   r   |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
 		"12w %13 +-----------------+%138|                 |%137|                 |%136|   R             |%135|                 |%134|                 |%133|             r   |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
-		
 		"2w %13 +-----------------+%138| r r   H r r r r |%137|   e   C r   r   |%136|   d X     X     |%135|   d R M c       |%134|       R         |%133|     X     X     |%132|                 |%131|       R       R |%13 +-----------------+%13   a b c d e f g h%13",
 	};
 
