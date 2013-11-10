@@ -68,7 +68,7 @@ public class FeatureExtractor{
 		
 		long[] move_bb = current_move.piece_bb;
 		for(int i = 0; i < 12; i++) {
-			long source = curr.piece_bb[i] & move_bb[i]; // this long encodes all the source locations of pieces that moved this turn
+			long source = prev.piece_bb[i] & move_bb[i]; // this long encodes all the source locations of pieces that moved this turn
 			long dest = source ^ move_bb[i]; // this long encodes all destination locations of pieces that moved this turn
 			int player = (i % 2==0) ? 0 : 1; // player is 0 (white) if piece_id is even
 			updateBitSetMovementFeatures(source, dest, piece_types[i], player);
@@ -159,13 +159,12 @@ public class FeatureExtractor{
 	    String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
 	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
 	    GameState startState = new GameState(white,black);
-	    System.out.println(startState.toBoardString());
-
 	    FeatureExtractor fe = new FeatureExtractor(startState, null);
-
-	    fe.extractFeatures(new ArimaaMove("Db2n Ha2n Ha3n Hh2n"));	
+	    fe.extractFeatures(new ArimaaMove("Db2n Ha2n Ha3n Hh2n"));
+	    
 	    System.out.println(fe.featureVector.toString());
 	    
+	    System.out.println(startState.toBoardString());
 	    System.out.println(fe.curr.toBoardString());
 
 
