@@ -109,7 +109,7 @@ public class FeatureExtractor{
 		int row = index >> 3;
 		index = index & 0x07; //reduces all rows to the same indices as first row
 		index = (index > 3) ? 7 - index : index;
-		return index + row * 4;
+		return index + (row << 2);
 	}
 
 	// Calculates the piece type (e.g. 3) for each piece id (e.g. black dog) for the current game state.
