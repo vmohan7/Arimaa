@@ -109,10 +109,10 @@ public class FeatureExtractor{
 		int row = index >> 3;
 		index = index & 0x07; //reduces all rows to the same indices as first row
 		index = (index > 3) ? 7 - index : index;
-		return index + row << 2;
+		return index + row * 4;
 	}
 
-	// Calculates the piece type (e.g. 3) for each piece category (e.g. black dog) for the current game state.
+	// Calculates the piece type (e.g. 3) for each piece id (e.g. black dog) for the current game state.
 	private void calculatePieceTypes(){
 		
 		for (int i = 0; i < 2; i++){ // calculate for rabbits 
@@ -153,26 +153,42 @@ public class FeatureExtractor{
 	};
 
 
-	// This has been tested and works as expected. 
-	private static void testPieceTypes(){
+	private static void testMovementFeatures(){
 		
-		FeatureExtractor fe = new FeatureExtractor(null, null);
-//	    String white ="1w Ee2 Me1 Hg2 Hb2 Df2 Dd1 Cc2 Cd2 Ra2 Rh2 Ra1 Rb1 Rc1 Rf1 Rg1 Rh1";
-//	    String black = "1b ha7 db7 cc7 md7 ee7 cf7 dg7 hh7 ra8 rb8 rc8 rd8 re8 rf8 rg8 rh8";
-//
-//	    GameState gs = new GameState(white,black);
-//	    System.out.println(gs.toBoardString());
-//	    fe.extractFeatures(gs);	
+		// data from first game in "games" relation
+	    String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
+	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
+	    GameState startState = new GameState(white,black);
+	    System.out.println(startState.toBoardString());
+
+	    FeatureExtractor fe = new FeatureExtractor(startState, null);
+
+	    fe.extractFeatures(new ArimaaMove("Db2n Ha2n Ha3n Hh2n"));	
+	    System.out.println(fe.featureVector.toString());
 	    
-	    for (String text : tests) {
-		      GameState position = new GameState(text);
-		      System.out.println(position.toBoardString());
-//		      fe.extractFeatures(position);
-	    }
+	    System.out.println(fe.curr.toBoardString());
+
+
+	    
+//	    for (String text : tests) {
+//		      GameState position = new GameState(text);
+//		      System.out.println(position.toBoardString());
+////		      fe.extractFeatures(position);
+//	    }
+	}
+	
+	private static void testLocationMappings(){
+		// VM needs argument -ea for asserts to be enabled
+		assert(getLocation(0) == 0); 
+		assert(getLocation(5) == 2);
+		assert(getLocation(10) == 6);
+		assert(getLocation(15) == 4);
+		assert(getLocation(57) == 29);
 	}
 	
 	public static void main(String[] args){
-		// testPieceTypes();
+		testLocationMappings();
+		testMovementFeatures();
 
 	}
 	
