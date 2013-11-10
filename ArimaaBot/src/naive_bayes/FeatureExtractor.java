@@ -54,7 +54,7 @@ public class FeatureExtractor{
 
 		// Generate the current game state by applying move on the previous game state
 		curr = new GameState();
-		curr.play(current_move, prev);
+		curr.playFullClear(current_move, prev);
 		calculatePieceTypes();
 
 		// feature extraction subroutine calls here
@@ -153,7 +153,7 @@ public class FeatureExtractor{
 	};
 
 
-	private static void testMovementFeatures(){
+	private static void testMovementFeatures1() {
 		
 		// data from first game in "games" relation
 	    String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
@@ -164,16 +164,35 @@ public class FeatureExtractor{
 	    
 	    System.out.println(fe.featureVector.toString());
 	    
+	    assert(fe.featureVector.get(620));
+	    assert(fe.featureVector.get(68));
+	    assert(fe.featureVector.get(101));
+	    assert(fe.featureVector.get(586));
+	    assert(fe.featureVector.get(590));
+	    
 	    System.out.println(startState.toBoardString());
 	    System.out.println(fe.curr.toBoardString());
-
-
 	    
 //	    for (String text : tests) {
 //		      GameState position = new GameState(text);
 //		      System.out.println(position.toBoardString());
 ////		      fe.extractFeatures(position);
 //	    }
+	}
+	
+	private static void testMovementFeatures2() {
+	    GameState startState = new GameState(tests[2]);
+	    FeatureExtractor fe = new FeatureExtractor(startState, null);
+	    fe.extractFeatures(new ArimaaMove("db6e dc6x ce5s ce4s ce3s"));
+
+	    assert(fe.featureVector.get(339));
+	    assert(fe.featureVector.get(341));
+	    assert(fe.featureVector.get(849));
+	    assert(fe.featureVector.get(874));
+	    
+	    System.out.println(fe.featureVector.toString());
+	    System.out.println(startState.toBoardString());
+	    System.out.println(fe.curr.toBoardString());
 	}
 	
 	private static void testLocationMappings(){
@@ -187,7 +206,8 @@ public class FeatureExtractor{
 	
 	public static void main(String[] args){
 		testLocationMappings();
-		testMovementFeatures();
+		testMovementFeatures1();
+		testMovementFeatures2();
 
 	}
 	
