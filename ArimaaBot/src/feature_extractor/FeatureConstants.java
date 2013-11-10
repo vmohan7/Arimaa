@@ -31,8 +31,15 @@ public interface FeatureConstants {
 		public static final byte THREE_E  = 6;
 		/** 4 pieces touching trap (indifferent to presence of elephant) */
 		public static final byte FOUR     = 7;
+		/** The number of possible TrapStatus-es for a given player and trap */
+		public static final byte NUM_STATUSES = 8;
 	}
 	
+	public static class FeatureRange {
+		
+		/** There are 512 Trap Status features set by the TrapExtractor class. */
+		public static final int TRAP_STATUS_START = 1040, TRAP_STATUS_END = 1551;
+	}
 	
 	
 	

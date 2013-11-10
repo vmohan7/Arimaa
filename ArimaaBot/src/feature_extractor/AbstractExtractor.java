@@ -1,13 +1,15 @@
 package feature_extractor;
 
+import arimaa3.Constants;
 import java.util.BitSet;
+
 
 /** The abstract superclass of all extractors that will be used to add to the
  *  feature BitSet, for use by the FeatureExtactor class. The FeatureExtractor
  *  class itself will not extend this class.
  *  <p> Implements FeatureConstants
  *  <br> Supports updating a BitSet */
-public abstract class AbstractExtractor implements FeatureConstants {
+public abstract class AbstractExtractor implements FeatureConstants, Constants {
 	
 	/** Updates the BitSet -- should be declared static when implemented. Only
 	 *  a portion of the entire BitSet will be set by a particular extractor class. 
