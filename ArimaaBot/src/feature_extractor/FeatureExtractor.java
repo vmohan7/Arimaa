@@ -1,10 +1,12 @@
 package feature_extractor;
+import java.util.ArrayList;
 import java.util.BitSet;
+
 import feature_extractor.FeatureConstants.TrapStatus;
 import ai_util.LogFile;
 import arimaa3.*;
 
-public class FeatureExtractor {
+public class FeatureExtractor implements Constants {
 	
 	private static final int NUM_FEATURES = 1040; //TODO update this as you add more features
 	
@@ -153,11 +155,74 @@ public class FeatureExtractor {
 		assert(getLocation(57) == 29);
 	}
 	
+	
+	private static void testElephantTouchingTraps() {
+		long neighboringTrapSpots = 0;
+		for (int trap = 0; trap < TOUCH_TRAP.length; trap++) 
+			neighboringTrapSpots |= TOUCH_TRAP[trap];
+		
+		GameState gsWhite = new GameState();
+		GameState gsBlack = new GameState();
+		
+		for (int board = 0; board < 64; board++) { //check 64 boards, elephant in different spot each time
+			//System.out.println("\n\n ----- BOARD " + board + " ----- \n");
+			
+			gsWhite.piece_bb[PT_WHITE_ELEPHANT] = 1L << board;
+			gsBlack.piece_bb[PT_BLACK_ELEPHANT] = 1L << board;
+			//System.out.println(gsWhite.toBoardString());
+			//System.out.println(gsBlack.toBoardString());
+			boolean whiteEleph = false, blackEleph = false;
+			for (int trap = 0; trap < 4; trap++) {
+				whiteEleph = whiteEleph || TrapExtractor.isElephantTouchingTrap(gsWhite, trap, PL_WHITE);
+				blackEleph = blackEleph || TrapExtractor.isElephantTouchingTrap(gsBlack, trap, PL_BLACK);
+			}
+			
+			boolean onTrap = (neighboringTrapSpots & (1L << board)) != 0;
+			if (onTrap != whiteEleph)
+				System.err.printf("White elephant: board %d, position %x. onTrap is %b\n", board, 1L << board, onTrap);
+			if (onTrap != blackEleph)
+				System.err.printf("Black elephant: board %d, position %x. onTrap is %b\n", board, 1L << board, onTrap);
+		}
+	}
+	
+	private static void testGetTrapStatus() {
+		String white1 = "Eb3 Rc2"; //expect TWO_E == 4
+		String black1 = "ed3 rc4"; //expect TWO_E == 4
+		
+		String white2 = "Rf6 Df5 Cf7"; //expect TWO_NE == 3
+		String black2 = "rf6 df5 cf7"; //expect TWO_NE == 3
+		
+		String mixedW1 = "Ec7 Dd6 Cc5"; //expect THREE_E == 6
+		String mixedB1 = "rb6"; //expect ONE_NE == 1
+		
+		GameState gs1 = new GameState(white1, black1);
+		GameState gs2 = new GameState(white2, black2);
+		GameState gsMixed = new GameState(mixedW1, mixedB1);
+		
+		ArrayList<GameState> arr = new ArrayList<GameState>();
+		arr.add(gs1); arr.add(gs2); arr.add(gsMixed);
+		
+		int count = 1;
+		for (GameState gs : arr) {
+			for (int trap = 0; trap < 4; trap++) {
+				byte wStatus = TrapExtractor.getTrapStatus(gs, trap, PL_WHITE);
+				byte bStatus = TrapExtractor.getTrapStatus(gs, trap, PL_BLACK);
+				
+				System.out.printf("\nTrap %d, Game %d, Player WHITE, Status %d\n", trap, count, wStatus);
+				System.out.printf("Trap %d, Game %d, Player BSTATUS, Status %d\n", trap, count, bStatus);
+			}
+			count++;
+		}
+	}
+	
 	public static void main(String[] args){
-		testLocationMappings();
-		testMovementFeatures1();
-		testMovementFeatures2();
-
+//		testLocationMappings();
+//		testMovementFeatures1();
+//		testMovementFeatures2();
+		
+		//vmnz tests
+		testElephantTouchingTraps();
+		testGetTrapStatus();
 	}
 	
 }
