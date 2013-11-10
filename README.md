@@ -51,3 +51,4 @@ It shows which features (from David Wu's paper) correspond to which bits of our 
 | Feature | Range of Bits |
 | ------ |:---:|
 | Position + Movement | 0 - 1039 |
+| Trap Status | 1040 - 1551 |
