@@ -12,45 +12,49 @@ public class FeatureExtractor{
 	private static final int NUM_PIECE_TYPES = 8;
 	private static final int DEFAULT_CAPTURE_LOCATION = 32;
 	
+	/* Move that changed prev to curr */
+	private ArimaaMove current_move;
+	
 	/* Game state resulting from a move that we are extracting feature vectors for */
 	private GameState curr;
 	
-	/* Original game state that is one move behind curr (i.e. before trying all possible moves from prev)*/
+	/* Original game state that is one move behind curr (i.e. before trying all possible moves from prev) */
 	private GameState prev;
 	
 	private GameState prev_prev;
-	
-	/* "Expert" move actually played by person/bot in training data from prev game state */
-	private ArimaaMove expert_move;
 	
 	/* Piece category --> type mapping in curr GameState. E.g. if piece_types[3] = 4, this means that "black cat" 
 	 * is of piece type 4 for the current GameState. */
 	private byte piece_types[];
 	
 	private BitSet featureVector;
-	
-	/* Move that changed prev to curr */
-	private ArimaaMove current_move;
-	
-	public FeatureExtractor(GameState prev, ArimaaMove expert_move) {
-		this.expert_move = expert_move;
+		
+	public FeatureExtractor(GameState prev, GameState prev_prev) {
 		this.prev = prev;
-		prev_prev = null;
+		this.prev_prev = null;
 		curr = null;
 		featureVector = null;
 		current_move = null;
-		piece_types = new byte[12];
+		piece_types = null; 
 	}
 	
 	/*
 	 * Extracts features for the resulting board after playing a possible legal move.
-	 * current_board is the resulting board after playing current_move on prev game state
+	 * current_board is the resulting board after playing current_move on prev game state.
+	 * 
+	 * NOTE: none of this has been tested
 	 */
-	public BitSet extractFeatures(GameState current_board, ArimaaMove current_move){
+	public BitSet extractFeatures(ArimaaMove current_move){
 		featureVector = new BitSet(NUM_FEATURES);
-		curr = current_board;
+		piece_types = new byte[12];
+
 		this.current_move = current_move;
+
+		// Generate the current game state by applying move on the previous game state
+		curr = new GameState();
+		curr.play(current_move, prev);
 		calculatePieceTypes();
+
 		// feature extraction subroutine calls here
 		
 		generateMovementFeatures();
@@ -62,36 +66,29 @@ public class FeatureExtractor{
 		
 		long[] move_bb = current_move.piece_bb;
 		for(int i = 0; i < 12; i++) {
-			long source = curr.piece_bb[i] & move_bb[i];
-			long dest = source ^ move_bb[i];
-			updateBitSetMovementFeatures(source, dest, i);
+			long source = curr.piece_bb[i] & move_bb[i]; // this long encodes all the source locations of pieces that moved this turn
+			long dest = source ^ move_bb[i]; // this long encodes all destination locations of pieces that moved this turn
+			int player = (i % 2==0) ? 0 : 1; // player is 0 (white) if piece_id is even
+			updateBitSetMovementFeatures(source, dest, piece_types[i], player);
 		}
 	}
 
-	private void updateBitSetMovementFeatures(long source, long dest, int piece_id) {
-		//TODO captures
-		int player = (piece_id%2==0) ? 0 : 1; //white if even
-		//higher rows are at the most significant bits
+	private void updateBitSetMovementFeatures(long source, long dest, byte piece_type, int player) {
+		// higher rows are at the most significant bits		
+		// Loop across each of 64 bits in source and dest, and set features on featureVector accordingly. 
 		for(int i = 0; i < Long.SIZE; i++) {
 			if((source & (1L << i)) > 0) {
-				setSrcMovementFeature(player, piece_types[piece_id], getLocation(i));
+				setSrcMovementFeature(player, piece_type, getLocation(i));
 			}
 			if((dest & (1L << i)) > 0) {
-				setDestMovementFeature(player, piece_types[piece_id], getLocation(i));
+				setDestMovementFeature(player, piece_type, getLocation(i));
 			}
-			if(countOneBits(source) > countOneBits(dest)) {
-				setDestMovementFeature(player, piece_types[piece_id], DEFAULT_CAPTURE_LOCATION);
-			}
+		}
+		if(countOneBits(source) > countOneBits(dest)) { // a piece of type "piece_id" has been captured
+			setDestMovementFeature(player, piece_type, DEFAULT_CAPTURE_LOCATION);
 		}
 	}
 	
-	private int getLocation(int index) {
-		int row = index >> 3;
-		index = index & 0x07; //reduces all rows to the same indices as first row
-		index = (index > 3) ? 7 - index : index;
-		return index + row << 2;
-	}
-
 	private void setSrcMovementFeature(int player, int piece_type, int location) {
 		int index = player*NUM_PIECE_TYPES*NUM_LOCATIONS + piece_type*NUM_LOCATIONS + location;
 		featureVector.set(index);
@@ -103,19 +100,18 @@ public class FeatureExtractor{
 	}
 	
 	/*
-	 * This moves forward one move in the training data by passing in the actual move played
-	 * (expert_move) and the resulting board.
+	 * Maps from board index between 0-63 to board index between 0-31, leveraging 
+	 * the vertical symmetry of the board. 
 	 */
-	public void incrementMove(GameState new_board, ArimaaMove expert_move){
-		this.expert_move = expert_move;
-		prev_prev = prev;
-		prev = new_board;
+	private int getLocation(int index) {
+		int row = index >> 3;
+		index = index & 0x07; //reduces all rows to the same indices as first row
+		index = (index > 3) ? 7 - index : index;
+		return index + row << 2;
 	}
-	
+
 	// Calculates the piece type (e.g. 3) for each piece category (e.g. black dog).
 	private void calculatePieceTypes(){
-		// compute_secondary_bitboards has to have been called, so
-		// that stronger_enemy_bb is up-to-date.
 		
 		for (int i = 0; i < 2; i++){ // calculate for rabbits 
 			byte numStronger = countOneBits(curr.stronger_enemy_bb[i]);
