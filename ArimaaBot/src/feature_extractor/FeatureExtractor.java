@@ -1,5 +1,5 @@
-package naive_bayes;
-import naive_bayes.FeatureConstants.TrapStatus;
+package feature_extractor;
+import feature_extractor.FeatureConstants.TrapStatus;
 import ai_util.LogFile;
 import arimaa3.*;
 
