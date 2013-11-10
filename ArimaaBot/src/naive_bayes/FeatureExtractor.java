@@ -27,6 +27,10 @@ public class FeatureExtractor{
 		piece_types = new byte[12];
 	}
 	
+	private void extractTrapStatus(GameState current_board){
+		
+	}
+	
 	public void extractFeatures(GameState current_board){
 		curr = current_board;
 		calculatePieceTypes();
