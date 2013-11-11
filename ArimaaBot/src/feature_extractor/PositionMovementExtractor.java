@@ -57,12 +57,12 @@ public class PositionMovementExtractor extends AbstractExtractor {
 	}
 	
 	private void setSrcMovementFeature(int player, int piece_type, int location) {
-		int index = player*NUM_PIECE_TYPES*NUM_LOCATIONS + piece_type*NUM_LOCATIONS + location;
+		int index = START_INDEX + player*NUM_PIECE_TYPES*NUM_LOCATIONS + piece_type*NUM_LOCATIONS + location;
 		featureVector.set(index);
 	}
 	
 	private void setDestMovementFeature(int player, int piece_type, int location) {
-		int index = NUM_SRC_MVMT + player*NUM_PIECE_TYPES*(NUM_LOCATIONS+1) + piece_type*(NUM_LOCATIONS+1) + location;
+		int index = START_INDEX + NUM_SRC_MVMT + player*NUM_PIECE_TYPES*(NUM_LOCATIONS+1) + piece_type*(NUM_LOCATIONS+1) + location;
 		featureVector.set(index);
 	}
 	
