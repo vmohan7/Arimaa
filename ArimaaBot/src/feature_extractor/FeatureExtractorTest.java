@@ -130,7 +130,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	}
 	
 	@Test
-	public void testBitCodes() {
+	public void testBitCodes() { //TODO: Set the bit indices for the games--try different games?
 		BitSet bitset = new BitSet(FeatureRange.TRAP_STATUS_END + 1);
 		
 		String[] whitesBlacks = {  
@@ -165,7 +165,6 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 			
 			TrapExtractor te = new TrapExtractor(prev, gs);
 			te.updateBitSet(bitset);
-			
 			assertTrue(bitset.cardinality() == 8);
 			
 			//check whiteBits
