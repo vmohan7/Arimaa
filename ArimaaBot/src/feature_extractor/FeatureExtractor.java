@@ -27,7 +27,7 @@ public class FeatureExtractor implements Constants {
 	private byte piece_types[];
 	
 	/* The feature vector corresponding to current_move. */ 
-	private BitSet featureVector;
+	BitSet featureVector;
 		
 	public FeatureExtractor(GameState prev, GameState prev_prev) {
 		this.prev = prev;
@@ -37,7 +37,6 @@ public class FeatureExtractor implements Constants {
 		current_move = null;
 		piece_types = null; 
 	}
-	
 
 	/*
 	 * Extracts features for the resulting board after playing a possible legal move.
@@ -239,5 +238,5 @@ public class FeatureExtractor implements Constants {
 		testGetTrapStatus();
 		testBitCodes();
 	}
-	
+
 }
