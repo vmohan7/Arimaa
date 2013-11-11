@@ -25,7 +25,7 @@ public class FeatureExtractor {
 	private byte piece_types[];
 	
 	/* The feature vector corresponding to current_move. */ 
-	private BitSet featureVector;
+	BitSet featureVector;
 		
 	public FeatureExtractor(GameState prev, GameState prev_prev) {
 		this.prev = prev;
@@ -35,7 +35,7 @@ public class FeatureExtractor {
 		current_move = null;
 		piece_types = null; 
 	}
-	
+
 	/*
 	 * Extracts features for the resulting board after playing a possible legal move.
 	 * current_board is the resulting board after playing current_move on prev game state.
@@ -100,63 +100,4 @@ public class FeatureExtractor {
 			n &= n - 1; // clear the least significant bit set
 		return c;
 	}
-	
-	private static String tests[] = {
-		"12w %13 +-----------------+%138|                 |%137|                 |%136|   R             |%135|                 |%134|                 |%133|         D   r   |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
-		"12w %13 +-----------------+%138|                 |%137|                 |%136|   R             |%135|                 |%134|                 |%133|             r   |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
-		"2w %13 +-----------------+%138| r r   H r r r r |%137|   e   C r   r   |%136|   d X     X     |%135|   d R M c       |%134|       R         |%133|     X     X     |%132|                 |%131|       R       R |%13 +-----------------+%13   a b c d e f g h%13",
-	};
-
-	private static void testMovementFeatures1() {
-		
-		// data from first game in "games" relation
-	    String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
-	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
-	    GameState startState = new GameState(white,black);
-	    FeatureExtractor fe = new FeatureExtractor(startState, null);
-	    fe.extractFeatures(new ArimaaMove("Db2n Ha2n Ha3n Hh2n"));
-	    
-	    System.out.println(fe.featureVector.toString());
-	    
-	    assert(fe.featureVector.get(620));
-	    assert(fe.featureVector.get(68));
-	    assert(fe.featureVector.get(101));
-	    assert(fe.featureVector.get(586));
-	    assert(fe.featureVector.get(590));
-	    
-	    System.out.println(startState.toBoardString());
-	    System.out.println(fe.curr.toBoardString());
-	}
-	
-	private static void testMovementFeatures2() {
-	    GameState startState = new GameState(tests[2]);
-	    FeatureExtractor fe = new FeatureExtractor(startState, null);
-	    fe.extractFeatures(new ArimaaMove("db6e dc6x ce5s ce4s ce3s"));
-
-	    assert(fe.featureVector.get(339));
-	    assert(fe.featureVector.get(341));
-	    assert(fe.featureVector.get(849));
-	    assert(fe.featureVector.get(874));
-	    
-	    System.out.println(fe.featureVector.toString());
-	    System.out.println(startState.toBoardString());
-	    System.out.println(fe.curr.toBoardString());
-	}
-	
-	private static void testLocationMappings(){
-		// VM needs argument -ea for asserts to be enabled
-		assert(getLocation(0) == 0); 
-		assert(getLocation(5) == 2);
-		assert(getLocation(10) == 6);
-		assert(getLocation(15) == 4);
-		assert(getLocation(57) == 29);
-	}
-	
-	public static void main(String[] args){
-		testLocationMappings();
-		testMovementFeatures1();
-		testMovementFeatures2();
-
-	}
-	
 }
