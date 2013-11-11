@@ -215,6 +215,20 @@ public class FeatureExtractor implements Constants {
 		}
 	}
 	
+	private static void testBitCodes() {
+		BitSet bitset = new BitSet(1552);
+		
+		String mixedW1 = "Ec7 Dd6 Cc5"; //expect THREE_E == 6
+		String mixedB1 = "rb6"; //expect ONE_NE == 1
+		
+		GameState gsMixed = new GameState(mixedW1, mixedB1);
+		
+		TrapExtractor te = new TrapExtractor(gsMixed, gsMixed);
+		te.updateBitSet(bitset);
+		System.out.println(bitset);
+		
+	}
+	
 	public static void main(String[] args){
 //		testLocationMappings();
 //		testMovementFeatures1();
@@ -223,6 +237,7 @@ public class FeatureExtractor implements Constants {
 		//vmnz tests
 		testElephantTouchingTraps();
 		testGetTrapStatus();
+		testBitCodes();
 	}
 	
 }
