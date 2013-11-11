@@ -2,9 +2,9 @@ package feature_extractor;
 import java.util.BitSet;
 import arimaa3.*;
 
-public class FeatureExtractor implements Constants {
+public class FeatureExtractor implements Constants, FeatureConstants {
 	
-	private static final int NUM_FEATURES = 1040; //TODO update this as you add more features
+	private static final int NUM_FEATURES = FeatureRange.TRAP_STATUS_END + 1; //TODO update this as you add more features
 	
 	/* Move for which we are extracting features. This changes every time extractFeatures() is called. */
 	private ArimaaMove current_move;

@@ -34,6 +34,9 @@ public interface FeatureConstants {
 		/** The number of possible TrapStatus-es for a given player and trap */
 		public static final byte NUM_STATUSES = 8;
 		
+		/** Converts the number of pieces touching (the trap) + presence of an elephant
+		 * to one of the NUM_STATUSES statuses. (See TrapStatus class' comment for an
+		 * explanation.)*/
 		public static byte convertToStatus(byte numAdjacent, boolean elephant) {
 			if (numAdjacent == 0) return ZERO;
 			if (numAdjacent == 4) return FOUR;
@@ -42,7 +45,12 @@ public interface FeatureConstants {
 		}
 	}
 	
+	/** FeatureRange contains the constants describing the <i>start</i> and <i>end</i>
+	 *  indices (in the FeatureExtractor's BitSet) of the different AbstractExtractor subclasses. */
 	public static class FeatureRange {
+		
+		/** There are 1040 Position Movement features set by the PositionMovementExtractor class. */
+		public static final int POS_MVMT_START = 0, POS_MVMT_END = 1039;
 		
 		/** There are 512 Trap Status features set by the TrapExtractor class. */
 		public static final int TRAP_STATUS_START = 1040, TRAP_STATUS_END = 1551;

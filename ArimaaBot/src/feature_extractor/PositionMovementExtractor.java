@@ -6,8 +6,8 @@ import arimaa3.*;
 
 public class PositionMovementExtractor extends AbstractExtractor {
 
-	private static final int START_INDEX = 0;
-	private static final int END_INDEX = 1039;
+	private static final int START_INDEX = FeatureRange.POS_MVMT_START;
+	private static final int END_INDEX = FeatureRange.POS_MVMT_END;
 	private static final int NUM_SRC_MVMT = 512;
 	private static final int NUM_LOCATIONS = 32;
 	private static final int NUM_PIECE_TYPES = 8;
