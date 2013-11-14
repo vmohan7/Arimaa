@@ -7,6 +7,13 @@ public class ArimaaState {
 	private GameState prev_prev, prev, curr;
 	private ArimaaMove move;
 	
+	/** 
+	 * <b>A struct with 4 fields:</b> 
+	 *  <br>1. previous previous game state, 
+	 *  <br>2. previous game state,
+	 *  <br>3. current game state,
+	 *  <br>4. the move from previous to current
+	 * */
 	public ArimaaState(GameState prev_prev, GameState prev, GameState curr, ArimaaMove move) {
 		this.prev_prev = prev_prev;
 		this.prev = prev;
