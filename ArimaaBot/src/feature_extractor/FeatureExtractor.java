@@ -3,9 +3,7 @@ import java.util.BitSet;
 import arimaa3.*;
 
 public class FeatureExtractor implements Constants, FeatureConstants {
-	
-	private static final int NUM_FEATURES = FeatureRange.TRAP_STATUS_END + 1; //TODO update this as you add more features
-	
+		
 	/* Move for which we are extracting features. This changes every time extractFeatures() is called. */
 	private ArimaaMove current_move;
 	
@@ -39,21 +37,33 @@ public class FeatureExtractor implements Constants, FeatureConstants {
 	 * current_board is the resulting board after playing current_move on prev game state.
 	 */
 	public BitSet extractFeatures(ArimaaMove current_move){
+		
+		// Generate the current game state by applying move on the previous game state
+		GameState currState = new GameState();
+		currState.playFullClear(current_move, prev);
+		return extractFeatures(current_move, currState);
+	}
+	
+	/**
+	 * 
+	 * @param current_move
+	 * @param curr The game state that results from playing current_move to prev
+	 * @return
+	 */
+	public BitSet extractFeatures(ArimaaMove current_move, GameState curr){
 		featureVector = new BitSet(NUM_FEATURES);
 		piece_types = new byte[12];
 
 		this.current_move = current_move;
 
-		// Generate the current game state by applying move on the previous game state
-		curr = new GameState();
-		curr.playFullClear(current_move, prev);
+		this.curr = curr;
 		calculatePieceTypes();
 
 		// feature extraction subroutine calls here
 		
 		(new PositionMovementExtractor(prev, curr, current_move, piece_types)).updateBitSet(featureVector);
 		(new TrapExtractor(prev, curr)).updateBitSet(featureVector);
-		return featureVector;
+		return featureVector;		
 	}
 	
 	/*
