@@ -18,12 +18,14 @@ public class MyDB {
 
 	
 	private static Connection con;
+	private static Statement stmt;
 	
 	static {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://" + MYSQL_DATABASE_SERVER + "/" + MYSQL_DATABASE_NAME;
 			con = DriverManager.getConnection(url, MYSQL_USERNAME, MYSQL_PASSWORD);
+			stmt = con.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.err.println("Update the MySQL constants to correct values!");
@@ -31,10 +33,6 @@ public class MyDB {
 			e.printStackTrace();
 			System.err.println("Add the MySQL jar file to your build path!");
 		}
-	}
-	
-	public static Connection getConnection() {
-		return con;
 	}
 	
 	public static void close() {
@@ -48,7 +46,6 @@ public class MyDB {
 	public static void executeUpdate(String query)
 	{
 		try {
-			Statement stmt = con.createStatement();
 			stmt.executeUpdate(query);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -59,7 +56,6 @@ public class MyDB {
 	public static ResultSet executeQuery(String query)
 	{
 		try {
-			Statement stmt = con.createStatement();
 			return stmt.executeQuery(query);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
