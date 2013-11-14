@@ -16,7 +16,6 @@ public class GameParser {
 		moveList = myGameInfo.getMoveList().split("\\r?\\n"); //split on newlines
 		
 		for (int move = 0; move < moveList.length; move++) {
-			if (moveList[move])
 		}
 	}
 	
