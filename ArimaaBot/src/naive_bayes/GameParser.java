@@ -37,6 +37,8 @@ public class GameParser {
 		
 		ArimaaState tempAS = new ArimaaState(arimaaState);
 		arimaaState.update(new ArimaaMove(moveList[count]));
+		count++;
+		
 		return tempAS;
 	}
 	
