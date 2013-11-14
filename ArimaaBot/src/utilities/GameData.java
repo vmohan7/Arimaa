@@ -1,10 +1,9 @@
-package naive_bayes;
+package utilities;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import naive_bayes.helper_classes.GameInfo;
-import utilities.MyDB;
+import utilities.helper_classes.GameInfo;
 
 import com.mysql.jdbc.Statement;
 

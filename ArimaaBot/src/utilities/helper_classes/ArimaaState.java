@@ -1,4 +1,4 @@
-package naive_bayes.helper_classes;
+package utilities.helper_classes;
 
 import arimaa3.ArimaaMove;
 import arimaa3.GameState;

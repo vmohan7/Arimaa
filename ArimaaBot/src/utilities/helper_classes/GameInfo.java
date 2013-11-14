@@ -1,4 +1,4 @@
-package naive_bayes.helper_classes;
+package utilities.helper_classes;
 
 public class GameInfo {
 	
