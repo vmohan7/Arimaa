@@ -21,15 +21,11 @@ public class FeatureExtractor implements Constants, FeatureConstants {
 	 * that piece id 3 (black cat) is of piece type 4 for the current GameState. This changes every time 
 	 * extractFeatures() is called. */
 	private byte piece_types[];
-	
-	/* The feature vector corresponding to current_move. */ 
-	BitSet featureVector;
 		
 	public FeatureExtractor(GameState prev, GameState prev_prev) {
 		this.prev = prev;
 		this.prev_prev = null;
 		curr = null;
-		featureVector = null;
 		current_move = null;
 		piece_types = null; 
 	}
@@ -39,7 +35,7 @@ public class FeatureExtractor implements Constants, FeatureConstants {
 	 * current_board is the resulting board after playing current_move on prev game state.
 	 */
 	public BitSet extractFeatures(ArimaaMove current_move){
-		featureVector = new BitSet(NUM_FEATURES);
+		BitSet featureVector = new BitSet(NUM_FEATURES);
 		piece_types = new byte[12];
 
 		this.current_move = current_move;
