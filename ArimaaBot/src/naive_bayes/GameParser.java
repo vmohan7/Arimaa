@@ -16,8 +16,7 @@ public class GameParser {
 		return false;
 	}
 	
-	/* obj[0] -> prev; obj[1] -> move; obj[2] -> curr that results from applying move to prev */
-	/**
+	/** TODO: MODIFY THIS COMMENT
 	 *  @return An <b>array of 3 objects</b>:
 	 *    <br>0 - previous board
 	 *    <br>1 - the move itself
@@ -25,7 +24,7 @@ public class GameParser {
 	 *    <br><i> or </i><b>null</b><i> if there are no more game states 
 	 *    			(i.e. the game is over)</i>
 	 */
-	public Object[] getNextGameState() {
+	public ArimaaState getNextGameState() {
 		//return null if no more game states
 		
 		return null;
