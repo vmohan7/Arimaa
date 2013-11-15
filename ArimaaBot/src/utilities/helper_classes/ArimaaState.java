@@ -3,47 +3,56 @@ package utilities.helper_classes;
 import arimaa3.ArimaaMove;
 import arimaa3.GameState;
 
+/** 
+ * <b>A struct with 3 fields:</b> 
+ *  <br>1. previous game state,
+ *  <br>2. current game state,
+ *  <br>3. the (expert) move from current to the next (expert) position 
+ * */
 public class ArimaaState {
 	private GameState prev, curr;
-	private ArimaaMove move;
+	private ArimaaMove nextMove;
 	
-	/** 
-	 * <b>A struct with 3 fields:</b> 
-	 *  <br>1. previous game state,
-	 *  <br>2. current game state,
-	 *  <br>3. the move from previous to current
+	/**
+	 * @param prev previous game state
+	 * @param curr current game state
+	 * @param nextMove the (expert) move from current to the next (expert) position
 	 * */
-	public ArimaaState(GameState prev, GameState curr, ArimaaMove move) {
+	public ArimaaState(GameState prev, GameState curr, ArimaaMove nextMove) {
 		this.prev = prev;
 		this.curr = curr;
-		this.move = move;
+		this.nextMove = nextMove;
 	}
 	
 	/** Copy constructor for an ArimaaState */
 	public ArimaaState(ArimaaState toCopy) {
 		this.prev = toCopy.getPrev();
 		this.curr = toCopy.getCurr();
-		this.move = toCopy.getMove();
+		this.nextMove = toCopy.getNextMove();
 	}
 	
 	/** Constructor for initializing an ArimaaState at the beginning of a game. */
-	public ArimaaState(GameState startOfGame) {
-		this(null, startOfGame, null);
+	public ArimaaState(GameState startOfGame, ArimaaMove nextMove) {
+		this(null, startOfGame, nextMove);
 	}
 	
 	/** 
-	 * Updates the fields of an ArimaaState given a move to be played.
+	 * Updates the fields of an ArimaaState given the move after next move 
+	 * to be played. (ArimaaState stores the move after current, and plays the
+	 * stored move.)
+	 * @param nextNextMove updates ArimaaState's nextMove field once that stored
+	 * move is played. 
 	 * */
-	public void update(ArimaaMove nextMove) {
+	public void update(ArimaaMove nextNextMove) {
 		prev = curr;
 		
 		GameState next = new GameState();
-		next.playFullClear(nextMove, curr);
+		next.playFullClear(nextMove, curr); 
 		curr = next;
-		move = nextMove;
+		nextMove = nextNextMove;
 	}
 
 	public GameState getPrev() { return prev; }
 	public GameState getCurr() { return curr; }
-	public ArimaaMove getMove() { return move; }
+	public ArimaaMove getNextMove() { return nextMove; }
 }

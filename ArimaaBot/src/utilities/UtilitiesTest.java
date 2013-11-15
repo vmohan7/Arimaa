@@ -68,12 +68,14 @@ public class UtilitiesTest {
 			ArimaaState as = gp.getNextGameState();
 			assertTrue(as.getPrev() == prev);
 			
+			//System.out.println(as.getCurr().toBoardString());
+			
 			prev = as.getCurr();
 			loopCount++;
 		}
 		
 		assertTrue(gp.getNextGameState() == null);
-		assertTrue(loopCount == 4); //1 initially + 3 for each move
+		assertTrue(loopCount == 3); //3 == numMoves
 	}
 
 }
