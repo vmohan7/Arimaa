@@ -5,12 +5,8 @@ import java.sql.SQLException;
 
 import utilities.helper_classes.GameInfo;
 
-import com.mysql.jdbc.Statement;
-
 public class GameData {
 	private ResultSet filteredGames; 
-	private int numGames;
-	private double trainFraction;
 	private double firstTestGame;
 	private Mode myMode;
 	
@@ -24,8 +20,6 @@ public class GameData {
 	}
 	
 	public GameData(int numGames, double trainFraction){
-		this.numGames = numGames;
-		this.trainFraction = trainFraction;
 		this.firstTestGame = trainFraction * numGames + 1;
 		setMode(Mode.TRAIN);
 		
@@ -33,7 +27,6 @@ public class GameData {
 		try {
 			filteredGames.next();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -48,7 +41,6 @@ public class GameData {
 			else return true;
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
@@ -65,7 +57,6 @@ public class GameData {
 			return ret;
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

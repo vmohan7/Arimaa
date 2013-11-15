@@ -57,5 +57,7 @@ public interface FeatureConstants {
 	}
 	
 	
+	/** The total number of features in our feature vector. UPDATE this as we add more features. */
+	public static final int NUM_FEATURES = FeatureRange.TRAP_STATUS_END + 1;
 	
 }

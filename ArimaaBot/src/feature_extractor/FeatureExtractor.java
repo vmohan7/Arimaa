@@ -4,14 +4,6 @@ import arimaa3.*;
 
 public class FeatureExtractor implements Constants, FeatureConstants {
 	
-	private static final int NUM_FEATURES = FeatureRange.TRAP_STATUS_END + 1; //TODO update this as you add more features
-	
-	/* Move for which we are extracting features. This changes every time extractFeatures() is called. */
-	private ArimaaMove current_move;
-	
-	/* Game state resulting from current_move. This changes every time extractFeatures() is called. */
-	private GameState curr;
-	
 	/* Starting game state from which we play current_move */
 	private GameState prev;
 	
@@ -25,8 +17,6 @@ public class FeatureExtractor implements Constants, FeatureConstants {
 	public FeatureExtractor(GameState prev, GameState prev_prev) {
 		this.prev = prev;
 		this.prev_prev = null;
-		curr = null;
-		current_move = null;
 		piece_types = null; 
 	}
 
@@ -35,21 +25,31 @@ public class FeatureExtractor implements Constants, FeatureConstants {
 	 * current_board is the resulting board after playing current_move on prev game state.
 	 */
 	public BitSet extractFeatures(ArimaaMove current_move){
+	
+		// Generate the current game state by applying move on the previous game state
+		GameState currState = new GameState();
+		currState.playFullClear(current_move, prev);
+		return extractFeatures(current_move, currState);
+	}
+	
+	/**
+	 * 
+	 * @param current_move
+	 * @param curr The game state that results from playing current_move to prev
+	 * @return
+	 */
+	public BitSet extractFeatures(ArimaaMove current_move, GameState curr){
 		BitSet featureVector = new BitSet(NUM_FEATURES);
 		piece_types = new byte[12];
 
-		this.current_move = current_move;
 
-		// Generate the current game state by applying move on the previous game state
-		curr = new GameState();
-		curr.playFullClear(current_move, prev);
-		calculatePieceTypes();
+		calculatePieceTypes(curr);
 
 		// feature extraction subroutine calls here
 		
 		(new PositionMovementExtractor(prev, curr, current_move, piece_types)).updateBitSet(featureVector);
 		(new TrapExtractor(prev, curr)).updateBitSet(featureVector);
-		return featureVector;
+		return featureVector;		
 	}
 	
 	/*
@@ -64,7 +64,7 @@ public class FeatureExtractor implements Constants, FeatureConstants {
 	}
 
 	// Calculates the piece type (e.g. 3) for each piece id (e.g. black dog) for the current game state.
-	private void calculatePieceTypes(){
+	private void calculatePieceTypes(GameState curr){
 		
 		for (int i = 0; i < 2; i++){ // calculate for rabbits 
 			byte numStronger = countOneBits(curr.stronger_enemy_bb[i]);
