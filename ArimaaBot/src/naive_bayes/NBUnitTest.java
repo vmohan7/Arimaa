@@ -22,7 +22,7 @@ public class NBUnitTest {
 
 	@Test
 	public void testGetFeaturesFromMove() {
-		long[][] frequencyTable = new long[FeatureConstants.NUM_FEATURES][2];
+		long[][] frequencyTable = new long[2][FeatureConstants.NUM_FEATURES];
 		
 		GameState curr = new GameState(tests[3]); // TODO: initialize these to sensical values
 		
@@ -39,18 +39,18 @@ public class NBUnitTest {
 //		}
 		NBTrain.trainOnTurn(frequencyTable, myState, myEngine);
 		
-		assertTrue(frequencyTable[245][0] == 10);
-		assertTrue(frequencyTable[245][1] == 1);
-		assertTrue(frequencyTable[763][0] == 1);
-		assertTrue(frequencyTable[767][0] == 1);
-		assertTrue(frequencyTable[768][0] == 1);
-		assertTrue(frequencyTable[769][1] == 1);
-		assertTrue(frequencyTable[770][0] == 2);
-		assertTrue(frequencyTable[771][0] == 1);
-		assertTrue(frequencyTable[772][0] == 1);
-		assertTrue(frequencyTable[773][0] == 1);
-		assertTrue(frequencyTable[774][0] == 1);
-		assertTrue(frequencyTable[775][0] == 1);
+		assertTrue(frequencyTable[0][245] == 10);
+		assertTrue(frequencyTable[1][245] == 1);
+		assertTrue(frequencyTable[0][763] == 1);
+		assertTrue(frequencyTable[0][767] == 1);
+		assertTrue(frequencyTable[0][768] == 1);
+		assertTrue(frequencyTable[1][769] == 1);
+		assertTrue(frequencyTable[0][770] == 2);
+		assertTrue(frequencyTable[0][771] == 1);
+		assertTrue(frequencyTable[0][772] == 1);
+		assertTrue(frequencyTable[0][773] == 1);
+		assertTrue(frequencyTable[0][774] == 1);
+		assertTrue(frequencyTable[0][775] == 1);
 //		for(int i = 0; i< frequencyTable.length; i++) {
 //				if(frequencyTable[i][0]!=0) {
 //					System.out.println("Non-expert Move: Feature :" + i + " Count: " + frequencyTable[i][0]);

@@ -9,9 +9,6 @@ import feature_extractor.FeatureExtractor;
 import utilities.helper_classes.ArimaaState;
 import utilities.helper_classes.GameInfo;
 
-import java.util.Comparator;
-import java.util.PriorityQueue;
-
 public class HypothesisTest {
 	
 	/** Runs evaluation based on the 30% of the data that is in GameData
@@ -49,21 +46,21 @@ public class HypothesisTest {
 		MoveList possibleMoves = ai.genRootMoves(arimaaState.getCurr());
 		
 		int numAbove = 0;
-		int totalMoves = possibleMoves.size();
-		BitSet bs = fe.extractFeatures( arimaaState.getNextMove() );
+		ArimaaMove expertMove = arimaaState.getNextMove();
+		BitSet bs = fe.extractFeatures( expertMove );
 		double expertWeight = hyp.evaluate(bs);
 		
 		for (ArimaaMove possibleMove : possibleMoves){
-			if ( !possibleMove.equals( arimaaState.getNextMove() ) ){
+			if ( !possibleMove.equals( expertMove ) ){ //make sure that this is not the expert move
 				bs = fe.extractFeatures(possibleMove);
-				if ( hyp.evaluate(bs) >= expertWeight ){
+				if ( hyp.evaluate(bs) > expertWeight ){ // must be greater than expert in ordering
 					numAbove++;
 				}
 			}
 			
 		}
 		
-		ar.addMove(numAbove, totalMoves);
+		ar.addMove(numAbove, possibleMoves.size());
 	}
 	
 	/** This internal class maintains the aggregate 
@@ -111,7 +108,7 @@ public class HypothesisTest {
 		public String toString(){
 			return String.format("The number of moves classified in the top 5% of the move ordering is : %d\n"+
 									"The average percentage of the move classified is : %f\n", 
-									numInTop5Percent, getAvgEvaluation() );
+									numInTop5Percent, getAvgEvaluation()*100 );
 		}
 
 	}

@@ -16,13 +16,13 @@ public class NBTrain {
 	
 	/**
 	 * @param trainGames The same GameData is instantiated in NaiveBayes and passed onto NBTest after training
-	 * @return Matrix (of dimension numFeatures x 2) representing frequencies of each feature in expert and 
-	 * non-expert training examples. Everything is zero-indexed, and the 0th column is for non-expert moves. 
-	 * E.g. frequencies[10][1] represents the frequency count of feature 10 in expert moves.
+	 * @return Matrix (of dimension 2 x numFeatures) representing frequencies of each feature in expert and 
+	 * non-expert training examples. Everything is zero-indexed, and the 0th row is for non-expert moves. 
+	 * E.g. frequencies[1][10] represents the frequency count of feature 10 in expert moves.
 	 */
 	public static long[][] train(GameData trainGames){
 		
-		long[][] frequencyTable = new long[FeatureConstants.NUM_FEATURES][2];
+		long[][] frequencyTable = new long[2][FeatureConstants.NUM_FEATURES];
 		ArimaaEngine myEngine = new ArimaaEngine(); // used to generate all possible moves
 		
 		// Iterate across all games in training set and extract features for expert and non-expert moves
@@ -69,7 +69,7 @@ public class NBTrain {
 		// Iterate across all set bits in featureVector and increment the appropriate cell in frequencyTable
 		// Warms the cockles of my heart
 		for (int i = featureVector.nextSetBit(0); i != -1; i = featureVector.nextSetBit(i+1))
-		     frequencyTable[i][(isExpertMove)?1:0]++; 
+		     frequencyTable[(isExpertMove)?1:0][i]++; 
 	}
 
 }
