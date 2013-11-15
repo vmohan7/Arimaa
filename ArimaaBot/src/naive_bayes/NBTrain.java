@@ -2,12 +2,20 @@ package naive_bayes;
 
 import java.util.BitSet;
 import java.util.HashSet;
+import java.util.Iterator;
 
+import utilities.GameData;
+import utilities.GameParser;
+import utilities.helper_classes.ArimaaState;
+import utilities.helper_classes.GameInfo;
 import feature_extractor.FeatureConstants;
 import feature_extractor.FeatureExtractor;
+import arimaa3.ArimaaEngine;
+import arimaa3.ArimaaMove;
 import arimaa3.GameState;
-import naive_bayes.helper_classes.ArimaaState;
-import naive_bayes.helper_classes.GameInfo;
+import arimaa3.GenTurn;
+import arimaa3.MoveList;
+
 
 public class NBTrain {
 	
@@ -24,25 +32,34 @@ public class NBTrain {
 		FeatureExtractor myExtractor;
 		BitSet featureVector;
 		long[][] frequencyTable = new long[FeatureConstants.NUM_FEATURES][2];
+		ArimaaEngine myEngine = new ArimaaEngine();
+		MoveList allPossibleMoves;
+		ArimaaMove expertMove;
 		
 		// Iterate across all games in training set and extract features for expert and non-expert moves
 		while (trainGames.hasNextGame()){
 			trainGameInfo = trainGames.getNextGame();
 			myParser = new GameParser(trainGameInfo);
 			
-			// Don't need to extract features for the game's starting state
-			if (myParser.hasNextGameState()) 
-				myParser.getNextGameState();
-			
 			while (myParser.hasNextGameState()){
+				trainOnGame(frequencyTable, myParser.getNextGameState());
 				myState = myParser.getNextGameState();
+				expertMove = myState.getMove();
 				
 				// Extract features for the expert move
-				myExtractor = new FeatureExtractor(myState.getPrev(), myState.getPrev_prev());
-				featureVector = myExtractor.extractFeatures(myState.getMove(), myState.getCurr()); // extract features from expert move
+				myExtractor = new FeatureExtractor(myState.getCurr(), myState.getPrev());
+				featureVector = myExtractor.extractFeatures(expertMove); // extract features from expert move
 				updateFrequencies(featureVector, frequencyTable, true);
 				
 				// Extract features for all non-expert possible moves
+				allPossibleMoves = myEngine.genRootMoves(myState.getCurr()); // upper limit of 400,000 possible moves
+				
+				for (ArimaaMove possibleMove : allPossibleMoves){
+					if (!possibleMove.equals(expertMove)){
+						featureVector = myExtractor.extractFeatures(possibleMove); // extract features from non-expert move
+						updateFrequencies(featureVector, frequencyTable, false);
+					}
+				}
 			}
 		}
 		
@@ -51,6 +68,12 @@ public class NBTrain {
 		return null;
 	}
 	
+	private static void trainOnGame(long[][] frequencyTable,
+			ArimaaState nextGameState) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * 
 	 * @param featureVector 
@@ -62,20 +85,5 @@ public class NBTrain {
 		     frequencyTable[i][(isExpertMove)?1:0]++;
 		 }
 	}
-	/*
-	 * 
-	public double[][] frequencies train(GameData myGames)
-		for each training game from GameData 
-		    GameParser(game…);
-		    while myGameParser.hasNextGameState()
-		        Get states and move from myGameParser.getNextGameState()
-		        expertVector = getFeatureVector(expertMove)
-		        updateFreq(expertVector, y=1)
-		        legalMoves = generateLegalMoves(prevState)
-		        for each legalMove in legalMoves (excluding the expert move)
-		            notExpertVector = getFeatureVector(legalMove)
-		            updateFreq(notExpertVector, y=0)
-	 * 
-	 */
 
 }
