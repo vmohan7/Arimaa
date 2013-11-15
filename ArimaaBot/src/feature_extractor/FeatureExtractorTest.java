@@ -27,15 +27,15 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
 	    GameState startState = new GameState(white,black);
 	    FeatureExtractor fe = new FeatureExtractor(startState, null);
-	    fe.extractFeatures(new ArimaaMove("Db2n Ha2n Ha3n Hh2n"));
+	    BitSet bs = fe.extractFeatures(new ArimaaMove("Db2n Ha2n Ha3n Hh2n"));
 	    
 //	    System.out.println(fe.featureVector.toString());
-	    
-	    assertTrue(fe.featureVector.get(620));
-	    assertTrue(fe.featureVector.get(68));
-	    assertTrue(fe.featureVector.get(101));
-	    assertTrue(fe.featureVector.get(586));
-	    assertTrue(fe.featureVector.get(590));
+
+	    assertTrue(bs.get(620));
+	    assertTrue(bs.get(68));
+	    assertTrue(bs.get(101));
+	    assertTrue(bs.get(586));
+	    assertTrue(bs.get(590));
 	    
 //	    System.out.println(startState.toBoardString());
 //	    System.out.println(fe.curr.toBoardString());
@@ -45,12 +45,12 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testMovementFeatures2() {
 	    GameState startState = new GameState(tests[2]);
 	    FeatureExtractor fe = new FeatureExtractor(startState, null);
-	    fe.extractFeatures(new ArimaaMove("db6e dc6x ce5s ce4s ce3s"));
+	    BitSet bs = fe.extractFeatures(new ArimaaMove("db6e dc6x ce5s ce4s ce3s"));
 
-	    assertTrue(fe.featureVector.get(339));
-	    assertTrue(fe.featureVector.get(341));
-	    assertTrue(fe.featureVector.get(849));
-	    assertTrue(fe.featureVector.get(874));
+	    assertTrue(bs.get(339));
+	    assertTrue(bs.get(341));
+	    assertTrue(bs.get(849));
+	    assertTrue(bs.get(874));
 	    
 //	    System.out.println(fe.featureVector.toString());
 //	    System.out.println(startState.toBoardString());
