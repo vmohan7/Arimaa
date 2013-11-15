@@ -18,33 +18,34 @@ public class GameParser {
 	public GameParser(GameInfo myGameInfo) {
 		initMoveList(myGameInfo);
 		initArimaaState(myGameInfo);
-		count = -1; //after client gets the start board, count will be 0
+		count = 0;
 	}
 	
+	/**
+	 * @return true iff there are more moves (i.e. iff there is another 
+	 * GameState which is not the last) 
+	 */
 	public boolean hasNextGameState() {
+		//TODO: update this to reflect comment ^
 		return count < moveList.length;
 	}
 	
 	/**
-	 *  @return An <b>ArimaaState</b> containing 3 fields:
-	 *    <br>1 - previous board
-	 *    <br>2 - current board, resulting from the move applied to previous board
-	 *    <br>3 - the move itself
-	 *    <br><i> or </i><b>null</b><i> if there are no more game states 
-	 *    			(i.e. the game is over)</i>
+	 *  @return an <b>ArimaaState</b> or </i><b>null</b><i> if there are no 
+	 *  more game states (i.e. the game is over)</i>
 	 */
 	/* arimaaState is always one step ahead of the client. That is,
 	 * the a copy of the version of arimaaState stored in this class
 	 * is returned, and then arimaaState is incremented to the next move.
 	 * If this is the last move, arimaaState requires no update, and is
 	 * returned as is.
-	 * NOTE: count is initialized to -1, so after count++, count
-	 *    	 properly indexes into moveList */
+	 * */
 	public ArimaaState getNextGameState() {
 		if (!hasNextGameState()) return null;
 		
 		ArimaaState tempAS = new ArimaaState(arimaaState);
-		count++; 
+		count++; //NOTE: count is initialized to 0, so after  
+				 //count++, count properly indexes into moveList  
 		
 		if (count != moveList.length) //if we are on the last move, no update to perform
 			arimaaState.update(new ArimaaMove(moveList[count]));
@@ -79,7 +80,7 @@ public class GameParser {
 		String black = gi.getBlackStartState();
 		
 		GameState gs = new GameState(white, black);
-		arimaaState = new ArimaaState(gs); //no previous games, no moves
+		arimaaState = new ArimaaState(gs, new ArimaaMove(moveList[0])); //no previous GameState
 	}
 	
 }
