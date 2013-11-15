@@ -18,27 +18,35 @@ public class NBTrain {
 	 * E.g. frequencies[10][1] represents the frequency count of feature 10 in expert moves.
 	 */
 	public static long[][] train(GameData trainGames){
-		GameInfo trainInfo;
+		GameInfo trainGameInfo;
 		GameParser myParser;
 		ArimaaState myState;
 		FeatureExtractor myExtractor;
 		BitSet featureVector;
 		long[][] frequencyTable = new long[FeatureConstants.NUM_FEATURES][2];
 		
+		// Iterate across all games in training set and extract features for expert and non-expert moves
 		while (trainGames.hasNextGame()){
-			trainInfo = trainGames.getNextGame();
-			myParser = new GameParser(trainInfo);
+			trainGameInfo = trainGames.getNextGame();
+			myParser = new GameParser(trainGameInfo);
 			
-			if (myParser.hasNextGameState()) // don't need to extract features for starting state
+			// Don't need to extract features for the game's starting state
+			if (myParser.hasNextGameState()) 
 				myParser.getNextGameState();
 			
 			while (myParser.hasNextGameState()){
 				myState = myParser.getNextGameState();
+				
+				// Extract features for the expert move
 				myExtractor = new FeatureExtractor(myState.getPrev(), myState.getPrev_prev());
 				featureVector = myExtractor.extractFeatures(myState.getMove(), myState.getCurr()); // extract features from expert move
 				updateFrequencies(featureVector, frequencyTable, true);
+				
+				// Extract features for all non-expert possible moves
 			}
 		}
+		
+		// Take another look at genAllTurns in GenTurn.java
 		
 		return null;
 	}
