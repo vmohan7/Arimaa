@@ -1,19 +1,21 @@
 package utilities;
 
-public class HypothesisTest {
+import utilities.helper_classes.GameInfo;
 
-	private AbstractHypothesis hypothesis;
-	private GameData gameData;
+public class HypothesisTest {
 	
-	public HypothesisTest(AbstractHypothesis hyp, GameData gd) {
-		hypothesis = hyp;
-		gameData = gd;
+	public static void test(AbstractHypothesis hyp, GameData gd) { //rename
+		gd.setMode(GameData.Mode.TEST); //ensure that we are testing...
 		
-		gameData.setMode(GameData.Mode.TEST); //ensure that we are testing...
-	}
-	
-	public void test() { //rename
+		while (gd.hasNextGame()) {
+			GameInfo gi = gd.getNextGame();
+			GameParser gp = new GameParser(gi);
+			
+			while (gp.hasNextGameState())
+				evaluateMoveOrdering(gp.getNextGameState());
+		}
 		
+		printStatistics(); //proper prototype?
 	}
 	/* for each game:
 	 * 		gp = GameParser(game)
