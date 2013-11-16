@@ -13,10 +13,11 @@ public class HypothesisTest {
 	
 	/** Runs evaluation based on the 30% of the data that is in GameData
 	 * Once we have run our tests, we print out the statistics.
+	 * The client should ensure that GameData is in the correct mode (train or test)
+	 * before calling this method. 
 	 * @param hyp The evaluation hypothesis 
 	 * @param gd The testing game data */
 	public static void test(AbstractHypothesis hyp, GameData gd) { //rename
-		gd.setMode(GameData.Mode.TEST); //ensure that we are testing...
 		
 		AggregateResults totalScore = new AggregateResults();
 		while (gd.hasNextGame()) {

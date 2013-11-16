@@ -30,6 +30,7 @@ public class NBMain {
 				trainingModel.getNumNonExpertMoves(), trainingModel.getNumExpertMoves() );
 		
 		System.out.println("\nTesting hypothesis on test set...");
+		myGameData.setMode(GameData.Mode.TEST);
 		HypothesisTest.test(myHypothesis, myGameData);
 		
 		System.out.println("\nTesting hypothesis on train set...");
