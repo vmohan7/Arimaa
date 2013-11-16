@@ -5,7 +5,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-public class TestofHypothesisTest {
+public class AggregateResultTest {
 
 	@Test
 	public void test() {
