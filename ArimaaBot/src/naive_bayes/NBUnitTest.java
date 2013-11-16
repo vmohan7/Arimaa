@@ -67,16 +67,29 @@ public class NBUnitTest {
 	
 	@Test
 	public void testHypothesis() {
-		long[][] frequencyTable = new long[2][FeatureConstants.NUM_FEATURES];
-		frequencyTable[0][0] = 2;
-		frequencyTable[1][0] = 1;
+		//This test assumes Laplace smoothing on the x's and the y's
+		testHypHelper(0, 1, 0, 1, true, Math.log(8.0/3));
+		testHypHelper(1, 1, 1, 1, true, 0);
+		testHypHelper(1, 1, 1, 1, false, 0);
 		
-		NBHypothesis hyp = new NBHypothesis(frequencyTable);
+		testHypHelper(100, 200, 300, 300, true, Math.log(201.0/101));
+		testHypHelper(100, 200, 300, 300, false, Math.log(101.0/201));
+	}
+	
+	private void testHypHelper(long freq0, long freq1, long numNeg, long numPos,
+								boolean featureOn, double weightToMatch) {
+		long[][] frequencyTable = new long[2][1];
+		frequencyTable[0][0] = freq0; // y = 0, x_0 = 1 freq0 times
+		frequencyTable[1][0] = freq1; // y = 1, x_0 = 1 freq1 times
+		
+		// we have one positive training example and one negative training example
+		NBHypothesis hyp = new NBHypothesis(frequencyTable, numNeg, numPos);
+		
+		//now we test a feature with x_0 = 1
 		BitSet bs = new BitSet(1);
-		bs.set(0);
-		
+		if (featureOn) bs.set(0);
 		double weight = hyp.evaluate(bs);
-		System.out.println("The weight is: "+ weight);
+		assertEquals(weight, weightToMatch, 0.0000000001);
 	}
 
 }
