@@ -30,7 +30,7 @@ public class UtilitiesTest {
 	}
 	
 	@Test
-	public void testGameData(){
+	public void testGameData1(){
 		GameData gd = new GameData(100, 0.7);
 		HashSet<GameInfo> trainSet = new HashSet<GameInfo>();
 		HashSet<GameInfo> testSet = new HashSet<GameInfo>();
@@ -49,6 +49,36 @@ public class UtilitiesTest {
 		assertTrue(testSet.size() == 30);
 		trainSet.retainAll(testSet);
 		assertTrue(trainSet.size() == 0);
+	}
+	
+	@Test
+	public void testGameData2(){
+		GameData gd = new GameData(100, 0.7);
+		HashSet<GameInfo> trainSet = new HashSet<GameInfo>();
+		HashSet<GameInfo> testSet = new HashSet<GameInfo>();
+		while (gd.hasNextGame()){
+			GameInfo trainInfo = gd.getNextGame();
+			trainSet.add(trainInfo);	
+		}
+		
+		gd.setMode(GameData.Mode.TEST);
+		while (gd.hasNextGame()){
+			testSet.add(gd.getNextGame());
+		}
+		
+		gd.setMode(GameData.Mode.TRAIN);
+		while (gd.hasNextGame()){
+			GameInfo trainInfo = gd.getNextGame();
+			trainSet.remove(trainInfo);	
+		}
+		
+		gd.setMode(GameData.Mode.TEST);
+		while (gd.hasNextGame()){
+			testSet.remove(gd.getNextGame());
+		}
+		
+		assertTrue(trainSet.size() == 0);
+		assertTrue(testSet.size() == 0);
 	}
 
 	@Test

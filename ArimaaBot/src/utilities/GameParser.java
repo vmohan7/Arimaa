@@ -69,7 +69,6 @@ public class GameParser {
 		}
 		
 		//remove the very last "move", which is generally an empty move signifying end of game
-		//tempMoveList.remove(tempMoveList.size() - 1);
 		
 		moveList = tempMoveList.toArray(new String[0]); 
 				//Arrays.copyOf(tempMoveList.toArray(), tempMoveList.size(), String[].class);

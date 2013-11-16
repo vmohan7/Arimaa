@@ -20,8 +20,8 @@ public class NBMain {
 		System.out.println("Finished fetching game data");
 		
 		NBTrain trainingModel = new NBTrain();
-		System.out.println("Created my model");
-		
+		System.out.println("Created the NB model");
+
 		long[][] frequencyTable = trainingModel.train(myGameData);
 		System.out.println("Just finished training!");
 		
