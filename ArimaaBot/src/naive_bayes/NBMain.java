@@ -12,7 +12,8 @@ public class NBMain {
 		GameData myGameData = new GameData(NUM_GAMES, TRAIN_FRACTION);
 		NBTrain trainingModel = new NBTrain();
 		long[][] frequencyTable = trainingModel.train(myGameData);
-		NBHypothesis myHypothesis = new NBHypothesis(frequencyTable);
+		NBHypothesis myHypothesis = new NBHypothesis( frequencyTable, 
+				trainingModel.getNumNonExpertMoves(), trainingModel.getNumExpertMoves() );
 		HypothesisTest.test(myHypothesis, myGameData);
 	}
 
