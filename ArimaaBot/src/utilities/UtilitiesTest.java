@@ -117,10 +117,10 @@ public class UtilitiesTest {
 	@Test
 	public void testTime() {
 		
-		assertTrue(Utilities.msToString(1_000).equals("1 second"));
-		assertTrue(Utilities.msToString(2_000).equals("2 seconds"));
-		assertTrue(Utilities.msToString(1_000_000).equals("16 minutes, 40 seconds"));
-		assertTrue(Utilities.msToString(1_000_000_000).equals("11 days, 13 hours, 46 minutes, 40 seconds"));
+		assertTrue(Utilities.msToString(1000).equals("1 second"));
+		assertTrue(Utilities.msToString(2000).equals("2 seconds"));
+		assertTrue(Utilities.msToString(1000000).equals("16 minutes, 40 seconds"));
+		assertTrue(Utilities.msToString(1000000000).equals("11 days, 13 hours, 46 minutes, 40 seconds"));
 
 		//SEE TODO to FIX THIS
 		//System.out.println(Utilities.msToString(951_000_000));
