@@ -39,7 +39,8 @@ public class NBUnitTest {
 //		for(ArimaaMove m: list) {
 //			System.out.println(m.toBoardString());
 //		}
-		NBTrain.trainOnTurn(frequencyTable, myState, myEngine);
+		NBTrain trainingModel = new NBTrain();
+		trainingModel.trainOnTurn(frequencyTable, myState, myEngine);
 		
 		assertTrue(frequencyTable[0][245] == 10);
 		assertTrue(frequencyTable[1][245] == 1);
@@ -53,6 +54,8 @@ public class NBUnitTest {
 		assertTrue(frequencyTable[0][773] == 1);
 		assertTrue(frequencyTable[0][774] == 1);
 		assertTrue(frequencyTable[0][775] == 1);
+		assertTrue(trainingModel.getNumExpertMoves() == 1);
+		assertTrue(trainingModel.getNumNonExpertMoves() == list.size() - 1);
 //		for(int i = 0; i< frequencyTable.length; i++) {
 //				if(frequencyTable[i][0]!=0) {
 //					System.out.println("Non-expert Move: Feature :" + i + " Count: " + frequencyTable[i][0]);

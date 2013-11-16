@@ -10,7 +10,8 @@ public class NBMain {
 
 	public static void main(String[] args) {		
 		GameData myGameData = new GameData(NUM_GAMES, TRAIN_FRACTION);
-		long[][] frequencyTable = NBTrain.train(myGameData);
+		NBTrain trainingModel = new NBTrain();
+		long[][] frequencyTable = trainingModel.train(myGameData);
 		NBHypothesis myHypothesis = new NBHypothesis(frequencyTable);
 		HypothesisTest.test(myHypothesis, myGameData);
 	}
