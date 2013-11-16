@@ -70,9 +70,9 @@ public class HypothesisTest {
 		
 		public static final double TOP5PERCENT = 0.05;
 		
-		private int numInTop5Percent = 0;
-		private double sumPercent = 0;
-		private int numMoves = 0;
+		private int numInTop5Percent = 0; //number of moves where we classified in the top 5%
+		private double sumPercent = 0;  //sum used for average percentile
+		private int numMoves = 0; //number of expert moves
 		
 		public void addResult(AggregateResults otherAr){
 			numInTop5Percent += otherAr.getNumInTop5Percent();

@@ -1,7 +1,10 @@
 package naive_bayes;
 
+import java.util.concurrent.TimeUnit;
+
 import utilities.GameData;
 import utilities.HypothesisTest;
+import utilities.helper_classes.Utilities;
 
 public class NBMain {
 	
@@ -10,8 +13,6 @@ public class NBMain {
 
 	public static void main(String[] args) {
 		final long startTime = System.currentTimeMillis();
-		
-
 		
 		System.out.println("I am in");
 		GameData myGameData = new GameData(NUM_GAMES, TRAIN_FRACTION);
@@ -25,9 +26,8 @@ public class NBMain {
 		System.out.println("About to test the hypothesis");
 		HypothesisTest.test(myHypothesis, myGameData);
 		
-		
 		final long endTime = System.currentTimeMillis();
-		System.out.println("Total execution time (in ms): " + (endTime - startTime) );
+		System.out.println("Total execution time: " + Utilities.msToString(endTime - startTime));
 	}
 
 }
