@@ -15,7 +15,7 @@ public class AggregateResultTest {
 			HypothesisTest.AggregateResults ar = new HypothesisTest.AggregateResults();
 			ar.addMove(i, UPPER_BOUND);
 			assertEquals(1.0- (double)i/UPPER_BOUND, ar.getAvgEvaluation(), 0.0000000001);
-			assertSame(ar.getNumMoves(), 1);
+			assertSame(ar.getNumExpertMoves(), 1);
 			
 		}
 		
@@ -27,7 +27,7 @@ public class AggregateResultTest {
 				ar.addMove(j, UPPER_BOUND);
 				
 				assertEquals(ar.getAvgEvaluation(), 1.0- ( (double)i/UPPER_BOUND +(double)j/UPPER_BOUND ) /2, 0.0000000001);
-				assertSame(ar.getNumMoves(), 2);
+				assertSame(ar.getNumExpertMoves(), 2);
 			}
 		}
 		
