@@ -1,5 +1,7 @@
 package naive_bayes;
 
+import java.util.concurrent.TimeUnit;
+
 import utilities.GameData;
 import utilities.HypothesisTest;
 
@@ -27,7 +29,12 @@ public class NBMain {
 		
 		
 		final long endTime = System.currentTimeMillis();
-		System.out.println("Total execution time (in ms): " + (endTime - startTime) );
+		final long duration = (endTime - startTime);
+		System.out.println("Total execution time: " + String.format("%d min, %d sec", 
+			    TimeUnit.MILLISECONDS.toMinutes(duration),
+			    TimeUnit.MILLISECONDS.toSeconds(duration) - 
+			    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
+			));
 	}
 
 }
