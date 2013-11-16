@@ -56,23 +56,28 @@ public class UtilitiesTest {
 		String whiteSS = "1w Re2", blackSS = "1b rd7";
 		String moveW1 = "2w Re2n Re3n Re4n", moveB1 = "\n2b rd7s rd6s rd5s";
 		String moveW2 = "\n3w Re5e";
+		String emptyMove = "\n3b";
 		
-		GameInfo gi = new GameInfo(whiteSS, blackSS, moveW1 + moveB1 + moveW2 + "\n3b bogus move");
+		GameInfo gi = new GameInfo(whiteSS, blackSS, moveW1 + moveB1 + moveW2 + emptyMove);
 		GameParser gp = new GameParser(gi);
 		
 		assertTrue(gp.hasNextGameState());
 		
 		int loopCount = 0;
 		GameState prev = null;
+		ArimaaState as = null; //init to silence compiler xD--this is initialized in the loop
 		while (gp.hasNextGameState()) {
-			ArimaaState as = gp.getNextGameState();
+			as = gp.getNextGameState();
 			assertTrue(as.getPrev() == prev);
 			
-			//System.out.println(as.getCurr().toBoardString());
+			System.out.println(as.getCurr().toBoardString());
 			
 			prev = as.getCurr();
 			loopCount++;
 		}
+		
+		if (as != null)
+			assertTrue(as.getNextMove().equals(new ArimaaMove(moveW2.substring(4)))); //test to ensure that this is the last move
 		
 		assertTrue(gp.getNextGameState() == null);
 		assertTrue(loopCount == 3); //3 == numMoves
