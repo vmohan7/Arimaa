@@ -42,7 +42,9 @@ public class NBTrain {
 		ArimaaEngine myEngine = new ArimaaEngine(); // used to generate all possible moves
 		
 		// Iterate across all games in training set and extract features for expert and non-expert moves
+		int count = 0;
 		while (trainGames.hasNextGame()){
+			System.out.println("Training on Game # " + ++count);
 			GameInfo trainGameInfo = trainGames.getNextGame();
 			GameParser myParser = new GameParser(trainGameInfo);
 			
