@@ -90,7 +90,7 @@ public class HypothesisTest {
 		}
 		
 		public double getAvgEvaluation(){
-			return sumPercent / numMoves;
+			return 1.0 - sumPercent / numMoves;
 		}
 
 		public int getNumInTop5Percent() {
@@ -106,9 +106,10 @@ public class HypothesisTest {
 		}
 		
 		public String toString(){
-			return String.format("The number of moves classified in the top 5% of the move ordering is : %d\n"+
-									"The average percentage of the move classified is : %f\n", 
-									numInTop5Percent, getAvgEvaluation()*100 );
+			double avgEval = getAvgEvaluation() * 100;
+			return String.format("The number of expert moves classified in the top 5 percent of the move ordering is : %d\n"+
+									"The average percentile of the expert move classified is : %f\n", 
+									numInTop5Percent, avgEval);
 		}
 
 	}

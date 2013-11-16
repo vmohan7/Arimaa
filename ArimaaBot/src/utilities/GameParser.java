@@ -58,7 +58,7 @@ public class GameParser {
 		ArrayList<String> tempMoveList = new ArrayList<String>();
 		moveList = gi.getMoveList().split("\\r?\\n"); //split on newlines
 		
-		for (int move = 0; move < moveList.length; move++) {
+		for (int move = 0; move < moveList.length - 1; move++) { //perhaps a hacky -1, to avoid the last move (which is empty, of the form "#w" or "#b")
 			if (moveList[move].indexOf("takeback") == -1)
 				 //split (e.g. "2w Re2n Re3n Re4n Re5n") into two strings, take the second
 				tempMoveList.add(moveList[move].split(" ", 2)[1]); //if this crashes, maybe it's on the last "empty move" signifying the end of the game
