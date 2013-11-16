@@ -74,13 +74,13 @@ public class HypothesisTest {
 	/** This internal class maintains the aggregate 
 	 * information across each given move and then prints them out with toString()
 	 */
-	private static class AggregateResults {
+	static class AggregateResults {
 		
 		public static final double TOP5PERCENT = 0.05;
 		
-		private int numInTop5Percent = 0;
-		private double sumPercent = 0;
-		private int numMoves = 0;
+		private int numInTop5Percent = 0; //number of moves where we classified in the top 5%
+		private double sumPercent = 0;  //sum used for average percentile
+		private int numMoves = 0; //number of expert moves
 		
 		public void addResult(AggregateResults otherAr){
 			numInTop5Percent += otherAr.getNumInTop5Percent();
@@ -115,9 +115,9 @@ public class HypothesisTest {
 		
 		public String toString(){
 			double avgEval = getAvgEvaluation() * 100;
-			return String.format("The number of expert moves classified in the top 5 percent of the move ordering is : %d\n"+
+			return String.format("The proportion of expert moves classified in the top 5 percent of the move ordering is : %d / %d\n"+
 									"The average percentile of the expert move classified is : %f\n", 
-									numInTop5Percent, avgEval);
+									numInTop5Percent, numMoves, avgEval);
 		}
 
 	}

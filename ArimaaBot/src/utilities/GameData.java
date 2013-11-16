@@ -7,10 +7,10 @@ import utilities.helper_classes.GameInfo;
 
 public class GameData {
 	private ResultSet filteredGames; 
-	private double firstTestGame;
+	private int firstTestGame;
 	private Mode myMode;
 	
-	private final int RATING_THRESHOLD = 2100;
+	private static final int RATING_THRESHOLD = 2100;
 	// For reference, there are 279K total games, and 5K where both players are rated > 2100. 
 	
 	private static String myQuery = "SELECT w_state, b_state, movelist FROM games WHERE id in " +
@@ -22,15 +22,9 @@ public class GameData {
 	}
 	
 	public GameData(int numGames, double trainFraction){
-		this.firstTestGame = trainFraction * numGames + 1;
-		setMode(Mode.TRAIN);
-		
+		this.firstTestGame = (int) (trainFraction * numGames) + 1;
 		filteredGames = MyDB.executeQuery(String.format(myQuery, RATING_THRESHOLD, RATING_THRESHOLD, numGames));
-		try {
-			filteredGames.next();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		setMode(Mode.TRAIN);
 	}
 	
 	
@@ -65,7 +59,18 @@ public class GameData {
 		return null;
 	}
 	
+	/**
+	 * Switching to training mode resets the cursor to the first training game.
+	 * @param myMode The mode you want to switch to.
+	 */
 	public void setMode(Mode myMode){
 		this.myMode = myMode; 
+		if(myMode == Mode.TRAIN) {
+			try {
+				filteredGames.first();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

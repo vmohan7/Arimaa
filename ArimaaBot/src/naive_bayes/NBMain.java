@@ -16,7 +16,7 @@ public class NBMain {
 		GameData myGameData = new GameData(NUM_GAMES, TRAIN_FRACTION);
 		System.out.println("Just got game data");
 		NBTrain trainingModel = new NBTrain();
-		System.out.println("Created my model");
+		System.out.println("Created the NB model");
 		long[][] frequencyTable = trainingModel.train(myGameData);
 		System.out.println("Just finished training!");
 		NBHypothesis myHypothesis = new NBHypothesis( frequencyTable, 
