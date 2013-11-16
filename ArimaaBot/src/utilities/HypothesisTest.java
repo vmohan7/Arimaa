@@ -66,7 +66,7 @@ public class HypothesisTest {
 	/** This internal class maintains the aggregate 
 	 * information across each given move and then prints them out with toString()
 	 */
-	private static class AggregateResults {
+	static class AggregateResults {
 		
 		public static final double TOP5PERCENT = 0.05;
 		
