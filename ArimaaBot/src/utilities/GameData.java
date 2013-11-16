@@ -7,10 +7,10 @@ import utilities.helper_classes.GameInfo;
 
 public class GameData {
 	private ResultSet filteredGames; 
-	private double firstTestGame;
+	private int firstTestGame;
 	private Mode myMode;
 	
-	private final int RATING_THRESHOLD = 2100;
+	private static final int RATING_THRESHOLD = 2100;
 	// For reference, there are 279K total games, and 5K where both players are rated > 2100. 
 	
 	private static String myQuery = "SELECT w_state, b_state, movelist FROM games WHERE id in " +
@@ -22,7 +22,7 @@ public class GameData {
 	}
 	
 	public GameData(int numGames, double trainFraction){
-		this.firstTestGame = trainFraction * numGames + 1;
+		this.firstTestGame = (int) (trainFraction * numGames) + 1;
 		setMode(Mode.TRAIN);
 		
 		filteredGames = MyDB.executeQuery(String.format(myQuery, RATING_THRESHOLD, RATING_THRESHOLD, numGames));

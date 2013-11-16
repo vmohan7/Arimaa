@@ -107,7 +107,7 @@ public class HypothesisTest {
 		
 		public String toString(){
 			double avgEval = getAvgEvaluation() * 100;
-			return String.format("The number of expert moves classified in the top 5 percent of the move ordering is : %d / %d\n"+
+			return String.format("The proportion of expert moves classified in the top 5 percent of the move ordering is : %d / %d\n"+
 									"The average percentile of the expert move classified is : %f\n", 
 									numInTop5Percent, numMoves, avgEval);
 		}
