@@ -22,6 +22,7 @@ public class Utilities {
 		String timeStamp = sb.toString();
 		
 		//TODO: there is an issue if one of the hours, days, minutes is 0--the %d is skipped in the string but the argument is not...
+		//		i.e., 11 days, 10 minutes prints 11 days, 0 hours (because 0 hours is passed in)
 		if (usedDays) return String.format(timeStamp, days, hours, minutes, seconds);
 		if (usedHours) return String.format(timeStamp, hours, minutes, seconds);
 		if (usedMinutes) return String.format(timeStamp, minutes, seconds);

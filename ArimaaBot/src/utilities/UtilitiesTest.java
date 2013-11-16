@@ -118,6 +118,7 @@ public class UtilitiesTest {
 	public void testTime() {
 		
 		assertTrue(Utilities.msToString(1_000).equals("1 second"));
+		assertTrue(Utilities.msToString(2_000).equals("2 seconds"));
 		assertTrue(Utilities.msToString(1_000_000).equals("16 minutes, 40 seconds"));
 		assertTrue(Utilities.msToString(1_000_000_000).equals("11 days, 13 hours, 46 minutes, 40 seconds"));
 
