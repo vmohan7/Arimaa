@@ -2,6 +2,8 @@ package naive_bayes;
 
 import static org.junit.Assert.*;
 
+import java.util.BitSet;
+
 import org.junit.Test;
 
 import utilities.helper_classes.ArimaaState;
@@ -61,6 +63,20 @@ public class NBUnitTest {
 //		}
 		// assert on the values of cells in frequencyTable. 
 		
+	}
+	
+	@Test
+	public void testHypothesis() {
+		long[][] frequencyTable = new long[2][FeatureConstants.NUM_FEATURES];
+		frequencyTable[0][0] = 2;
+		frequencyTable[1][0] = 1;
+		
+		NBHypothesis hyp = new NBHypothesis(frequencyTable);
+		BitSet bs = new BitSet(1);
+		bs.set(0);
+		
+		double weight = hyp.evaluate(bs);
+		System.out.println("The weight is: "+ weight);
 	}
 
 }

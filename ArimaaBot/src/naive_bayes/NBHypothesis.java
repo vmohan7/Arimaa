@@ -36,7 +36,7 @@ public class NBHypothesis extends AbstractHypothesis {
 
 		}
 		
-		return weightY0 + weightY1;
+		return weightY1 - weightY0;
 	}
 	
 }
