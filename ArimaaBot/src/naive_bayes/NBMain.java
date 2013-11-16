@@ -1,7 +1,5 @@
 package naive_bayes;
 
-import java.util.concurrent.TimeUnit;
-
 import utilities.GameData;
 import utilities.HypothesisTest;
 import utilities.helper_classes.Utilities;

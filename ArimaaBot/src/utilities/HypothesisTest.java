@@ -8,6 +8,7 @@ import arimaa3.MoveList;
 import feature_extractor.FeatureExtractor;
 import utilities.helper_classes.ArimaaState;
 import utilities.helper_classes.GameInfo;
+import utilities.helper_classes.Utilities;
 
 public class HypothesisTest {
 	
@@ -19,7 +20,12 @@ public class HypothesisTest {
 		gd.setMode(GameData.Mode.TEST); //ensure that we are testing...
 		
 		AggregateResults totalScore = new AggregateResults();
+		
+		int count = 0;
 		while (gd.hasNextGame()) {
+			final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
+			System.out.print("Testing game # " + ++count + "..."); //time will be appended in-line
+			
 			GameInfo gi = gd.getNextGame();
 			GameParser gp = new GameParser(gi);
 			
@@ -30,6 +36,8 @@ public class HypothesisTest {
 			totalScore.addResult(ar);
 			//???? print ar moves for game????
 			
+			final long endTime = System.currentTimeMillis();
+			System.out.println("testing took " + Utilities.msToString(endTime - startTime)); //this is appended to "Testing on game #x..."
 		}
 		
 		System.out.println(totalScore); //prints the statistics stored in AggregateResults
