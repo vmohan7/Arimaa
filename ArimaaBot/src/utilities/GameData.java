@@ -23,14 +23,8 @@ public class GameData {
 	
 	public GameData(int numGames, double trainFraction){
 		this.firstTestGame = trainFraction * numGames + 1;
-		setMode(Mode.TRAIN);
-		
 		filteredGames = MyDB.executeQuery(String.format(myQuery, RATING_THRESHOLD, RATING_THRESHOLD, numGames));
-		try {
-			filteredGames.next();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		setMode(Mode.TRAIN);
 	}
 	
 	
@@ -65,7 +59,18 @@ public class GameData {
 		return null;
 	}
 	
+	/**
+	 * Switching to training mode resets the cursor to the first training game.
+	 * @param myMode The mode you want to switch to.
+	 */
 	public void setMode(Mode myMode){
 		this.myMode = myMode; 
+		if(myMode == Mode.TRAIN) {
+			try {
+				filteredGames.first();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }
