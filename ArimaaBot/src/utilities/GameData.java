@@ -13,9 +13,10 @@ public class GameData {
 	private static final int RATING_THRESHOLD = 2100;
 	// For reference, there are 279K total games, and 5K where both players are rated > 2100. 
 	
-	private static String myQuery = "SELECT w_state, b_state, movelist FROM games WHERE id in " +
-			"(SELECT id FROM games WHERE " +
-			"white_rating >= %d AND black_rating >= %d ORDER BY RAND() ) LIMIT %d;"; 
+	private static String myQuery = "SELECT w_state, b_state, movelist FROM " +
+			"(SELECT id FROM games WHERE white_rating >= %d " +
+			"AND black_rating >= %d ORDER BY RAND() LIMIT %d ) g_ids " +
+			"INNER JOIN games ON games.id = g_ids.id"; 
 	
 	public static enum Mode {
 		TRAIN, TEST;
