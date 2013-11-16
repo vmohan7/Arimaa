@@ -8,6 +8,7 @@ import arimaa3.MoveList;
 import feature_extractor.FeatureExtractor;
 import utilities.helper_classes.ArimaaState;
 import utilities.helper_classes.GameInfo;
+import utilities.helper_classes.Utilities;
 
 public class HypothesisTest {
 	
@@ -20,7 +21,12 @@ public class HypothesisTest {
 	public static void test(AbstractHypothesis hyp, GameData gd) { //rename
 		
 		AggregateResults totalScore = new AggregateResults();
+		
+		int count = 0;
 		while (gd.hasNextGame()) {
+			final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
+			System.out.print("Testing game # " + ++count + "..."); //time will be appended in-line
+			
 			GameInfo gi = gd.getNextGame();
 			GameParser gp = new GameParser(gi);
 			
@@ -31,6 +37,8 @@ public class HypothesisTest {
 			totalScore.addResult(ar);
 			//???? print ar moves for game????
 			
+			final long endTime = System.currentTimeMillis();
+			System.out.println("testing took " + Utilities.msToString(endTime - startTime)); //this is appended to "Testing on game #x..."
 		}
 		
 		System.out.println(totalScore); //prints the statistics stored in AggregateResults
@@ -67,7 +75,7 @@ public class HypothesisTest {
 	/** This internal class maintains the aggregate 
 	 * information across each given move and then prints them out with toString()
 	 */
-	private static class AggregateResults {
+	static class AggregateResults {
 		
 		public static final double TOP5PERCENT = 0.05;
 		

@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import utilities.helper_classes.ArimaaState;
 import utilities.helper_classes.GameInfo;
+import utilities.helper_classes.Utilities;
 import arimaa3.ArimaaMove;
 import arimaa3.GameState;
 import feature_extractor.FeatureExtractor;
@@ -111,6 +112,20 @@ public class UtilitiesTest {
 		
 		assertTrue(gp.getNextGameState() == null);
 		assertTrue(loopCount == 3); //3 == numMoves
+	}
+	
+	@Test
+	public void testTime() {
+		
+		assertTrue(Utilities.msToString(1_000).equals("1 second"));
+		assertTrue(Utilities.msToString(1_000_000).equals("16 minutes, 40 seconds"));
+		assertTrue(Utilities.msToString(1_000_000_000).equals("11 days, 13 hours, 46 minutes, 40 seconds"));
+
+		//SEE TODO to FIX THIS
+		//System.out.println(Utilities.msToString(951_000_000));
+		//System.out.println(Utilities.msToString(0));
+		//assertTrue(Utilities.msToString(0).equals("0 seconds"));
+		//assertTrue(Utilities.msToString(951_000_000).equals("11 days, 10 minutes"));
 	}
 
 }

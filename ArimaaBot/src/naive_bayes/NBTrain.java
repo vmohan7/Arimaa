@@ -1,10 +1,12 @@
 package naive_bayes;
 
 import java.util.BitSet;
+
 import utilities.GameData;
 import utilities.GameParser;
 import utilities.helper_classes.ArimaaState;
 import utilities.helper_classes.GameInfo;
+import utilities.helper_classes.Utilities;
 import feature_extractor.FeatureConstants;
 import feature_extractor.FeatureExtractor;
 import arimaa3.ArimaaEngine;
@@ -44,13 +46,18 @@ public class NBTrain {
 		// Iterate across all games in training set and extract features for expert and non-expert moves
 		int count = 0;
 		while (trainGames.hasNextGame()){
-			System.out.println("Training on Game # " + ++count);
+			final long startTime = System.currentTimeMillis();
+			
+			System.out.print("Training on game # " + ++count + "..."); //time will be appended in-line
 			GameInfo trainGameInfo = trainGames.getNextGame();
 			GameParser myParser = new GameParser(trainGameInfo);
 			
 			while (myParser.hasNextGameState()){
 				trainOnTurn(frequencyTable, myParser.getNextGameState(), myEngine);	
 			}
+			
+			final long endTime = System.currentTimeMillis();
+			System.out.println("training took " + Utilities.msToString(endTime - startTime));
 		}
 		
 		return frequencyTable;
