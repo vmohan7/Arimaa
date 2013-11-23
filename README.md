@@ -19,6 +19,11 @@ Setting up a database connection from Java:
 - In the Libraries tab, select "Add External Jar" and browse for your newly downloaded .jar file. 
 - For reference on how to use JDBC / working with ResultSet, see http://www.stanford.edu/class/cs108/handouts131/22JDBC.pdf starting at page 5. 
 
+Setting up liblinear
+- Download the liblinear jar file from http://www.bwaldvogel.de/liblinear-java/liblinear-1.94.jar
+- Right click on the ArimaaBot project in Eclipse's project browser and select Build Path -> Configure Build Path
+- In the Libraries tab, select "Add External Jar" and browse for your newly downloaded .jar file. 
+
 Migrating Data:
 - Get zip from Google Drive
 - Unzip
