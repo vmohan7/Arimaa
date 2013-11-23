@@ -60,7 +60,7 @@ public class SVMTrain implements FeatureConstants{
 			GameInfo trainGameInfo = trainGames.getNextGame();
 			GameParser myParser = new GameParser(trainGameInfo);
 			
-			while (myParser.hasNextGameState()){
+			while (myParser.hasNextGameState())	{
 				trainOnTurn(trainVectors, isExpert, myParser.getNextGameState(), myEngine);	
 			}
 			
@@ -75,9 +75,9 @@ public class SVMTrain implements FeatureConstants{
 		
 		//TODO not efficient but no known way to know number of feature vectors before hand
 		// so we will need to make the conversion
-		double[] temp = new double[ isExpert.size() ];
-		for (int i = 0 ; i < isExpert.size(); i++)
-			temp[i] = isExpert.get(i).doubleValue();
+		double[] temp = new double[ problem.l ];
+		for (int i = 0 ; i < problem.l; i++)
+			temp[i] = isExpert.contains(i) ? 1.0 : 0.0;
 		
 		problem.y = temp; // target values
 		
@@ -92,7 +92,8 @@ public class SVMTrain implements FeatureConstants{
 		// Extract features for the expert move
 		FeatureExtractor myExtractor = new FeatureExtractor(myState.getCurr(), myState.getPrev());
 		BitSet featureVector = myExtractor.extractFeatures(expertMove); // extract features from expert move
-		addFeatureVector(featureVector, trainVectors, isExpert, true);
+		trainVectors.add( SVMUtil.convertBitSet(featureVector) );
+		isExpert.add( (int) (numExpertMoves +  numNonExpertMoves) );
 		numExpertMoves++;
 		
 		// Extract features for all non-expert possible moves
@@ -102,23 +103,11 @@ public class SVMTrain implements FeatureConstants{
 		for (ArimaaMove possibleMove : allPossibleMoves){
 			if (!possibleMove.equals(expertMove)){
 				featureVector = myExtractor.extractFeatures(possibleMove); // extract features from non-expert move
-				addFeatureVector(featureVector, trainVectors, isExpert, false);
+				trainVectors.add( SVMUtil.convertBitSet(featureVector) );
 				numNonExpertMoves++;
 			}
 		}
 	}
 
-	/**
-	 * 
-	 * @param featureVector 
-	 * @param frequencyTable Frequency table to be updated with features in featureVector
-	 * @param isExpertMove
-	 */
-	private static void addFeatureVector(BitSet featureVector, ArrayList< FeatureNode[] > trainVectors, ArrayList< Integer > isExpert, boolean isExpertMove){
-		// Iterate across all set bits in featureVector and increment the appropriate cell in frequencyTable
-		// Warms the cockles of my heart
-		trainVectors.add( SVMUtil.convertBitSet(featureVector) );
-		isExpert.add( isExpertMove ? 1 :0  );
-	}
 
 }
