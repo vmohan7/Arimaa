@@ -28,7 +28,6 @@ public class GameData {
 		setMode(Mode.TRAIN);
 	}
 	
-	
 	public boolean hasNextGame(){
 		try {
 			if (myMode == Mode.TRAIN && filteredGames.getRow() >= firstTestGame)
