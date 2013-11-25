@@ -16,9 +16,15 @@ public class SVMHypothesis extends AbstractHypothesis {
 
 	@Override
 	public double evaluate(BitSet bs) {
-		double[] yMargin = new double[2]; //for y = -1 and y = +1
-		Linear.predictValues(model, SVMUtil.convertBitSet(bs), yMargin );
-		return yMargin[0]; //should be the margin for y = +1
+		if (model.isProbabilityModel()) { //logistic regression
+			double[] yProbs = new double[2]; //for y = +1 and y = -1
+			Linear.predictProbability(model, SVMUtil.convertBitSet(bs), yProbs );
+			return yProbs[0]; //should be probability y = +1
+		} else {
+			double[] yMargin = new double[2]; //for y = -1 and y = +1
+			Linear.predictValues(model, SVMUtil.convertBitSet(bs), yMargin );
+			return yMargin[0]; //should be the margin for y = +1
+		}
 	}
 	
 }
