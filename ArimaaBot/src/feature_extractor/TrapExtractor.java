@@ -7,6 +7,9 @@ public class TrapExtractor extends AbstractExtractor {
 
 	private GameState prev, curr;
 	
+	/** Extracts (change in) Trap Status information, using prev and curr 
+	 * @param prev The previous game state (leading to curr)
+	 * @param curr The current game state to be analyzed */
 	public TrapExtractor(GameState prev, GameState curr) {
 		this.prev = prev;
 		this.curr = curr;
