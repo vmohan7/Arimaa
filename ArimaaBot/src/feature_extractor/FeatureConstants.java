@@ -54,10 +54,17 @@ public interface FeatureConstants {
 		
 		/** There are 512 Trap Status features set by the TrapExtractor class. */
 		public static final int TRAP_STATUS_START = 1040, TRAP_STATUS_END = 1551;
+		
+		/** There are 704 Capture Threats features set by the CaptureThreatsExtractor class. */
+		public static final int CAPTURE_THREATS_START = 1776, CAPTURE_THREATS_END = 2479;
+		
+		/** The index of the last feature in the vector */
+		/* Update to the last feature as features are added*/
+		public static final int MAX_END = CAPTURE_THREATS_END;
 	}
 	
 	
-	/** The total number of features in our feature vector. UPDATE this as we add more features. */
-	public static final int NUM_FEATURES = FeatureRange.TRAP_STATUS_END + 1;
+	/** The total number of features in our feature vector. */
+	public static final int NUM_FEATURES = FeatureRange.MAX_END + 1;
 	
 }
