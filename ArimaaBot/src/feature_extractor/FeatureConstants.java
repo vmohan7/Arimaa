@@ -61,7 +61,7 @@ public interface FeatureConstants {
 	
 	
 	/** The total number of features in our feature vector. UPDATE this as we add more features. */
-	public static final int NUM_FEATURES = FeatureRange.TRAP_STATUS_END + 1;
+	public static final int NUM_FEATURES = FeatureRange.FREEZING_END + 1;
 	
 	/** There are 32 locations on the board taking left-right symmetry into account. */
 	public static final int NUM_LOCATIONS = 32;
