@@ -54,10 +54,18 @@ public interface FeatureConstants {
 		
 		/** There are 512 Trap Status features set by the TrapExtractor class. */
 		public static final int TRAP_STATUS_START = 1040, TRAP_STATUS_END = 1551;
+		
+		/** There are 160 Freezing features set by the FreezingExtractor class. */
+		public static final int FREEZING_START = 1552, FREEZING_END = 1711;
 	}
 	
 	
 	/** The total number of features in our feature vector. UPDATE this as we add more features. */
 	public static final int NUM_FEATURES = FeatureRange.TRAP_STATUS_END + 1;
 	
+	/** There are 32 locations on the board taking left-right symmetry into account. */
+	public static final int NUM_LOCATIONS = 32;
+	
+	/** There are 8 piece types as described in David Wu's paper pg 25. */
+	public static final int NUM_PIECE_TYPES = 8;
 }

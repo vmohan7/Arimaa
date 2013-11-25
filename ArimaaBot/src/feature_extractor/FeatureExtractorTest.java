@@ -17,6 +17,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		"12w %13 +-----------------+%138|                 |%137|                 |%136|   R             |%135|                 |%134|                 |%133|         D   r   |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
 		"12w %13 +-----------------+%138|                 |%137|                 |%136|   R             |%135|                 |%134|                 |%133|             r   |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
 		"2w %13 +-----------------+%138| r r   H r r r r |%137|   e   C r   r   |%136|   d X     X     |%135|   d R M c       |%134|       R         |%133|     X     X     |%132|                 |%131|       R       R |%13 +-----------------+%13   a b c d e f g h%13",
+		"12w %13 +-----------------+%138|                 |%137|                 |%136|   e             |%135| R               |%134|                 |%133| R               |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
 	};
 	
 	@Test
@@ -184,5 +185,26 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		
 	}
 
+	@Test
+	public void testFreezing1() {
+		GameState prev = new GameState(tests[3]);
+		prev.compute_tertiary_bitboards();
+		GameState curr = new GameState();
+		curr.playFull(new ArimaaMove("Ra5n"), prev);
+		GameState curr2 = new GameState();
+		curr2.playFull(new ArimaaMove("Ra6n"), curr);
+		System.out.println(prev.toBoardString());
+		System.out.println(curr.toBoardString());
+		System.out.println(curr2.toBoardString());
+		for(int i = 0; i < Long.SIZE; i++) {
+			if((prev.frozen_pieces_bb & (1L << i)) > 0)
+				System.out.println("Previous had 1 at index " + FeatureExtractor.getLocation(i));
+			if((curr.frozen_pieces_bb & (1L << i)) > 0)
+				System.out.println("Current has 1 at index " + FeatureExtractor.getLocation(i));
+			if((curr2.frozen_pieces_bb & (1L << i)) > 0)
+				System.out.println("Current2 has 1 at index " + FeatureExtractor.getLocation(i));
+		}
+
+	}
 
 }
