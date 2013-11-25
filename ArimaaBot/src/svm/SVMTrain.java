@@ -112,7 +112,7 @@ public class SVMTrain implements FeatureConstants{
 		// Warms the cockles of my heart
 		String sparseVector = isExpertMove ? "+1" : "-1"; 
 		for (int i = featureVector.nextSetBit(0); i != -1; i = featureVector.nextSetBit(i+1))
-		     sparseVector += (" " + i+1 + ":1");
+		     sparseVector += (" " + i+1 + ":1"); //index is 1 based
 		
 		writer.write(sparseVector + "\n");
 	}

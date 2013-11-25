@@ -12,22 +12,13 @@ public class SVMHypothesis extends AbstractHypothesis {
 	
 	public SVMHypothesis(Model model){
 		this.model = model;
-		if (model.isProbabilityModel()) {
-			System.out.println("Using a probability based model");
-		} else{
-			System.out.println("WARNING: Using a prediction based model. Will be less acurate. ");
-		}
 	}
 
 	@Override
 	public double evaluate(BitSet bs) {
-		if (model.isProbabilityModel()) {
-			double[] yProbs = new double[4];
-			Linear.predictProbability(model, SVMUtil.convertBitSet(bs), yProbs );
-			return yProbs[1]; //should be probability y = +1
-		} else {
-			return Linear.predict(model, SVMUtil.convertBitSet(bs));
-		}
+		double[] yMargin = new double[2]; //for y = -1 and y = +1
+		Linear.predictValues(model, SVMUtil.convertBitSet(bs), yMargin );
+		return yMargin[0]; //should be the margin for y = +1
 	}
 	
 }

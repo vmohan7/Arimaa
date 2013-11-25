@@ -11,15 +11,12 @@ import utilities.HypothesisTest;
 
 public class SVMMain {
 
-	//private static final int NUM_GAMES = 30;
-	private static final double TRAIN_FRACTION = 0.99;
-
 	public static void main(String[] args) {
 		if (args.length != 3){
 			printErrorMessage();
 		} else{
 			File file = new File( args[1] );
-			int num_games = Integer.parseInt(args[2]) + 1; //+ 1 so that we get exactly num_games with train fraction
+			int num_games = Integer.parseInt(args[2]); 
 			
 			if( args[0].equals("--train") ){
 				getTrainData(file, num_games);
@@ -45,19 +42,19 @@ public class SVMMain {
 			e.printStackTrace();
 		}
 		
-		System.out.println("Finished loading SVM...");
+		System.out.println("Finished loading SVM (class#=" + model.getNrClass() + ")...");
 		
 		SVMHypothesis myHypothesis = new SVMHypothesis( model );
-		GameData myGameData = new GameData(num_games, TRAIN_FRACTION);
+		GameData myGameData = new GameData(num_games, 1.0); //testing does not worry about the training fraction
 		myGameData.setMode(GameData.Mode.TEST);
 		
-		System.out.println("\nTesting hypothesis on" + num_games +" TEST games...");
+		System.out.println("\nTesting hypothesis on " + num_games +" TEST games...");
 		HypothesisTest.test(myHypothesis, myGameData);
 		
 	}
 
 	private static void getTrainData(File file, int num_games) {
-		GameData myGameData = new GameData(num_games, TRAIN_FRACTION);
+		GameData myGameData = new GameData(num_games+1, ( (double) num_games )/num_games+1); //+ 1 so that we get exactly num_games with train fraction
 		
 		SVMTrain trainingModel = new SVMTrain(file);
 		System.out.println("Created the SVM model");

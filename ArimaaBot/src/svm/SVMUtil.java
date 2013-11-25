@@ -13,7 +13,7 @@ public class SVMUtil {
 	public static FeatureNode[] convertBitSet(BitSet bs){
 		ArrayList< FeatureNode > list = new ArrayList< FeatureNode >();
 		for (int i = bs.nextSetBit(0); i != -1; i = bs.nextSetBit(i+1))
-		     list.add( new FeatureNode(i, 1) ); 
+		     list.add( new FeatureNode(i + 1, 1) ); // index is one based
 		
 		return list.toArray( new FeatureNode[1] );
 	}
