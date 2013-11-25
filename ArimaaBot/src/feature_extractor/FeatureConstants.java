@@ -54,10 +54,13 @@ public interface FeatureConstants {
 		
 		/** There are 512 Trap Status features set by the TrapExtractor class. */
 		public static final int TRAP_STATUS_START = 1040, TRAP_STATUS_END = 1551;
+		
+		/** There are 64 features set by the SteppingOnTrapsExtractor class. */
+		public static final int STEPPING_TRAP_START = 1712, STEPPING_TRAP_END = 1775;
 	}
 	
 	
 	/** The total number of features in our feature vector. UPDATE this as we add more features. */
-	public static final int NUM_FEATURES = FeatureRange.TRAP_STATUS_END + 1;
+	public static final int NUM_FEATURES = FeatureRange.STEPPING_TRAP_END + 1;
 	
 }

@@ -184,5 +184,49 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		
 	}
 
-
+	
+	@Test
+	public void testSteppingOnTraps() {
+		// data from first game in "games" relation -- copied from testMovementFeatures1
+	    String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
+	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
+	    GameState startState = new GameState(white,black);
+	    
+	    //test simple move (with no replacements)
+	    long moveBitBoard1 = (1L << startState.getIndex(2, 1)) //b3 -- zero indexed
+				  | (1L << startState.getIndex(3, 0)) //a4
+				  | (1L << startState.getIndex(2, 7)); //h3
+	    
+	    testMoveCorrectness("Db2n Ha2n Ha3n Hh2n", moveBitBoard1, startState);
+	    
+	    
+	    //test replacement of piece by another piece
+	    startState.playPASS(startState); //make it black's turn
+	    long moveBitBoard2 = (1L << startState.getIndex(4, 4)) //e5 (5-1, e-1)
+				  | (1L << startState.getIndex(6, 4)) //e7
+				  | (1L << startState.getIndex(5, 7)); //h6
+	    
+	    testMoveCorrectness("ee7s ee6s re8s rh7s", moveBitBoard2, startState);
+	    
+	}
+	
+	private void testMoveCorrectness(String moveString, long moveBitBoard, GameState start) {
+		//TODO: Test the new array-based move bit board.
+		
+		ArimaaMove move = new ArimaaMove(moveString);
+		GameState next = new GameState();
+	    next.copy(start); //play move from start...
+	    next.playFullClear(move, start);
+	    
+	    SteppingOnTrapsExtractor sOTE = new SteppingOnTrapsExtractor(start, next);
+	    
+	    long getMovedPieces = sOTE.getMovedPieces();
+	    if (moveBitBoard != getMovedPieces) { //to print out discrepancies
+	    	System.out.println("Error in testMoveCorrectness (perhaps a piece replaced a moved piece): ");
+	    	System.out.println("moveBitBoard (should be): " + Long.toBinaryString(moveBitBoard) +
+	    					 "\ngetMovedPieces (was)    : " + Long.toBinaryString(getMovedPieces));
+	    	assertTrue(moveBitBoard == getMovedPieces);
+	    }
+	    
+	}
 }
