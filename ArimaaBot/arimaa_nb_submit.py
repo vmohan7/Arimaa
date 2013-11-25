@@ -13,7 +13,7 @@ numTrials = 1
 # The -N argument to qsub gives the job name
 for exampleSetSize in range(10, 21, 10):
     for trialIndex in range(numTrials):
-        os.system("qsub -N arimaa_nb_%d_%d ./arimaa_nb.sh %d %d %d" % (exampleSetSize, trialIndex, exampleSetSize, exampleSetSize, 0))
+        os.system("qsub -N arimaa_nb_%d_%d ./arimaa_nb.sh %d %d %d" % (exampleSetSize, trialIndex, exampleSetSize, exampleSetSize, 1))
 
 endJob = datetime.datetime.now() 
 
