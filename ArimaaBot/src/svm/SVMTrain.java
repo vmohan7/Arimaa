@@ -1,13 +1,10 @@
 package svm;
 
-import java.util.ArrayList;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.BitSet;
-
-import de.bwaldvogel.liblinear.FeatureNode;
-import de.bwaldvogel.liblinear.Linear;
-import de.bwaldvogel.liblinear.Model;
-import de.bwaldvogel.liblinear.Parameter;
-import de.bwaldvogel.liblinear.Problem;
 
 import utilities.GameData;
 import utilities.GameParser;
@@ -25,10 +22,17 @@ public class SVMTrain implements FeatureConstants{
 	
 	private long numExpertMoves;
 	private long numNonExpertMoves;
+	private BufferedWriter writer;
 	
-	public SVMTrain() {
+	public SVMTrain(File file) {
 		numExpertMoves = 0L;
 		numNonExpertMoves = 0L;
+		
+		try {
+			writer = new BufferedWriter( new FileWriter(file.getAbsoluteFile()) );
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public long getNumExpertMoves() {
@@ -45,14 +49,12 @@ public class SVMTrain implements FeatureConstants{
 	 * non-expert training examples. Everything is zero-indexed, and the 0th row is for non-expert moves. 
 	 * E.g. frequencies[1][10] represents the frequency count of feature 10 in expert moves.
 	 */
-	public Model train(GameData trainGames, Parameter parameter){
+	public void train(GameData trainGames){
 		
 		ArimaaEngine myEngine = new ArimaaEngine(); // used to generate all possible moves
 		
 		// Iterate across all games in training set and extract features for expert and non-expert moves
 		int count = 0;
-		ArrayList< FeatureNode[] > trainVectors = new ArrayList<FeatureNode[]>();
-		ArrayList< Integer > isExpert = new ArrayList< Integer >();
 		while (trainGames.hasNextGame()){
 			final long startTime = System.currentTimeMillis();
 			
@@ -61,39 +63,26 @@ public class SVMTrain implements FeatureConstants{
 			GameParser myParser = new GameParser(trainGameInfo);
 			
 			while (myParser.hasNextGameState())	{
-				trainOnTurn(trainVectors, isExpert, myParser.getNextGameState(), myEngine);	
+				try {
+					trainOnTurn(myParser.getNextGameState(), myEngine);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}	
 			}
 			
 			final long endTime = System.currentTimeMillis();
 			System.out.println("training took " + Utilities.msToString(endTime - startTime));
 		}
-		
-		Problem problem = new Problem();
-		problem.l = (int) ( numExpertMoves + numNonExpertMoves ); // number of training examples //WARNING: THIS MAY OVERFLOW
-		problem.n = NUM_FEATURES; // number of features
-		problem.x = trainVectors.toArray( new FeatureNode[1][] ); // feature nodes
-		
-		//TODO not efficient but no known way to know number of feature vectors before hand
-		// so we will need to make the conversion
-		double[] temp = new double[ problem.l ];
-		for (int i = 0 ; i < problem.l; i++)
-			temp[i] = isExpert.contains(i) ? 1.0 : 0.0;
-		
-		problem.y = temp; // target values
-		
-		return Linear.train(problem, parameter);
 	}
 	
 	// This method is packaged so that it can be accessed in SVMTest only. 
-	void trainOnTurn(ArrayList< FeatureNode[] > trainVectors, ArrayList< Integer > isExpert,
-						ArimaaState myState, ArimaaEngine myEngine) {
+	void trainOnTurn(ArimaaState myState, ArimaaEngine myEngine) throws IOException {
 		ArimaaMove expertMove = myState.getNextMove();
 		
 		// Extract features for the expert move
 		FeatureExtractor myExtractor = new FeatureExtractor(myState.getCurr(), myState.getPrev());
 		BitSet featureVector = myExtractor.extractFeatures(expertMove); // extract features from expert move
-		trainVectors.add( SVMUtil.convertBitSet(featureVector) );
-		isExpert.add( (int) (numExpertMoves +  numNonExpertMoves) );
+		outputToFile(featureVector, true);
 		numExpertMoves++;
 		
 		// Extract features for all non-expert possible moves
@@ -103,10 +92,29 @@ public class SVMTrain implements FeatureConstants{
 		for (ArimaaMove possibleMove : allPossibleMoves){
 			if (!possibleMove.equals(expertMove)){
 				featureVector = myExtractor.extractFeatures(possibleMove); // extract features from non-expert move
-				trainVectors.add( SVMUtil.convertBitSet(featureVector) );
+				outputToFile(featureVector, false);
 				numNonExpertMoves++;
 			}
 		}
+		
+		writer.flush();
+	}
+	
+	/**
+	 * 
+	 * @param featureVector 
+	 * @param frequencyTable Frequency table to be updated with features in featureVector
+	 * @param isExpertMove
+	 * @throws IOException 
+	 */
+	private void outputToFile(BitSet featureVector, boolean isExpertMove) throws IOException{
+		// Iterate across all set bits in featureVector and increment the appropriate cell in frequencyTable
+		// Warms the cockles of my heart
+		String sparseVector = isExpertMove ? "+1" : "-1"; 
+		for (int i = featureVector.nextSetBit(0); i != -1; i = featureVector.nextSetBit(i+1))
+		     sparseVector += (" " + i+1 + ":1");
+		
+		writer.write(sparseVector + "\n");
 	}
 
 
