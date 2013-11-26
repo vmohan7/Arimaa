@@ -14,7 +14,7 @@ numTrials = 1
 for exampleSetSize in xrange(10, 120, 10):
     for model in [1,6,7]:
         for trialIndex in xrange(numTrials):
-            os.system("qsub -lM 90000M -N arimaa_svm_%d_%d_%d ./arimaa_svm.sh %d %d" % \
+            os.system("qsub -l mem_free=90G -pe shm 8 -N arimaa_svm_%d_%d_%d ./arimaa_svm.sh %d %d" % \
 			    (exampleSetSize, model, trialIndex, exampleSetSize, model) )
 
 endJob = datetime.datetime.now() 
