@@ -49,7 +49,8 @@ public class FeatureExtractor implements Constants, FeatureConstants {
 		
 		(new PositionMovementExtractor(prev, curr, current_move, piece_types)).updateBitSet(featureVector);
 		(new TrapExtractor(prev, curr)).updateBitSet(featureVector);
-		return featureVector;		
+		(new FreezingExtractor(prev, curr, piece_types)).updateBitSet(featureVector);
+		return featureVector;
 	}
 	
 	/*

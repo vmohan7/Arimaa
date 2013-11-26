@@ -4,13 +4,11 @@ import java.util.BitSet;
 
 import arimaa3.*;
 
-public class PositionMovementExtractor extends AbstractExtractor {
+public class PositionMovementExtractor extends AbstractExtractor implements FeatureConstants {
 
 	private static final int START_INDEX = FeatureRange.POS_MVMT_START;
 	private static final int END_INDEX = FeatureRange.POS_MVMT_END;
 	private static final int NUM_SRC_MVMT = 512;
-	private static final int NUM_LOCATIONS = 32;
-	private static final int NUM_PIECE_TYPES = 8;
 	private static final int DEFAULT_CAPTURE_LOCATION = 32;
 	
 	private GameState curr;
@@ -35,7 +33,7 @@ public class PositionMovementExtractor extends AbstractExtractor {
 		for(int i = 0; i < 12; i++) {
 			long source = prev.piece_bb[i] & move_bb[i]; // this long encodes all the source locations of pieces that moved this turn
 			long dest = source ^ move_bb[i]; // this long encodes all destination locations of pieces that moved this turn
-			int player = (i % 2==0) ? 0 : 1; // player is 0 (white) if piece_id is even
+			int player = i & 0x01; // player is 0 (white) if piece_id = i is even
 			updateBitSetMovementFeatures(source, dest, piece_types[i], player);
 		}
 	}
