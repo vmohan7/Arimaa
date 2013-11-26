@@ -130,7 +130,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	}
 	
 	@Test
-	public void testBitCodes() { //TODO: Set the bit indices for the games--try different games?
+	public void testBitCodesForTrapStatus() { //TODO: Set the bit indices for the games--try different games?
 		BitSet bitset = new BitSet(FeatureRange.TRAP_STATUS_END + 1);
 		
 		String[] whitesBlacks = {  
@@ -184,6 +184,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		
 	}
 
+	// -------- STEPPING ON TRAPS EXTRACTOR (BEGIN) ------- //
 	
 	@Test
 	public void testSteppingOnTraps() {
@@ -191,6 +192,11 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	    String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
 	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
 	    GameState startState = new GameState(white,black);
+	    
+	    
+	    //test bit updating (first, even though it is logically after tests below)
+	    updateBitsTestManager();
+	    
 	    
 	    //test simple move (with no replacements)
 	    long moveBitBoard1 = (1L << startState.getIndex(2, 1)) //b3 -- zero indexed
@@ -200,7 +206,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	    testMoveCorrectness("Db2n Ha2n Ha3n Hh2n", moveBitBoard1, startState);
 	    
 	    
-	    //test replacement of piece by another piece
+	    //test replacement of piece by another piece type
 	    startState.playPASS(startState); //make it black's turn
 	    long moveBitBoard2 = (1L << startState.getIndex(4, 4)) //e5 (5-1, e-1)
 				  | (1L << startState.getIndex(6, 4)) //e7
@@ -208,25 +214,141 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	    
 	    testMoveCorrectness("ee7s ee6s re8s rh7s", moveBitBoard2, startState);
 	    
+	    	    
+	    //test replace of piece by another of same piece type
+	    String whiteReplaceTest = "1w Ee1 Ee2";
+	    String blackReplaceTest = "1b ee8 ee7";
+	    startState = new GameState(whiteReplaceTest, blackReplaceTest);
+	    
+	    long moveBitBoardReplaceTest = (1L << startState.getIndex(2, 4)) //e3
+	    							| (1L << startState.getIndex(1, 4)); //e2
+	    		
+	    testMoveCorrectness("Ee2n Ee1n", moveBitBoardReplaceTest, startState);
+	}
+	
+	private void updateBitsTestManager() {
+		/* e.g. if type3 steps unsafely on the lower left trap, then the bit set is:
+	   	 *  <br> - ->      0 * 32 + 0 * 8 + 3 = 3 [where the second 0 is the number of the lower left trap]*/
+		
+		String[] whiteStrings = { 
+				"1w Dc2 Rb3", //ensure dog isn't eaten by trap
+				"1w Dc2 Rb3 Rd3", //ensure dog isn't eaten by trap, and is safe
+				"1w Df2 Ee3" //try elephant safety at a different trap
+		};
+		
+		String[] blackStrings = {
+		   /* Note that black has a safe trap, but this shouldn't matter since it's white to play */
+				"1b hd7 ef7 mg7", // note 3 stronger pieces (horse, elephant, camel) --> white dog type 3
+				"1b hd7 ef7 mg7", // note 3 stronger pieces (horse, elephant, camel)
+				"1b hd7 ef7 mg7" // note 3 stronger pieces (horse, elephant, camel)
+		};
+		
+		String[] whiteMoves = {
+				"Dc2n",
+				"Dc2n",
+				"Df2n"
+		};
+		
+		int[][] bitIndicesArray = {
+			{ FeatureRange.STEPPING_TRAP_START + 3 },
+			{ FeatureRange.STEPPING_TRAP_START + 3 + 32 },
+			{ FeatureRange.STEPPING_TRAP_START + 3 + 32 + 2 * 8 } //trap #2
+		};
+		
+		boolean[][] trapSafetyArray = {
+			{ false, false, false, false }, //no one is safe :O
+			{ true, false, false, false }, //lower left safe
+			{ false, false, true, false } //lower right safe
+		};
+		
+		assertTrue(whiteStrings.length == blackStrings.length 
+				&& bitIndicesArray.length == trapSafetyArray.length
+				&& whiteStrings.length == trapSafetyArray.length
+				&& whiteMoves.length == whiteStrings.length); //ensure all arrays same length;
+		
+		testBitUpdateCorrectnessForAllGames(whiteMoves, whiteStrings, blackStrings, bitIndicesArray, trapSafetyArray);
+	}
+	
+	private void testBitUpdateCorrectnessForAllGames(String[] whiteMoves, String[] whiteStarts, 
+			String[] blackStarts, int[][] bitIndicesArray, boolean[][] trapSafetyArray) {
+	
+		int numGames = whiteStarts.length;
+		
+		for (int game = 0; game < numGames; game++) {
+			GameState startState = new GameState(whiteStarts[game], blackStarts[game]);
+			testBitUpdateCorrectness(whiteMoves[game], startState, bitIndicesArray[game], trapSafetyArray[game]);
+		}
+	}
+
+	private void testBitUpdateCorrectness(String moveString, GameState start, int[] bitIndices, 
+											boolean[] trapSafety) {
+		BitSet bitset = new BitSet(FeatureRange.STEPPING_TRAP_END + 1);
+		SteppingOnTrapsExtractor sOTE = getNewSOTE(moveString, start);
+	    sOTE.updateBitSet(bitset);
+	    
+	    for (int trap = 0; trap < trapSafety.length; trap++) 
+	    	assertTrue(trapSafety[trap] == sOTE.getTrapSafety(trap));
+	    
+	    for (int i = 0; i < bitIndices.length; i++)
+	    	assertTrue(bitset.get(bitIndices[i]));
 	}
 	
 	private void testMoveCorrectness(String moveString, long moveBitBoard, GameState start) {
-		//TODO: Test the new array-based move bit board.
-		
+		String NEEMA_ERROR_STRING = "** Error in testMoveCorrectness"
+				+ " (perhaps a piece was replaced by another on the same turn) **"
+				+ "\n[Please note this shouldn't matter for SteppingOnTrapsExtractor since the piece"
+				+ " strength on the trap has not changed...]";
+	    
+	    SteppingOnTrapsExtractor sOTE = getNewSOTE(moveString, start);
+	    
+	    long getMovedPieces = sOTE.getMovedPieces();
+	    if (moveBitBoard != getMovedPieces) { //to print out discrepancies before assertion
+	    	System.out.println(NEEMA_ERROR_STRING);
+	    	System.out.println("Bit board should be: " + Long.toBinaryString(moveBitBoard) +
+	    					 "\nBut actually was   : " + Long.toBinaryString(getMovedPieces));
+	    	assertTrue(moveBitBoard == getMovedPieces);
+	    }
+	    
+	}
+	
+	private SteppingOnTrapsExtractor getNewSOTE(String moveString, GameState start) {
 		ArimaaMove move = new ArimaaMove(moveString);
 		GameState next = new GameState();
 	    next.copy(start); //play move from start...
 	    next.playFullClear(move, start);
 	    
-	    SteppingOnTrapsExtractor sOTE = new SteppingOnTrapsExtractor(start, next);
+	    byte[] pieceTypes = new byte[12];
+	    calculatePieceTypes(next, pieceTypes); //modify pieceTypes in place
 	    
-	    long getMovedPieces = sOTE.getMovedPieces();
-	    if (moveBitBoard != getMovedPieces) { //to print out discrepancies
-	    	System.out.println("Error in testMoveCorrectness (perhaps a piece replaced a moved piece): ");
-	    	System.out.println("moveBitBoard (should be): " + Long.toBinaryString(moveBitBoard) +
-	    					 "\ngetMovedPieces (was)    : " + Long.toBinaryString(getMovedPieces));
-	    	assertTrue(moveBitBoard == getMovedPieces);
-	    }
-	    
+	    return new SteppingOnTrapsExtractor(start, next, pieceTypes);
 	}
+	
+	/* Helper method copy-pasted (and then modified to fix compiler issues only) from FeatureExtractor
+	 * for use in SteppingOnTrapsExtractor testing */
+	private static void calculatePieceTypes(GameState curr, byte[] piece_types){
+		assert(piece_types.length == 12);
+		
+		for (int i = 0; i < 2; i++){ // calculate for rabbits 
+			byte numStronger = FeatureExtractor.countOneBits(curr.stronger_enemy_bb[i]);
+			if (numStronger < 5)
+				piece_types[i] = 7;
+			else if (numStronger < 7)
+				piece_types[i] = 6;
+			else
+				piece_types[i] = 5;
+		}
+		
+		for (int i = 2; i < 12; i++){ // calculate for non-rabbits
+			byte numStronger = FeatureExtractor.countOneBits(curr.stronger_enemy_bb[i]);
+			switch (numStronger) {
+				case 0: piece_types[i] = 0; break;
+				case 1: piece_types[i] = 1; break;
+				case 2: piece_types[i] = 2; break;
+				case 3: case 4: piece_types[i] = 3; break;
+				default: piece_types[i] = 4; break;
+			}
+		}
+	}
+	
+	// -------- STEPPING ON TRAPS EXTRACTOR (END) ------- //
 }
