@@ -12,7 +12,7 @@ numTrials = 1
 # Submit job for each training set size
 # The -N argument to qsub gives the job name
 for exampleSetSize in xrange(10, 120, 10):
-    for model in [2,6,7]:
+    for model in [1,6,7]:
         for trialIndex in xrange(numTrials):
             os.system("qsub -N arimaa_svm_%d_%d_%d ./arimaa_svm.sh %d %d" % \
 			    (exampleSetSize, model, trialIndex, exampleSetSize, model) )
