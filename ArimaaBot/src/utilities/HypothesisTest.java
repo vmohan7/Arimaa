@@ -42,6 +42,8 @@ public class HypothesisTest {
 	    }
     }
 	
+    public static final int FREE_CORES = 2;
+    
 	/** Runs evaluation based on the 30% of the data that is in GameData
 	 * Once we have run our tests, we print out the statistics.
 	 * The client should ensure that GameData is in the correct mode (train or test)
@@ -55,7 +57,7 @@ public class HypothesisTest {
 		
 		int count = 0;
 		while (gd.hasNextGame()) {
-			int cores = Runtime.getRuntime().availableProcessors() - 1; //do based on the number of cores to limit memory usage
+			int cores = Runtime.getRuntime().availableProcessors() - FREE_CORES; //do based on the number of cores to limit memory usage
 			ArrayList<Thread> threads = new ArrayList<Thread>();
 			
 			//Create the threads
