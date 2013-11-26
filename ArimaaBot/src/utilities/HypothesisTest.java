@@ -21,13 +21,14 @@ public class HypothesisTest {
     	
     	public AggregateThread(GameInfo gi, int gameNum, AbstractHypothesis hyp, AggregateResults total_results){
     		gp = new GameParser(gi);
+    		gameNumber = gameNum;
     		this.hyp = hyp;
     		totalScore = total_results;
     	}
     	
 	    public void run() {
 	    	final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
-			System.out.print("Testing game # " + gameNumber + "..."); //time will be appended in-line
+			System.out.println("Testing game # " + gameNumber + "..."); //time will be appended in-line
 			
 			AggregateResults ar = new AggregateResults();
 			while (gp.hasNextGameState())
