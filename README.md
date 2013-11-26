@@ -59,3 +59,4 @@ It shows which features (from David Wu's paper) correspond to which bits of our 
 | Freezing | 1552 - 1711 |
 | Stepping on Traps | 1712 - 1775 |
 | Capture Threats | 1776 - 2479 |
+| Previous Moves | 2480 - 2608 |
