@@ -1,5 +1,6 @@
 package utilities;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 
 import arimaa3.ArimaaEngine;
@@ -12,23 +13,21 @@ import utilities.helper_classes.Utilities;
 
 public class HypothesisTest {
 	
-	/** Runs evaluation based on the 30% of the data that is in GameData
-	 * Once we have run our tests, we print out the statistics.
-	 * The client should ensure that GameData is in the correct mode (train or test)
-	 * before calling this method. 
-	 * @param hyp The evaluation hypothesis 
-	 * @param gd The testing game data */
-	public static void test(AbstractHypothesis hyp, GameData gd) { //rename
-		
-		AggregateResults totalScore = new AggregateResults();
-		
-		int count = 0;
-		while (gd.hasNextGame()) {
-			final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
-			System.out.print("Testing game # " + ++count + "..."); //time will be appended in-line
-			
-			GameInfo gi = gd.getNextGame();
-			GameParser gp = new GameParser(gi);
+    private static class AggregateThread implements Runnable {
+    	private int gameNumber;
+    	private GameParser gp;
+    	private AbstractHypothesis hyp;
+    	private AggregateResults totalScore;
+    	
+    	public AggregateThread(GameInfo gi, int gameNum, AbstractHypothesis hyp, AggregateResults total_results){
+    		gp = new GameParser(gi);
+    		this.hyp = hyp;
+    		totalScore = total_results;
+    	}
+    	
+	    public void run() {
+	    	final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
+			System.out.print("Testing game # " + gameNumber + "..."); //time will be appended in-line
 			
 			AggregateResults ar = new AggregateResults();
 			while (gp.hasNextGameState())
@@ -38,7 +37,41 @@ public class HypothesisTest {
 			//???? print ar moves for game????
 			
 			final long endTime = System.currentTimeMillis();
-			System.out.println("testing took " + Utilities.msToString(endTime - startTime)); //this is appended to "Testing on game #x..."
+			System.out.println("Testing game # " + gameNumber + " took " + Utilities.msToString(endTime - startTime)); //this is appended to "Testing on game #x..."
+	    }
+    }
+	
+	/** Runs evaluation based on the 30% of the data that is in GameData
+	 * Once we have run our tests, we print out the statistics.
+	 * The client should ensure that GameData is in the correct mode (train or test)
+	 * before calling this method. 
+	 * @param hyp The evaluation hypothesis 
+	 * @param gd The testing game data 
+	 * */
+	public static void test(AbstractHypothesis hyp, GameData gd) { //rename
+		
+		AggregateResults totalScore = new AggregateResults();
+		
+		int count = 0;
+		while (gd.hasNextGame()) {
+			int cores = Runtime.getRuntime().availableProcessors() - 1; //do based on the number of cores to limit memory usage
+			ArrayList<Thread> threads = new ArrayList<Thread>();
+			
+			for (int i = 0; i < cores && gd.hasNextGame(); i++){
+				count++;
+				GameInfo gi = gd.getNextGame();
+				Thread t = new Thread( new AggregateThread(gi, count, hyp, totalScore) );
+				t.start();
+				threads.add(t);
+			}
+			
+			for(Thread t: threads){
+				try {
+					t.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		System.out.println(totalScore); //prints the statistics stored in AggregateResults
@@ -83,7 +116,7 @@ public class HypothesisTest {
 		private double sumPercent = 0;  //sum used for average percentile
 		private int numExpertMoves = 0; //number of expert moves
 		
-		public void addResult(AggregateResults otherAr){
+		public synchronized void addResult(AggregateResults otherAr){
 			numInTop5Percent += otherAr.getNumInTop5Percent();
 			sumPercent += otherAr.getSumPercent();
 			numExpertMoves += otherAr.getNumExpertMoves();
