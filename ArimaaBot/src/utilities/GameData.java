@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 import utilities.helper_classes.GameInfo;
 
-public class GameData {
+public class GameData implements AbstractGameData {
 	private ResultSet filteredGames; 
 	private int firstTestGame;
 	private Mode myMode;

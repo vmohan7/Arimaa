@@ -6,8 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.BitSet;
 
-import utilities.GameData;
 import utilities.GameParser;
+import utilities.DisconnectedGameData;
 import utilities.helper_classes.ArimaaState;
 import utilities.helper_classes.GameInfo;
 import utilities.helper_classes.Utilities;
@@ -18,7 +18,7 @@ import arimaa3.ArimaaMove;
 import arimaa3.MoveList;
 
 
-public class SVMTrain implements FeatureConstants{
+public class SVMTrain implements FeatureConstants {
 	
 	private long numExpertMoves;
 	private long numNonExpertMoves;
@@ -49,7 +49,7 @@ public class SVMTrain implements FeatureConstants{
 	 * non-expert training examples. Everything is zero-indexed, and the 0th row is for non-expert moves. 
 	 * E.g. frequencies[1][10] represents the frequency count of feature 10 in expert moves.
 	 */
-	public void train(GameData trainGames){
+	public void train(DisconnectedGameData trainGames){
 		
 		ArimaaEngine myEngine = new ArimaaEngine(); // used to generate all possible moves
 		

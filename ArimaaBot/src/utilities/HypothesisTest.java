@@ -18,7 +18,7 @@ public class HypothesisTest {
 	 * before calling this method. 
 	 * @param hyp The evaluation hypothesis 
 	 * @param gd The testing game data */
-	public static void test(AbstractHypothesis hyp, GameData gd) { //rename
+	public static void test(AbstractHypothesis hyp, AbstractGameData gd) { //rename
 		
 		AggregateResults totalScore = new AggregateResults();
 		
