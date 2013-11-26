@@ -9,7 +9,7 @@ import java.util.BitSet;
  *  class itself will not extend this class.
  *  <p> Implements FeatureConstants
  *  <br> Supports updating a BitSet */
-public abstract class AbstractExtractor implements FeatureConstants, Constants {
+public abstract class AbstractExtractor implements FeatureConstants {
 	
 	/** Updates the BitSet -- should be declared static when implemented. Only
 	 *  a portion of the entire BitSet will be set by a particular extractor class. 

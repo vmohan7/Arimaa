@@ -1,6 +1,9 @@
 package feature_extractor;
 
-public interface FeatureConstants {
+import arimaa3.Constants;
+
+/** Extends Constants to add more constants (for the Feature Extractor in particular) */
+public interface FeatureConstants extends Constants {
 	
 	/**
 	 * Status number -> trap "condition"
@@ -45,6 +48,7 @@ public interface FeatureConstants {
 		}
 	}
 	
+
 	/** There are eight threats in total. (See David Wu's paper p. 26, or 
 	 * CaptureThreatsExtractor.java) <br>
 	 * The first four are threatening and defending captures.
@@ -94,8 +98,23 @@ public interface FeatureConstants {
 			CAP_DEF_ELE_OFFSET, CAP_DEF_OTHER_OFFSET, CAP_DEF_RUNAWAY, CAP_DEF_INTERFERE
 				
 		};
-		
 	}
+		
+	/** Contains the constants used in SteppingOnTrapsExtractor
+	 * @author Neema */
+	public static class SteppingOnTraps {
+		
+		/** These are the piece types for the bit-boards long[6] stored in SteppingOnTrapsExtractor */
+		/* These don't seem to be used just yet... update this comment if this changes... Really
+		 * just here for the sake of clarity */
+		public static final byte RABBIT =	PT_WHITE_RABBIT / 2,
+								 CAT = 		PT_WHITE_CAT / 2,
+								 DOG = 		PT_WHITE_DOG / 2,
+								 HORSE = 	PT_WHITE_HORSE / 2,
+								 CAMEL = 	PT_WHITE_CAMEL / 2,
+								 ELEPHANT = PT_WHITE_ELEPHANT / 2;
+	}
+	
 	
 	/** FeatureRange contains the constants describing the <i>start</i> and <i>end</i>
 	 *  indices (in the FeatureExtractor's BitSet) of the different AbstractExtractor subclasses. */
@@ -106,6 +125,12 @@ public interface FeatureConstants {
 		
 		/** There are 512 Trap Status features set by the TrapExtractor class. */
 		public static final int TRAP_STATUS_START = 1040, TRAP_STATUS_END = 1551;
+
+		/** There are 160 Freezing features set by the FreezingExtractor class. */
+		public static final int FREEZING_START = 1552, FREEZING_END = 1711;
+		
+		/** There are 64 features set by the SteppingOnTrapsExtractor class. */
+		public static final int STEPPING_TRAP_START = 1712, STEPPING_TRAP_END = 1775;
 		
 		/** There are 704 Capture Threats features set by the CaptureThreatsExtractor class. */
 		public static final int CAPTURE_THREATS_START = 1776, CAPTURE_THREATS_END = 2479;
@@ -113,10 +138,17 @@ public interface FeatureConstants {
 		/** The index of the last feature in the vector */
 		/* Update to the last feature as features are added*/
 		public static final int MAX_END = CAPTURE_THREATS_END;
+		
 	}
 	
-	
+
 	/** The total number of features in our feature vector. */
 	public static final int NUM_FEATURES = FeatureRange.MAX_END + 1;
+	
+	/** There are 32 locations on the board taking left-right symmetry into account. */
+	public static final int NUM_LOCATIONS = 32;
+	
+	/** There are 8 piece types as described in David Wu's paper pg 25. */
+	public static final int NUM_PIECE_TYPES = 8;
 	
 }
