@@ -28,17 +28,17 @@ public class HypothesisTest {
     	
 	    public void run() {
 	    	final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
-			System.out.println("Testing game # " + gameNumber + "..."); //time will be appended in-line
+			System.out.println("Testing game # " + gameNumber + "..."); 
 			
 			AggregateResults ar = new AggregateResults();
 			while (gp.hasNextGameState())
 				evaluateMoveOrdering(ar, hyp, gp.getNextGameState());
 			
-			totalScore.addResult(ar);
+			totalScore.addResult(ar); //this method is synchronized so threading does not affect this
 			//???? print ar moves for game????
 			
 			final long endTime = System.currentTimeMillis();
-			System.out.println("Testing game # " + gameNumber + " took " + Utilities.msToString(endTime - startTime)); //this is appended to "Testing on game #x..."
+			System.out.println("Testing game # " + gameNumber + " took " + Utilities.msToString(endTime - startTime)); 
 	    }
     }
 	
@@ -58,6 +58,7 @@ public class HypothesisTest {
 			int cores = Runtime.getRuntime().availableProcessors() - 1; //do based on the number of cores to limit memory usage
 			ArrayList<Thread> threads = new ArrayList<Thread>();
 			
+			//Create the threads
 			for (int i = 0; i < cores && gd.hasNextGame(); i++){
 				count++;
 				GameInfo gi = gd.getNextGame();
@@ -66,12 +67,10 @@ public class HypothesisTest {
 				threads.add(t);
 			}
 			
+			//Wait for all the threads to finish
 			for(Thread t: threads){
-				try {
-					t.join();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				try { t.join(); }
+				catch (InterruptedException e) { e.printStackTrace(); }
 			}
 		}
 		
@@ -117,6 +116,7 @@ public class HypothesisTest {
 		private double sumPercent = 0;  //sum used for average percentile
 		private int numExpertMoves = 0; //number of expert moves
 		
+		//This method is synchronized because we are overwriting variables and don't want to lose information
 		public synchronized void addResult(AggregateResults otherAr){
 			numInTop5Percent += otherAr.getNumInTop5Percent();
 			sumPercent += otherAr.getSumPercent();
