@@ -9,6 +9,7 @@ The python and bash scripts allow you to submit Naive Bayes training jobs to the
 =========================================================================
 If you need to compile or run the Java program, here's how you do it... 
 # Compile from root ArimaaBot dir.
+# Note that the version of mysql may vary from person to person
 javac -d bin -classpath ./mysql-connector-java-5.1.26-bin.jar:./src:./ src/naive_bayes/NBMain.java
 javac -d bin -classpath ./mysql-connector-java-5.1.26-bin.jar:./liblinear-1.94.jar:./src:./ src/svm/SVMMain.java  
 
