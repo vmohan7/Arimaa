@@ -1,7 +1,7 @@
 #!/usr/bin/expect -f
 
 # ---- PARAMETERS TO CONFIGURE HERE ---- #
-set ARIMAABOT_DIR "~/test/cs229_testing/ArimaaBot"
+set ARIMAABOT_DIR "~/cs229/Arimaa/ArimaaBot"
 
 # mysql-connector .jar path relative to ARIMAABOT_DIR
 set JAR_PATH "./mysql-connector-java-5.1.26-bin.jar"
@@ -27,6 +27,7 @@ expect "%"
 
 log_user 1
 set timeout -1
-send "java -Xmx500000000 -classpath $JAR_PATH:./bin:./ naive_bayes.NBMain $startSize $endSize $incrSize\r"
+# send "java -Xmx500000000 -classpath $JAR_PATH:./bin:./ naive_bayes.NBMain $startSize $endSize $incrSize\r"
+send "java -classpath $JAR_PATH:./bin:./ naive_bayes.NBMain $startSize $endSize $incrSize\r"
 set timeout -1
 expect "Total execution time"

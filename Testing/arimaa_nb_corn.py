@@ -15,10 +15,10 @@ PASSWORD = passwords.my_password
 NUM_TRIALS = 1
 
 # Number of examples in first test
-START_SIZE = 2
+START_SIZE = 150
 
 # Number of examples in last test (inclusive)
-END_SIZE = 4
+END_SIZE = 150
 
 # Increment by which to increase number of examples in successive tests
 INCR_SIZE = 1
