@@ -45,6 +45,58 @@ public interface FeatureConstants {
 		}
 	}
 	
+	/** There are eight threats in total. (See David Wu's paper p. 26, or 
+	 * CaptureThreatsExtractor.java) <br>
+	 * The first four are threatening and defending captures.
+	 * The last four are the method by which the capture was defended.
+	 * @author Neema */
+	public static class CaptureThreats {	
+		
+		/** THREATENS CAP(type,s,trap): Threatens capture of opposing piece of type type (0-7)
+		 *			in s (1-4) steps , in trap trap (0-3). (128 features) */
+		public static final int THREATENS_CAP_OFFSET = FeatureRange.CAPTURE_THREATS_START;
+		
+		/**	INVITES CAP MOVED(type,s,trap): Moves own piece of type type (0-7) so that it can be
+		 *		 	captured by opponent in s (1-4) steps , in trap trap (0-3). (128 features) */
+		public static final int INVITES_CAP_MOVED_OFFSET = THREATENS_CAP_OFFSET + 128;
+		
+		/**	INVITES CAP UNMOVED(type,s,trap): Own piece of type type (0-7) can now be captured by
+		 *			opponent in s (1-4) steps, in trap trap (0-3), but it was not itself moved. 
+		 * 			(128 features)*/ 
+		public static final int INVITES_CAP_UNMOVED_OFFSET = INVITES_CAP_MOVED_OFFSET + 128;
+		
+		/**	PREVENTS CAP(type,loc): Removes the threat of capture from own piece of type type (0-7)
+		 *			at location loc (0-31). (256 features) */
+		public static final int PREVENTS_CAP_OFFSET = INVITES_CAP_UNMOVED_OFFSET + 128;
+		
+		/**	CAP DEF ELE(trap,s): Defends own piece otherwise capturable in s (1-4) steps in trap 
+		 *			trap (0-3) by using the elephant as a trap defender. (16 features) */
+		public static final int CAP_DEF_ELE_OFFSET = PREVENTS_CAP_OFFSET + 256;
+		
+		/**	CAP DEF OTHER(trap,s): Defends own piece otherwise capturable in s (1-4) steps in trap
+		 *			trap (0-3) by using a non-elephant piece as a trap defender. (16 features) */
+		public static final int CAP_DEF_OTHER_OFFSET = CAP_DEF_ELE_OFFSET + 16;
+		
+		/**	CAP DEF RUNAWAY(trap,s): Defends own piece otherwise capturable in s (1-4) steps in trap
+		 *			trap (0-3) by making the threatened piece run away. (16 features) */
+		public static final int CAP_DEF_RUNAWAY = CAP_DEF_OTHER_OFFSET + 16;
+		 
+		/**	CAP DEF INTERFERE(trap,s): Defends own piece otherwise capturable in s (1-4) steps in trap
+		 *			trap (0-3) by freezing or blocking the threatening piece. (16 features) */
+		public static final int CAP_DEF_INTERFERE = CAP_DEF_RUNAWAY + 16;
+		//assert(CAP_DEF_INTERFERE + 16 == FeatureRange.CAPTURE_THREATS_END + 1);
+		
+		/** Contains the offsets for each sub-feature class, in order of description by David Wu.
+		 * (OFFSET_ARRAY[0] is the first sub-feature class described by Wu, p. 26) */
+		public static final int[] OFFSET_ARRAY = {
+			THREATENS_CAP_OFFSET, INVITES_CAP_MOVED_OFFSET, INVITES_CAP_UNMOVED_OFFSET,
+				PREVENTS_CAP_OFFSET, 
+			CAP_DEF_ELE_OFFSET, CAP_DEF_OTHER_OFFSET, CAP_DEF_RUNAWAY, CAP_DEF_INTERFERE
+				
+		};
+		
+	}
+	
 	/** FeatureRange contains the constants describing the <i>start</i> and <i>end</i>
 	 *  indices (in the FeatureExtractor's BitSet) of the different AbstractExtractor subclasses. */
 	public static class FeatureRange {
