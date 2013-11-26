@@ -184,5 +184,30 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		
 	}
 
-
+	/** Tests different portions of CaptureThreats one at a time...*/
+	@Test
+	public void testCaptureThreats() {
+		testThreatenCapture();
+	}
+	
+	//testing THREATEN CAP
+	private void testThreatenCapture() {
+		//set up valid start game -- no captures possible
+		String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
+		String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
+		GameState curr = new GameState(white, black);
+		CaptureThreatsExtractor cTE = new CaptureThreatsExtractor(null, curr);
+		
+		BitSet bs = new BitSet(NUM_FEATURES);
+		cTE.updateBitSet(bs);
+		
+		// capture possible -- 
+		String whiteCap = "1w Me2"; //can be pulled/pushed into trap at f3 by Ee3
+		String blackCap = "1b md3 ee3";
+		curr = new GameState(whiteCap, blackCap);
+		cTE = new CaptureThreatsExtractor(null, curr);
+		
+		bs.clear();
+		cTE.updateBitSet(bs);
+	}
 }
