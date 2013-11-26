@@ -17,6 +17,12 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		"12w %13 +-----------------+%138|                 |%137|                 |%136|   R             |%135|                 |%134|                 |%133|         D   r   |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
 		"12w %13 +-----------------+%138|                 |%137|                 |%136|   R             |%135|                 |%134|                 |%133|             r   |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
 		"2w %13 +-----------------+%138| r r   H r r r r |%137|   e   C r   r   |%136|   d X     X     |%135|   d R M c       |%134|       R         |%133|     X     X     |%132|                 |%131|       R       R |%13 +-----------------+%13   a b c d e f g h%13",
+		"12w %13 +-----------------+%138|                 |%137|                 |%136|   e             |%135| R               |%134|                 |%133| R               |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
+		"12w %13 +-----------------+%138|                 |%137|                 |%136|   E             |%135| r               |%134|                 |%133|                 |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
+		"12w %13 +-----------------+%138|                 |%137|                 |%136| r E             |%135|                 |%134| r               |%133|                 |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
+		"12w %13 +-----------------+%138|                 |%137|                 |%136| r E             |%135| c               |%134|                 |%133|                 |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
+		"12w %13 +-----------------+%138|                 |%137|                 |%136| m E             |%135|                 |%134|                 |%133|                 |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
+		"12w %13 +-----------------+%138|                 |%137|                 |%136| r E             |%135|                 |%134| c               |%133|                 |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13",
 	};
 	
 	@Test
@@ -183,6 +189,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		}
 		
 	}
+
 
 	// -------- STEPPING ON TRAPS EXTRACTOR (BEGIN) ------- //
 	
@@ -351,4 +358,128 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	}
 	
 	// -------- STEPPING ON TRAPS EXTRACTOR (END) ------- //
+
+	
+	
+	
+	@Test
+	public void testFreezing1() {
+		GameState prev = new GameState(tests[3]);
+		prev.compute_tertiary_bitboards();
+		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		BitSet featureVector = fe.extractFeatures(new ArimaaMove("Ra5n"));
+		GameState curr = new GameState();
+		curr.playFull(new ArimaaMove("Ra5n"), prev);
+//		System.out.println(prev.toBoardString());
+//		System.out.println(curr.toBoardString());
+		assertTrue(featureVector.get(1567));
+		assertTrue(featureVector.get(1625));
+	}
+
+	@Test
+	public void testFreezing2() {
+		GameState prev = new GameState(tests[4]);
+		prev.compute_tertiary_bitboards();
+		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra5n"));
+		GameState curr = new GameState();
+		curr.playFull(new ArimaaMove("ra5n"), prev);
+//		System.out.println(prev.toBoardString());
+//		System.out.println(curr.toBoardString());
+		assertTrue(featureVector.get(1583));
+		assertTrue(featureVector.get(1689));
+	}
+	
+	@Test
+	public void testFreezing3() {
+		GameState prev = new GameState(tests[5]);
+		prev.compute_tertiary_bitboards();
+		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ra4n"));
+//		System.out.println(prev.toBoardString());
+		GameState curr = new GameState();
+		curr.playFull(new ArimaaMove("ra6n ra7n ra4n"), prev);
+//		System.out.println(curr.toBoardString());
+//		System.out.println(featureVector);
+		assertTrue(featureVector.get(1582));
+		assertTrue(featureVector.get(1688));
+	}
+	
+	@Test
+	public void testFreezing4a() {
+		GameState prev = new GameState(tests[6]);
+		prev.compute_tertiary_bitboards();
+		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ca5n"));
+//		System.out.println(prev.toBoardString());
+		GameState curr = new GameState();
+		curr.playFull(new ArimaaMove("ra6n ra7n ca5n"), prev);
+//		System.out.println(curr.toBoardString());
+//		System.out.println(featureVector);
+		assertTrue(featureVector.get(1571));
+		assertTrue(featureVector.get(1689));
+	}
+	
+	@Test
+	public void testFreezing4b() {
+		GameState prev = new GameState(tests[6]);
+		prev.compute_tertiary_bitboards();
+		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ca5n"));
+//		System.out.println(prev.toBoardString());
+		GameState curr = new GameState();
+		curr.playFull(new ArimaaMove("ra6n ca5n"), prev);
+//		System.out.println(curr.toBoardString());
+//		System.out.println(featureVector);
+		assertTrue(featureVector.nextSetBit(FeatureRange.FREEZING_START) == -1);
+	}
+	
+	@Test
+	public void testFreezing5() {
+		GameState prev = new GameState(tests[5]);
+		prev.compute_tertiary_bitboards();
+		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ra4n ra5n"));
+//		System.out.println(prev.toBoardString());
+		GameState curr = new GameState();
+		curr.playFull(new ArimaaMove("ra6n ra7n ra4n ra5n"), prev);
+//		System.out.println(curr.toBoardString());
+//		System.out.println(featureVector);
+		assertTrue(featureVector.nextSetBit(FeatureRange.FREEZING_START) == -1);
+	}
+	
+	@Test
+	public void testFreezing6() {
+		GameState prev = new GameState(tests[7]);
+		prev.compute_tertiary_bitboards();
+		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ma6n ma7e"));
+//		System.out.println(prev.toBoardString());
+		GameState curr = new GameState();
+		curr.playFull(new ArimaaMove("ma6n ma7e"), prev);
+//		System.out.println(curr.toBoardString());
+//		System.out.println(featureVector);
+		assertTrue(featureVector.get(1570));
+		assertTrue(featureVector.get(1571));
+		assertTrue(featureVector.get(1688));
+		assertTrue(featureVector.get(1699));
+	}
+	
+	@Test
+	public void testFreezing7() {
+		GameState prev = new GameState(tests[8]);
+		prev.compute_tertiary_bitboards();
+		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ca4n ca5n"));
+//		System.out.println(prev.toBoardString());
+		GameState curr = new GameState();
+		curr.playFull(new ArimaaMove("ra6n ra7n ca4n ca5n"), prev);
+//		System.out.println(curr.toBoardString());
+//		System.out.println(featureVector);
+		assertTrue(featureVector.get(1571));
+		assertTrue(featureVector.get(1688));
+		assertTrue(featureVector.get(1582));
+		assertTrue(featureVector.get(1689));
+	}
+	
 }
