@@ -57,7 +57,7 @@ public class NBMain {
 			System.out.println("Error in NBMain: expects 3 arguments...\n"
 					+ "Arguments: <min-example-set-size> <max-example-set-size> <increment> \n"
 					+ "e.g. to train on example sets of size 10, 15, and 20, use arguments '10 20 5' \n"
-					+ "e.g. to train on a single example set of 20 games, use arguments '20 20 0'");
+					+ "e.g. to train on a single example set of 20 games, use arguments '20 20 1'");
 			return;
 		}
 		
