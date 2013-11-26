@@ -7,6 +7,7 @@ ConvertData/TextData
 ConvertData/games.sql
 ConvertData/FastSQLLoad/*
 ConvertData/FastSQLLoad.zip
+Testing/passwords.py*
 
 # OS Files #
 .DS_Store

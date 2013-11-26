@@ -6,13 +6,24 @@ import datetime
 
 startJob = datetime.datetime.now() 
 
+## Variables to configure ##
+
 # Number of trials for each sample set size
-numTrials = 1
+NUM_TRIALS = 1
+
+# Number of examples in first test
+START_SIZE = 2
+
+# Number of examples in last test (inclusive)
+END_SIZE = 4
+
+# Increment by which to increase number of examples in successive tests
+INCR_SIZE = 1
 
 # Submit job for each training set size
 # The -N argument to qsub gives the job name
-for exampleSetSize in range(10, 21, 10):
-    for trialIndex in range(numTrials):
+for exampleSetSize in range(START_SIZE, END_SIZE + 1, INCR_SIZE):
+    for trialIndex in range(NUM_TRIALS):
         os.system("qsub -N arimaa_nb_%d_%d ./arimaa_nb.sh %d %d %d" % (exampleSetSize, trialIndex, exampleSetSize, exampleSetSize, 0))
 
 endJob = datetime.datetime.now() 
