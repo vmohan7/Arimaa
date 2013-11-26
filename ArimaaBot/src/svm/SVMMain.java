@@ -87,11 +87,11 @@ public class SVMMain {
 			e.printStackTrace();
 		}
 		
-		DisconnectedGameData myGameData = new DisconnectedGameData(num_games, gIds, true);
+		DisconnectedGameData myGameData = new DisconnectedGameData(num_games, gIds, false);
 		System.out.println("\nTesting hypothesis on " + num_games +" TEST games...");
 		HypothesisTest.test(myHypothesis, myGameData);
 		
-		myGameData = new DisconnectedGameData(num_games, gIds, false);
+		myGameData = new DisconnectedGameData(num_games, gIds, true);
 		System.out.println("\nTesting hypothesis on TRAINING games...");
 		HypothesisTest.test(myHypothesis, myGameData);
 	}
