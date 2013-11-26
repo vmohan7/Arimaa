@@ -2,7 +2,7 @@ package feature_extractor;
 import java.util.BitSet;
 import arimaa3.*;
 
-public class FeatureExtractor implements Constants, FeatureConstants {
+public class FeatureExtractor implements FeatureConstants {
 	
 	/* Starting game state from which we play current_move */
 	private GameState prev;

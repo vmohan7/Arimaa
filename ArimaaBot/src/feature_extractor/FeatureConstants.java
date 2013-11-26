@@ -3,7 +3,7 @@ package feature_extractor;
 import arimaa3.Constants;
 
 /** Extends Constants to add more constants (for the Feature Extractor in particular) */
-public interface FeatureConstants extends Constants{
+public interface FeatureConstants extends Constants {
 	
 	/**
 	 * Status number -> trap "condition"

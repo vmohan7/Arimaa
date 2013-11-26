@@ -2,7 +2,6 @@ package feature_extractor;
 
 import java.util.BitSet;
 
-import arimaa3.ArimaaMove;
 import arimaa3.GameState;
 
 public class SteppingOnTrapsExtractor extends AbstractExtractor {
@@ -72,6 +71,7 @@ public class SteppingOnTrapsExtractor extends AbstractExtractor {
 					int pieceType = pieceTypes[board];
 					bitset.set(pieceType + totalOffset);
 					
+					//TODO: remove this once we are confident :)
 					int numFeatures = endOfRange() - startOfRange() + 1;
 					assert(pieceType + trapOffset + safetyOffset < numFeatures); //this should never go off...
 				}
