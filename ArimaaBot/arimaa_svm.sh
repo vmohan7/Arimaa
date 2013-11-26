@@ -7,7 +7,7 @@
 #$ -cwd
 
 #Tell the grid engine we want 90 GB
-#$ -l mem=90000
+#$ -pe pvm 12- -l mem=90000
 
 #arguments is 1= the number of games; 2 = the model
 TRAIN=$(echo '.7 * ' $1 | bc | sed 's/[.].*//')
