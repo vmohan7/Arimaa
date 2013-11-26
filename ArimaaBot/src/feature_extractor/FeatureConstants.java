@@ -48,6 +48,8 @@ public interface FeatureConstants extends Constants{
 		}
 	}
 	
+	/** Contains the constants used in SteppingOnTrapsExtractor
+	 * @author Neema */
 	public static class SteppingOnTraps {
 		
 		/** These are the piece types for the bit-boards long[6] stored in SteppingOnTrapsExtractor */
