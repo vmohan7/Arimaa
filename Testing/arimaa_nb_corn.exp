@@ -3,7 +3,7 @@
 # ---- PARAMETERS TO CONFIGURE HERE ---- #
 set ARIMAABOT_DIR "~/test/cs229_testing/ArimaaBot"
 
-# mysql-connector .jar path relative to arimaabot_dir
+# mysql-connector .jar path relative to ARIMAABOT_DIR
 set JAR_PATH "./mysql-connector-java-5.1.26-bin.jar"
 
 # -------------------------------------- #
