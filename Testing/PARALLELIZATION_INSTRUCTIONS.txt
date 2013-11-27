@@ -18,11 +18,11 @@ The python and bash scripts with "barley" in their names allow you to submit Nai
 
 
 ----------------
-If you need to compile or run the Java program, here's how you do it... 
+If you need to compile or run the Java program, here's how you do it. In the classpath arguments, replace "./mysql-connector-java-5.1.26-bin.jar" with the path to your jar file if it is different. 
 # Compile from ArimaaBot dir.
 javac -d bin -classpath ./mysql-connector-java-5.1.26-bin.jar:./src:./ src/naive_bayes/NBMain.java 
 
-# Run from the ArimaaBot dir, assuming you have compiled class files in bin/. Of course, configure the arguments to NBMain according to your needs. 
+# Run from the ArimaaBot dir, assuming you have compiled class files in bin/. Of course, configure the arguments to NBMain according to your needs. Also, you can leave out the -Xmx500000000 argument according to your needs. 
 # Arguments: <min-example-set-size> <max-example-set-size> <increment> 
 # e.g. to train on example sets of size 10, 15, and 20, use arguments '10 20 5' 
 # e.g. to train on a single example set of 20 games, use arguments '20 20 0'
