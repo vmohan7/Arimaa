@@ -102,7 +102,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 		
 		for (ArimaaMove move : moveList) {//seems to avoid null moves...
 			GameState postCapture = new GameState();
-			postCapture.playFullClear(move, currOppPass);
+			postCapture.play(move, currOppPass); //was playFullClear -- no longer
 			recordCaptureMove(curr, postCapture, move.steps, bitset, offset, opponent, oppPieceTypes);
 		}
 	}
@@ -133,7 +133,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 			captured ^= (1 << type); //turn off the type-bit just considered (faster than & ~?)
 			int trap = getTrapNumber(preCapture, postCapture); //2
 			
-			if (type >= Byte.Size) type -= Byte.Size; // 0 <= type < Byte.Size (8)
+			if (type >= Byte.SIZE) type -= Byte.SIZE; // 0 <= type < Byte.Size (8)
 			int bitToSet = bitOffset + 32 * trap + 8 * (numSteps - 1) + type; //TODO: remove hardcoding
 			toUpdate.set(bitToSet);
 		}
@@ -164,7 +164,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 				case 0:
 					break;
 				case 2:
-					captures |= (1 << (pieceType + Byte.Size)); 
+					captures |= (1 << (pieceType + Byte.SIZE)); 
 					//fall through
 				case 1:
 					captures |= (1 << pieceType);
