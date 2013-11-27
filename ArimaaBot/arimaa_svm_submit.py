@@ -11,11 +11,12 @@ numTrials = 1
 
 # Submit job for each training set size
 # The -N argument to qsub gives the job name
-for exampleSetSize in xrange(10, 120, 10):
+for exampleSetSize in xrange(10, 110, 10):
+    memory = exampleSetSize/2;
     for model in [1,6,7]:
         for trialIndex in xrange(numTrials):
-            os.system("qsub -l mem_free=90G -pe shm 8 -N arimaa_svm_%d_%d_%d ./arimaa_svm.sh %d %d" % \
-			    (exampleSetSize, model, trialIndex, exampleSetSize, model) )
+            os.system("qsub -l mem_free=%dG -N arimaa_svm_%d_%d_%d ./arimaa_svm.sh %d %d" % \
+			    (memory, exampleSetSize, model, trialIndex, exampleSetSize, model) )
 
 endJob = datetime.datetime.now() 
 
