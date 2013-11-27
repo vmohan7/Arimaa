@@ -501,14 +501,37 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		
 		BitSet bs = new BitSet(NUM_FEATURES);
 		cTE.updateBitSet(bs);
+		assertTrue(bs.cardinality() == 0);
 		
-		// capture possible -- 
-		String whiteCap = "1w Me2"; //can be pulled/pushed into trap at f3 by Ee3
-		String blackCap = "1b md3 ee3";
+		// capture possible -- assume black has just moved to "create a threat", white to play
+		String whiteCap = "1w Me2"; //can be pulled/pushed into trap at f3 by ee3 (trap #2) -- 2 ways -- both are the same?
+		String blackCap = "1b md3 ee3"; //opponent's threatened piece (M) has 1 piece stronger (namely e)
 		curr = new GameState(whiteCap, blackCap);
 		cTE = new CaptureThreatsExtractor(null, curr);
 		
 		bs.clear();
 		cTE.updateBitSet(bs);
+		assertTrue(bs.cardinality() == 1);
+		assertTrue(bs.get(CaptureThreats.THREATENS_CAP_OFFSET + 32 * 2 + 8 * 3 + 1)); // requires 4 moves -- step takes value 3
+		
+		// capture possible -- capturing two pieces in multiple ways (TODO: change trap calc)
+		String whiteCap2 = "1w Me3 Dd6";
+		String blackCap2 = "1b ee2 md5"; // each piece can kill/trap the corresponding white one in 2 ways each
+										 // and they can both kill in one turn (but doesn't matter)
+		curr = new GameState(whiteCap2, blackCap2);
+		cTE = new CaptureThreatsExtractor(null, curr);
+		
+		bs.clear();
+		cTE.updateBitSet(bs);
+		assertTrue(bs.cardinality() == 4);
+		
+		// killing the camel in trap 2 -- camel should be type 1.
+		assertTrue(bs.get(CaptureThreats.THREATENS_CAP_OFFSET + 32 * 2 + 8 * 3 + 1)); //roundabout kill
+		assertTrue(bs.get(CaptureThreats.THREATENS_CAP_OFFSET + 32 * 2 + 8 * 1 + 1)); //direct
+		
+		//TODO: test other traps (e.g. trap 1) once trap-detection is in place...
+		// killing the dog in trap 1 -- dog should be type 2. (if we pretend trap is 2, then: )
+		assertTrue(bs.get(CaptureThreats.THREATENS_CAP_OFFSET + 32 * 2 + 8 * 3 + 2)); //roundabout kill
+		assertTrue(bs.get(CaptureThreats.THREATENS_CAP_OFFSET + 32 * 2 + 8 * 1 + 2)); //direct
 	}
 }
