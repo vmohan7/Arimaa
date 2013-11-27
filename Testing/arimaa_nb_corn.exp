@@ -1,7 +1,7 @@
 #!/usr/bin/expect -f
 
 # ---- PARAMETERS TO CONFIGURE HERE ---- #
-set ARIMAABOT_DIR "~/cs229/Arimaa/ArimaaBot"
+set ARIMAABOT_DIR "/afs/ir.stanford.edu/users/v/h/vhchoksi/cs229/Arimaa/ArimaaBot"
 
 # mysql-connector .jar path relative to ARIMAABOT_DIR
 set JAR_PATH "./mysql-connector-java-5.1.26-bin.jar"
