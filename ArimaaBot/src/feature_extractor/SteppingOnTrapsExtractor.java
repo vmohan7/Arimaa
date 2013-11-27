@@ -4,7 +4,7 @@ import java.util.BitSet;
 
 import arimaa3.GameState;
 
-public class SteppingOnTrapsExtractor extends AbstractExtractor {
+public class SteppingOnTrapsExtractor extends AbstractTrapExtractor {
 
 	/** 0 = lower left, 1 = upper left, 2 = lower right, 3 = upper right <br>
 	 * areTrapsSafe[k] contains whether the k-th trap is safe (true == safe) */
@@ -109,7 +109,6 @@ public class SteppingOnTrapsExtractor extends AbstractExtractor {
 		for (int trap = 0; trap < trapSafety.length; trap++) {
 			// using curr, since safety should be judged at end of move (agreed?)
 			trapSafety[trap] = getTrapStatus(curr, trap, player) >= TrapStatus.ONE_E; 
-			//TODO: merge with TrapExtractor's method?
 		}
 		
 		return trapSafety;
@@ -140,35 +139,12 @@ public class SteppingOnTrapsExtractor extends AbstractExtractor {
 		
 		return pieceTypes;
 	}
-	
-	/** Returns a byte containing one of the TrapStatus.NUM_STATUSES possible
-	 * trap statuses (number of pieces on trap, elephant?, etc).
-	 * @param state The current board
-	 * @param trapNum Lower left, upper left, lower right, upper right
-	 * @param playerNum PL_WHITE, PL_BLACK */
-	private byte getTrapStatus(GameState state, int trapNum, int playerNum) {
-		long player_trap_bb = TOUCH_TRAP[trapNum] & state.colour_bb[playerNum]; // all white or black pieces touching trap #trapNum
-		byte numPieces = FeatureExtractor.countOneBits(player_trap_bb);
-		assert(numPieces <= 4); //shouldn't be more than 4 pieces touching a trap...
 		
-		boolean elephant = isElephantTouchingTrap(state, trapNum, playerNum);
-		return TrapStatus.convertToStatus(numPieces, elephant);
-	}
-	
-	/** Returns whether an elephant for the given player (in the current game state)
-	 * is on any of the four spaces adjacent to the given trap. */
-	private boolean isElephantTouchingTrap(GameState state, int trapNum, int playerNum) { //remove static once done testing, make private
-		int boardNum = playerNum == PL_WHITE ? PT_WHITE_ELEPHANT : PT_BLACK_ELEPHANT;
-		long elephant_bb = state.piece_bb[boardNum];
-	
-		return (elephant_bb & TOUCH_TRAP[trapNum]) != 0;
-	}
-	
 	
 	/** Returns a bit-board with 1s in positions where any bitboard has a piece */
 	private long getPieceBB(long[] bitboards) {
 		long bitboard = 0L;
-		for (int i = 0; i < bitboards.length; i++) //look only at bitboards for the player
+		for (int i = 0; i < bitboards.length; i++)
 			bitboard |= bitboards[i];
 		
 		return bitboard;
