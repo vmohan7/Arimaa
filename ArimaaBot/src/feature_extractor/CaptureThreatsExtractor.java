@@ -155,9 +155,8 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	private short getCapturesFromStates(GameState preCapture, GameState postCapture,
 													int opponent, byte[] oppPieceTypes) {
 		short captures = 0;
-		
-		//TODO: Assumption: the piece_bbs are visited in what order? OH MY GOD WHY IS THIS SO HARD :(
-		for (int i = opponent; i < oppPieceTypes.length; i++) {
+	
+		for (int i = opponent; i < 12; i += 2) { //TODO: fix hardcoding
 			int preCaptureCount = Util.PopCnt(preCapture.piece_bb[i]);
 			int postCaptureCount = Util.PopCnt(postCapture.piece_bb[i]);
 			int numCaptures = preCaptureCount - postCaptureCount; //numCaptures >= 0
@@ -243,7 +242,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 			int opponent, byte[] oppPieceTypes, ArrayList<Integer> captured, 
 												ArrayList<Integer> trapsUsed) {
 		
-		for (int piece = opponent; piece < oppPieceTypes.length; piece++) {
+		for (int piece = opponent; piece < 12; piece += 2) {
 			int preCaptureCount = Util.PopCnt(preCapture.piece_bb[piece]);
 			int postCaptureCount = Util.PopCnt(postCapture.piece_bb[piece]);
 			int numCaptures = preCaptureCount - postCaptureCount; //numCaptures >= 0
