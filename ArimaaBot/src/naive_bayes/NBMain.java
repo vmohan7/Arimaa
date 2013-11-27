@@ -6,7 +6,6 @@ import utilities.helper_classes.Utilities;
 
 public class NBMain {
 	
-
 	private static final double TRAIN_FRACTION = 0.7;
 	
 	private static void trainAndTest(int numGames){
