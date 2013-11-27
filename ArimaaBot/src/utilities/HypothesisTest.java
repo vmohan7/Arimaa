@@ -2,6 +2,7 @@ package utilities;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.concurrent.Semaphore;
 
 import arimaa3.ArimaaEngine;
 import arimaa3.ArimaaMove;
@@ -27,22 +28,34 @@ public class HypothesisTest {
     	}
     	
 	    public void run() {
-	    	final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
-			System.out.println("Testing game # " + gameNumber + "..."); 
-			
-			AggregateResults ar = new AggregateResults();
-			while (gp.hasNextGameState())
-				evaluateMoveOrdering(ar, hyp, gp.getNextGameState());
-			
-			totalScore.addResult(ar); //this method is synchronized so threading does not affect this
-			//???? print ar moves for game????
-			
-			final long endTime = System.currentTimeMillis();
-			System.out.println("Testing game # " + gameNumber + " took " + Utilities.msToString(endTime - startTime)); 
+	    	try {
+	    		
+				threadsRunning.acquire();
+				
+				final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
+				System.out.println("Testing game # " + gameNumber + "..."); 
+				
+				AggregateResults ar = new AggregateResults();
+				while (gp.hasNextGameState())
+					evaluateMoveOrdering(ar, hyp, gp.getNextGameState());
+				
+				totalScore.addResult(ar); //this method is synchronized so threading does not affect this
+				//???? print ar moves for game????
+				
+				final long endTime = System.currentTimeMillis();
+				System.out.println("Testing game # " + gameNumber + " took " + Utilities.msToString(endTime - startTime)); 
+				
+				threadsRunning.release();
+				
+	    	} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 	    }
     }
 	
     public static final int FREE_CORES = 2;
+    private static final int MAX_NUM_THREADS = Runtime.getRuntime().availableProcessors() - FREE_CORES;
+    private static Semaphore threadsRunning;
     
 	/** Runs evaluation based on the 30% of the data that is in GameData
 	 * Once we have run our tests, we print out the statistics.
@@ -54,28 +67,37 @@ public class HypothesisTest {
 	public static void test(AbstractHypothesis hyp, GameData gd) { //TODO: rename
 		
 		AggregateResults totalScore = new AggregateResults();
-		
+		threadsRunning = new Semaphore(MAX_NUM_THREADS);
+		ArrayList<Thread> threads = new ArrayList<Thread>();
 		int count = 0;
 		while (gd.hasNextGame()) {
-			int cores = Runtime.getRuntime().availableProcessors() - FREE_CORES; //do based on the number of cores to limit memory usage
-			ArrayList<Thread> threads = new ArrayList<Thread>();
-			
-			//Create the threads
-			for (int i = 0; i < cores && gd.hasNextGame(); i++){
-				count++;
-				GameInfo gi = gd.getNextGame();
-				Thread t = new Thread( new AggregateThread(gi, count, hyp, totalScore) );
-				t.start();
-				threads.add(t);
-			}
-			
-			//Wait for all the threads to finish
-			for(Thread t: threads){
-				try { t.join(); }
-				catch (InterruptedException e) { e.printStackTrace(); }
-			}
+			GameInfo gi = gd.getNextGame();
+			Thread t = new Thread( new AggregateThread(gi, count, hyp, totalScore) );
+			t.start();
+			count++;
+			threads.add(t);
+//			int cores = Runtime.getRuntime().availableProcessors() - FREE_CORES; //do based on the number of cores to limit memory usage
+//			ArrayList<Thread> threads = new ArrayList<Thread>();
+//			
+//			//Create the threads
+//			for (int i = 0; i < cores && gd.hasNextGame(); i++){
+//				count++;
+//				GameInfo gi = gd.getNextGame();
+//				Thread t = new Thread( new AggregateThread(gi, count, hyp, totalScore) );
+//				t.start();
+//				threads.add(t);
+//			}
+//			
+//			//Wait for all the threads to finish
+//			for(Thread t: threads){
+//				try { t.join(); }
+//				catch (InterruptedException e) { e.printStackTrace(); }
+//			}
 		}
-		
+		for(Thread t: threads){
+			try { t.join(); }
+			catch (InterruptedException e) { e.printStackTrace(); }
+		}
 		System.out.println(totalScore); //prints the statistics stored in AggregateResults
 	}
 	

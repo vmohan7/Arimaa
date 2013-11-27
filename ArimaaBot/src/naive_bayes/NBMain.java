@@ -6,7 +6,7 @@ import utilities.helper_classes.Utilities;
 
 public class NBMain {
 	
-	private static final int MAX_NUM_X_POINTS = 15;
+	private static final int MAX_NUM_X_POINTS = 1;
 	private static final int START_X_POINT = 1;
 	private static final int X_SCALING = 10;
 	private static final double TRAIN_FRACTION = 0.7;
@@ -44,7 +44,7 @@ public class NBMain {
 			System.out.println("\nTesting hypothesis on TEST set...");
 			myGameData.setMode(GameData.Mode.TEST);
 			HypothesisTest.test(myHypothesis, myGameData);
-			
+
 			System.out.println("\nTesting hypothesis on TRAIN set...");
 			myGameData.setMode(GameData.Mode.TRAIN);
 			HypothesisTest.test(myHypothesis, myGameData);
