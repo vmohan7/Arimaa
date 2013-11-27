@@ -19,4 +19,5 @@ JAR_PATH=../ArimaaBot/mysql-connector-java-5.1.26-bin.jar
 # this assumes that we're running from the root Arimaa directory
 
 # Configure the paths in this line if your directory structure is different! 
-java -Xmx500000000 -classpath $JAR_PATH:../ArimaaBot/bin:../ArimaaBot naive_bayes.NBMain $1 $2 $3 
+#java -Xmx500000000 -classpath $JAR_PATH:../ArimaaBot/bin:../ArimaaBot naive_bayes.NBMain $1 $2 $3 
+java -classpath $JAR_PATH:../ArimaaBot/bin:../ArimaaBot naive_bayes.NBMain $1 $2 $3 
