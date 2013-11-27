@@ -57,6 +57,9 @@ public interface FeatureConstants {
 		
 		/** There are 160 Freezing features set by the FreezingExtractor class. */
 		public static final int FREEZING_START = 1552, FREEZING_END = 1711;
+		
+		/** There are 128 Previous Moves features set by the PreviousMovesExtractor class. */
+		public static final int PREV_MOVES_START = 2480, PREV_MOVES_END = 2607;
 	}
 	
 	
