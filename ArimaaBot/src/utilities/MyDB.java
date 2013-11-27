@@ -13,7 +13,7 @@ public class MyDB {
 	
 	private static final String MYSQL_USERNAME = "arimaa";
 	private static final String MYSQL_PASSWORD = "arimaa";
-	private static final String MYSQL_DATABASE_SERVER = "localhost";
+	private static final String MYSQL_DATABASE_SERVER = "arimaa-navv.csqhtrngores.us-west-1.rds.amazonaws.com";
 	private static final String MYSQL_DATABASE_NAME = "Arimaa";
 
 	
