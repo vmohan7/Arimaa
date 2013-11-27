@@ -2,7 +2,7 @@ package feature_extractor;
 import java.util.BitSet;
 import arimaa3.*;
 
-public class FeatureExtractor implements Constants, FeatureConstants {
+public class FeatureExtractor implements FeatureConstants {
 	
 	/* Starting game state from which we play current_move */
 	private GameState prev;
@@ -17,7 +17,7 @@ public class FeatureExtractor implements Constants, FeatureConstants {
 	public FeatureExtractor(GameState prev, GameState prev_prev) {
 		this.prev = prev;
 		this.prev_prev = null;
-		piece_types = null; 
+		piece_types = null;
 	}
 
 	/*
@@ -25,7 +25,6 @@ public class FeatureExtractor implements Constants, FeatureConstants {
 	 * current_board is the resulting board after playing current_move on prev game state.
 	 */
 	public BitSet extractFeatures(ArimaaMove current_move){
-	
 		// Generate the current game state by applying move on the previous game state
 		GameState currState = new GameState();
 		currState.playFullClear(current_move, prev);
@@ -50,6 +49,7 @@ public class FeatureExtractor implements Constants, FeatureConstants {
 		(new PositionMovementExtractor(prev, curr, current_move, piece_types)).updateBitSet(featureVector);
 		(new TrapExtractor(prev, curr)).updateBitSet(featureVector);
 		(new FreezingExtractor(prev, curr, piece_types)).updateBitSet(featureVector);
+		(new SteppingOnTrapsExtractor(prev, curr, piece_types)).updateBitSet(featureVector);
 		return featureVector;
 	}
 	

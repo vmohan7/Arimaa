@@ -35,6 +35,10 @@ cat FastSQLLoad/*.sql | mysql -u root Arimaa   # create tables in database
 mysqlimport --local -u root Arimaa FastSQLLoad/*.txt   # load data into tables; may need to specify full path
 </code></pre>
 
+Running long processes on corn:
+- If we want to write to files and leave a process running on corn, follow the instructions at the bottom of the document
+- https://www.stanford.edu/group/farmshare/cgi-bin/wiki/index.php/AFS
+
 Other items: 
 - Use MySQL5.5
 - For reference on Arimaa move notation, see: http://arimaa.com/arimaa/learn/notation.html
@@ -57,3 +61,7 @@ It shows which features (from David Wu's paper) correspond to which bits of our 
 | ------ |:---:|
 | Position + Movement | 0 - 1039 |
 | Trap Status | 1040 - 1551 |
+| Freezing | 1552 - 1711 |
+| Stepping on Traps | 1712 - 1775 |
+| Capture Threats | 1776 - 2479 |
+| Previous Moves | 2480 - 2607 |
