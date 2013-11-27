@@ -11,9 +11,6 @@ import arimaa3.MoveList;
 
 //TODO: Make this class as efficient as possible--I can totally see this being a bottleneck.
 public class CaptureThreatsExtractor extends AbstractExtractor {
-
-	/** Used in bit manipulations -- the size of a byte is 8 */
-	private static final int SIZE_OF_BYTE = 8;
 	
 	private GameState prev, curr;
 	
@@ -136,7 +133,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 			captured ^= (1 << type); //turn off the type-bit just considered (faster than & ~?)
 			int trap = getTrapNumber(preCapture, postCapture); //2
 			
-			if (type >= SIZE_OF_BYTE) type -= SIZE_OF_BYTE; // 0 <= type < SIZE_OF_BYTE (8)
+			if (type >= Byte.Size) type -= Byte.Size; // 0 <= type < Byte.Size (8)
 			int bitToSet = bitOffset + 32 * trap + 8 * (numSteps - 1) + type; //TODO: remove hardcoding
 			toUpdate.set(bitToSet);
 		}
@@ -167,7 +164,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 				case 0:
 					break;
 				case 2:
-					captures |= (1 << (pieceType + SIZE_OF_BYTE)); 
+					captures |= (1 << (pieceType + Byte.Size)); 
 					//fall through
 				case 1:
 					captures |= (1 << pieceType);
