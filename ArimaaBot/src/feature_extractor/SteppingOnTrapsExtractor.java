@@ -116,10 +116,10 @@ public class SteppingOnTrapsExtractor extends AbstractExtractor {
 	}
 	
 	/** Returns bit-boards representing (for a player) locations of only moved pieces */
-	private long[] getMovedPieces(int player, final long[] preMoveBBs, final long[] postMoveBBs) {
-		long[] movedPiecesBB = new long[6]; //12 / 2 -- num of player's boards
+	private long[] getMovedPieces(int player, long[] preMoveBBs, long[] postMoveBBs) {
+		long[] movedPiecesBB = new long[preMoveBBs.length / 2];
 		
-		for (int i = player; i < 12; i += 2) {
+		for (int i = player; i < preMoveBBs.length; i += 2) {
 			/* Find the difference the move caused (~pieceBBBeforeMove has 1s exactly where
 		     * there weren't pieces before)--this is per piece*/
 			long pieceBBBeforeMove = preMoveBBs[i];
@@ -135,7 +135,7 @@ public class SteppingOnTrapsExtractor extends AbstractExtractor {
 	/** Copies into a new array only the pieceTypes relevant to player player */
 	private byte[] getPieceTypesForPlayer(int player, byte[] pieceTypesToCopy) {
 		byte[] pieceTypes = new byte[pieceTypesToCopy.length / 2];
-		for (int i = player; i < 12; i += 2) 
+		for (int i = player; i < pieceTypesToCopy.length; i += 2) 
 			pieceTypes[i / 2] = pieceTypesToCopy[i];
 		
 		return pieceTypes;
