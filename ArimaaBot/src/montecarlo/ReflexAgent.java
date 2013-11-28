@@ -1,7 +1,5 @@
 package montecarlo;
 
-import java.util.Random;
-
 import utilities.helper_classes.ArimaaState;
 import arimaa3.ArimaaEngine;
 import arimaa3.ArimaaMove;
@@ -16,7 +14,7 @@ public class ReflexAgent extends AbstractAgent {
 	@Override
 	public ArimaaMove selectMove(final ArimaaState arimaaState, ArimaaEngine engine) {
 		MoveList allPossibleMoves = engine.genRootMoves(arimaaState.getCurr());
-		ArimaaMove bestMove = trainRandomly(allPossibleMoves.move_list);
+		ArimaaMove bestMove = trainRandomly(allPossibleMoves.move_list, allPossibleMoves.size() );
 		if (bestMove != null)
 			return bestMove;
 		

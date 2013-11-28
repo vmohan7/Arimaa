@@ -32,11 +32,11 @@ public abstract class AbstractAgent {
 		weights = w;
 	}
 	
-	protected ArimaaMove trainRandomly(ArimaaMove[] movelist){
+	protected ArimaaMove trainRandomly(ArimaaMove[] movelist, int trueLength){
 		if (training){
 			Random r = new Random();
 			if( r.nextDouble() < RANDOM_CHOICE ){ 
-				return movelist[ r.nextInt( movelist.length ) ];
+				return movelist[ r.nextInt( trueLength ) ];
 			}
 		}
 		
