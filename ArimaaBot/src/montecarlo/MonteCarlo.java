@@ -77,7 +77,8 @@ public class MonteCarlo {
 		
 		int moveCount = 1;
 		while( !gameBoard.isGameOver() ) {
-			System.out.println(gameBoard);
+			System.out.println(state.getNextMove());
+			System.out.println(state.getCurr());
 			possibleMoves = engine.genRootMoves(state.getCurr());
 			if (possibleMoves.size() == 0) break; //Game Over does not seem to capture this
 			
@@ -97,7 +98,8 @@ public class MonteCarlo {
 			moveCount++;
 		}
 
-		System.out.println(gameBoard);
+		System.out.println(state.getNextMove());
+		System.out.println(state.getCurr());
 		Utilities.TDUpdate(state, null, moveCount % 2 == 0 ? 1 : 0 , ETA, weights);
 	}
 	
