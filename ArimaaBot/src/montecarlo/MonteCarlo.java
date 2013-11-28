@@ -2,6 +2,8 @@ package montecarlo;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 
 import utilities.helper_classes.ArimaaState;
@@ -14,20 +16,34 @@ import arimaa3.GameState;
 public class MonteCarlo {
 
 	/**
-	 * @param args
+	 * @param args - The first string should be the location of the output. The second string is the number of trails
 	 */
 	public static void main(String[] args) {
-		int numGames = 5;
-		if (args.length == 2)
-			numGames = Integer.parseInt(args[0]);
+		if (args.length != 2){
+			System.out.println("Error in usage - 2 string: location of output followed by number of trails");
+			System.exit(1);
+		}
+		int numGames = Integer.parseInt(args[1]);
 
 		double[] weights = new double[Utilities.TOTAL_FEATURES];
 		train(numGames, weights);
 
+		outputWeights(weights, new File(args[0]) );
 	}
 	
-	public static void outputWeights(double[] weights, File output){
-		BufferedWriter writer = new BufferedWriter(  );
+	public static void outputWeights(double[] weights, File output) {
+		try {
+			BufferedWriter writer = new BufferedWriter( new FileWriter(output.getAbsoluteFile()) );
+			
+			for(int i = 0; i < weights.length; i++){
+				writer.write(weights[i] + "\n");
+			}
+			
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public static final double VARIANCE = .01; 
