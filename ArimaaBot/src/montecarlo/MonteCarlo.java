@@ -92,11 +92,8 @@ public class MonteCarlo {
 
 			moveCount++;
 		}
-	    
-		//training for white only
-		//this should work because the feature vector is symmetric built
-		int reward = Math.max( 1, finalReward(moveCount/2) );
-		Utilities.TDUpdate(state, null, moveCount % 2 == 0 ? reward : -reward , ETA, weights);
+
+		Utilities.TDUpdate(state, null, moveCount % 2 == 0 ? 1 : 0 , ETA, weights);
 	}
 	
 	private static GameState getRandomStart(){
@@ -109,17 +106,6 @@ public class MonteCarlo {
 	    String b_text = first_move.getFirstMove(board, System.currentTimeMillis());
 	    
 	    return new GameState(w_text, b_text);
-	}
-
-	public static final int MAX_REWARD = 1000;
-	public static final double LAMBDA = - 1.0/(10000*Math.E);
-	/**
-	 * A function that gives a reward based on how many moves were taken to get to the end, the fewer the better
-	 * @param moveCount
-	 * @return
-	 */
-	private static int finalReward(int moveCount){
-		return (int) (MAX_REWARD*Math.exp(-LAMBDA*moveCount)); //At MoveCount = 100, reward = 1
 	}
 	
 }
