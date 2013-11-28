@@ -37,7 +37,9 @@ public abstract class AbstractAgent {
 		if (training){
 			Random r = new Random();
 			if( r.nextDouble() < RANDOM_CHOICE ){ 
-				return moves.move_list[ r.nextInt( moves.size() ) ];
+				int choice = r.nextInt( moves.size() );
+				System.out.println("PICKING RANDOM MOVE AT " + choice + "OUT OF " + moves.size());
+				return moves.move_list[ choice ];
 			}
 		}
 		
