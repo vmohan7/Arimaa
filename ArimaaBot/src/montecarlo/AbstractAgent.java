@@ -2,8 +2,8 @@ package montecarlo;
 
 import java.util.Random;
 
-import arimaa3.ArimaaEngine;
 import arimaa3.ArimaaMove;
+import arimaa3.MoveList;
 import utilities.helper_classes.ArimaaState;
 
 public abstract class AbstractAgent {
@@ -11,7 +11,7 @@ public abstract class AbstractAgent {
 	protected boolean training;
 	protected double[] weights;
 	
-	public static final double RANDOM_CHOICE = 0.20;
+	public static final double RANDOM_CHOICE = 0.10;
 	
 	public AbstractAgent(double[] weights, boolean training){
 		setWeights(weights);
@@ -19,10 +19,11 @@ public abstract class AbstractAgent {
 	}
 	
 	/**
+	 * Returns the best move for the model. Should not be passed an empty set
 	 * @param arimaaState - We assume that the nextMove field is null and use that to test out moves
 	 * @return The best move that the computer can think of.
 	 */
-	public abstract ArimaaMove selectMove(final ArimaaState arimaaState, ArimaaEngine engine);
+	public abstract ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves);
 	
 	/**
 	 * 
@@ -32,11 +33,11 @@ public abstract class AbstractAgent {
 		weights = w;
 	}
 	
-	protected ArimaaMove trainRandomly(ArimaaMove[] movelist, int trueLength){
+	protected ArimaaMove trainRandomly(MoveList moves){
 		if (training){
 			Random r = new Random();
 			if( r.nextDouble() < RANDOM_CHOICE ){ 
-				return movelist[ r.nextInt( trueLength ) ];
+				return moves.move_list[ r.nextInt( moves.size() ) ];
 			}
 		}
 		

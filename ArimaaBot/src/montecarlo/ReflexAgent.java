@@ -1,7 +1,6 @@
 package montecarlo;
 
 import utilities.helper_classes.ArimaaState;
-import arimaa3.ArimaaEngine;
 import arimaa3.ArimaaMove;
 import arimaa3.MoveList;
 
@@ -12,15 +11,14 @@ public class ReflexAgent extends AbstractAgent {
 	}
 
 	@Override
-	public ArimaaMove selectMove(final ArimaaState arimaaState, ArimaaEngine engine) {
-		MoveList allPossibleMoves = engine.genRootMoves(arimaaState.getCurr());
-		ArimaaMove bestMove = trainRandomly(allPossibleMoves.move_list, allPossibleMoves.size() );
+	public ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves) {
+		ArimaaMove bestMove = trainRandomly( moves );
 		if (bestMove != null)
 			return bestMove;
 		
 		double score = Double.NEGATIVE_INFINITY; //we want to maximize this value
 		
-		for (ArimaaMove possibleMove : allPossibleMoves){
+		for (ArimaaMove possibleMove : moves){
 			double evaluation = Utilities.logLinearEvaluation(arimaaState, possibleMove, weights);
 			if (evaluation > score){
 				score = evaluation;

@@ -12,6 +12,7 @@ import arimaa3.ArimaaEngine;
 import arimaa3.ArimaaMove;
 import arimaa3.FirstMove;
 import arimaa3.GameState;
+import arimaa3.MoveList;
 
 public class MonteCarlo {
 
@@ -68,16 +69,19 @@ public class MonteCarlo {
 		int player = 1; // we start with black in the loop
 		ArimaaState state = new ArimaaState(gameBoard, null);
 		ArimaaEngine engine = new ArimaaEngine();
+		MoveList possibleMoves = engine.genRootMoves(state.getCurr());
 		
 		//white needs to make the first move to initialize the state for TD
-		ArimaaMove move = agents[0].selectMove(state, engine);
+		ArimaaMove move = agents[0].selectMove(state, possibleMoves);
 		state = new ArimaaState(gameBoard, move); 
 		
 		int moveCount = 1;
 		while( !gameBoard.isGameOver() ) {
 			System.out.println(gameBoard);
+			possibleMoves = engine.genRootMoves(state.getCurr());
+			if (possibleMoves.size() == 0) break; //Game Over does not seem to capture this
 			
-			move = agents[player].selectMove(state, engine);
+			move = agents[player].selectMove(state, possibleMoves);
 			gameBoard = new GameState();
 			gameBoard.playFullClear(state.getNextMove(), state.getCurr());
 			ArimaaState nextState = new ArimaaState(state.getCurr(), gameBoard, move);
@@ -93,6 +97,7 @@ public class MonteCarlo {
 			moveCount++;
 		}
 
+		System.out.println(gameBoard);
 		Utilities.TDUpdate(state, null, moveCount % 2 == 0 ? 1 : 0 , ETA, weights);
 	}
 	

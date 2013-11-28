@@ -62,7 +62,6 @@ public class Utilities {
 	public static void TDUpdate(final ArimaaState state, final ArimaaState nextState, int reward, double eta, double[] weights){
 	    double r = reward + (nextState == null ? 0 : logLinearEvaluation(nextState, nextState.getNextMove() , weights) ) 
 	    				- logLinearEvaluation(state, state.getNextMove() , weights);
-	    System.out.println("My move is " + state.getNextMove());
 	    byte[] features = getFeatures(state, state.getNextMove());
 		long z = 0;
 		for(int i = 0; i < features.length; i++)
