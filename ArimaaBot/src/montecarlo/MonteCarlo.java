@@ -1,5 +1,7 @@
 package montecarlo;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.util.Random;
 
 import utilities.helper_classes.ArimaaState;
@@ -16,12 +18,16 @@ public class MonteCarlo {
 	 */
 	public static void main(String[] args) {
 		int numGames = 5;
-		if (args.length > 0)
+		if (args.length == 2)
 			numGames = Integer.parseInt(args[0]);
 
 		double[] weights = new double[Utilities.TOTAL_FEATURES];
 		train(numGames, weights);
 
+	}
+	
+	public static void outputWeights(double[] weights, File output){
+		BufferedWriter writer = new BufferedWriter(  );
 	}
 	
 	public static final double VARIANCE = .01; 
