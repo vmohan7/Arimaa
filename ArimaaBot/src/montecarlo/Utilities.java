@@ -23,6 +23,7 @@ public class Utilities {
 	public static byte[] getFeatures(final ArimaaState state, final ArimaaMove move){
 		byte[] features = new byte[TOTAL_FEATURES];
 		GameState currState = new GameState();
+		System.out.println("My move is " + move);
 		currState.playFullClear(move, state.getCurr());
 		
 		FeatureExtractor fe = new FeatureExtractor( state.getCurr(), state.getPrev());
