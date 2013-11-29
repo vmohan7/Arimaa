@@ -24,7 +24,7 @@ public class FeatureExtractor implements FeatureConstants {
 	 * Extracts features for the resulting board after playing a possible legal move.
 	 * current_board is the resulting board after playing current_move on prev game state.
 	 */
-	public BitSet extractFeatures(ArimaaMove current_move){
+	public BitSet extractFeatures(ArimaaMove current_move) {
 		// Generate the current game state by applying move on the previous game state
 		GameState currState = new GameState();
 		currState.playFullClear(current_move, prev);
@@ -37,7 +37,7 @@ public class FeatureExtractor implements FeatureConstants {
 	 * @param curr The game state that results from playing current_move to prev
 	 * @return
 	 */
-	public BitSet extractFeatures(ArimaaMove current_move, GameState curr){
+	public BitSet extractFeatures(ArimaaMove current_move, GameState curr) {
 		BitSet featureVector = new BitSet(NUM_FEATURES);
 		piece_types = new byte[12];
 

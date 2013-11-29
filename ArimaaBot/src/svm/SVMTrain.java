@@ -1,9 +1,13 @@
-package naive_bayes;
+package svm;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.BitSet;
 
-import utilities.AbstractGameData;
 import utilities.GameParser;
+import utilities.DisconnectedGameData;
 import utilities.helper_classes.ArimaaState;
 import utilities.helper_classes.GameInfo;
 import utilities.helper_classes.Utilities;
@@ -14,14 +18,21 @@ import arimaa3.ArimaaMove;
 import arimaa3.MoveList;
 
 
-public class NBTrain {
+public class SVMTrain implements FeatureConstants {
 	
 	private long numExpertMoves;
 	private long numNonExpertMoves;
+	private BufferedWriter writer;
 	
-	public NBTrain() {
+	public SVMTrain(File file) {
 		numExpertMoves = 0L;
 		numNonExpertMoves = 0L;
+		
+		try {
+			writer = new BufferedWriter( new FileWriter(file.getAbsoluteFile()) );
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public long getNumExpertMoves() {
@@ -38,9 +49,8 @@ public class NBTrain {
 	 * non-expert training examples. Everything is zero-indexed, and the 0th row is for non-expert moves. 
 	 * E.g. frequencies[1][10] represents the frequency count of feature 10 in expert moves.
 	 */
-	public long[][] train(AbstractGameData trainGames){
+	public void train(DisconnectedGameData trainGames){
 		
-		long[][] frequencyTable = new long[2][FeatureConstants.NUM_FEATURES];
 		ArimaaEngine myEngine = new ArimaaEngine(); // used to generate all possible moves
 		
 		// Iterate across all games in training set and extract features for expert and non-expert moves
@@ -52,25 +62,27 @@ public class NBTrain {
 			GameInfo trainGameInfo = trainGames.getNextGame();
 			GameParser myParser = new GameParser(trainGameInfo);
 			
-			while (myParser.hasNextGameState()){
-				trainOnTurn(frequencyTable, myParser.getNextGameState(), myEngine);	
+			while (myParser.hasNextGameState())	{
+				try {
+					trainOnTurn(myParser.getNextGameState(), myEngine);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}	
 			}
 			
 			final long endTime = System.currentTimeMillis();
 			System.out.println("training took " + Utilities.msToString(endTime - startTime));
 		}
-		
-		return frequencyTable;
 	}
 	
-	// This method is packaged so that it can be accessed in NBTest only. 
-	void trainOnTurn(long[][] frequencyTable, ArimaaState myState, ArimaaEngine myEngine) {
+	// This method is packaged so that it can be accessed in SVMTest only. 
+	void trainOnTurn(ArimaaState myState, ArimaaEngine myEngine) throws IOException {
 		ArimaaMove expertMove = myState.getNextMove();
 		
 		// Extract features for the expert move
 		FeatureExtractor myExtractor = new FeatureExtractor(myState.getCurr(), myState.getPrev());
 		BitSet featureVector = myExtractor.extractFeatures(expertMove); // extract features from expert move
-		updateFrequencies(featureVector, frequencyTable, true);
+		outputToFile(featureVector, true);
 		numExpertMoves++;
 		
 		// Extract features for all non-expert possible moves
@@ -80,23 +92,30 @@ public class NBTrain {
 		for (ArimaaMove possibleMove : allPossibleMoves){
 			if (!possibleMove.equals(expertMove)){
 				featureVector = myExtractor.extractFeatures(possibleMove); // extract features from non-expert move
-				updateFrequencies(featureVector, frequencyTable, false);
+				outputToFile(featureVector, false);
 				numNonExpertMoves++;
 			}
 		}
+		
+		writer.flush();
 	}
-
+	
 	/**
 	 * 
 	 * @param featureVector 
 	 * @param frequencyTable Frequency table to be updated with features in featureVector
 	 * @param isExpertMove
+	 * @throws IOException 
 	 */
-	private static void updateFrequencies(BitSet featureVector, long[][] frequencyTable, boolean isExpertMove){
+	private void outputToFile(BitSet featureVector, boolean isExpertMove) throws IOException{
 		// Iterate across all set bits in featureVector and increment the appropriate cell in frequencyTable
 		// Warms the cockles of my heart
+		String sparseVector = isExpertMove ? "+1" : "-1"; 
 		for (int i = featureVector.nextSetBit(0); i != -1; i = featureVector.nextSetBit(i+1))
-		     frequencyTable[(isExpertMove)?1:0][i]++; 
+		     sparseVector += (" " + i+1 + ":1"); //index is 1 based
+		
+		writer.write(sparseVector + "\n");
 	}
+
 
 }
