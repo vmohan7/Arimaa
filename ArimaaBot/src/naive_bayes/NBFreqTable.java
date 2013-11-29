@@ -10,7 +10,7 @@ import utilities.helper_classes.Utilities;
 
 public class NBFreqTable {
 	
-	private static long[][] train(int numGames){
+	private static void train(int numGames, String fileLoc){
 		System.out.println("-------------------------------");
 		System.out.println("------START OF ROUND (" + (numGames) + ")------");
 		System.out.println("-------------------------------\n");
@@ -31,12 +31,14 @@ public class NBFreqTable {
 		System.out.println("------END OF ROUND------");
 		System.out.println("------------------------\n\n");
 		
-		return frequencyTable;
+		outputToFile(fileLoc, frequencyTable, trainingModel.getNumNonExpertMoves(), trainingModel.getNumExpertMoves());
 	}
 	
-	private static void outputToFile(String file, long[][] ft){
+	private static void outputToFile(String file, long[][] ft, long numNeg, long numPos){
 		try {
 			BufferedWriter writer = new BufferedWriter( new FileWriter(new File(file).getAbsoluteFile()) );
+			
+			writer.write(numNeg + "\n" + numPos + "\n"); //first two y values
 			
 			for (int i = 0; i < ft.length; i++){
 				for (int j = 0; j < ft[i].length; j++){ 
@@ -70,13 +72,11 @@ public class NBFreqTable {
 		int numExamples = Integer.parseInt(args[0]);
 		String fileLocation = args[1];
 
-		long[][] frequencyTable = train(numExamples);
+		train(numExamples, fileLocation);
 		
 		final long totalEndTime = System.currentTimeMillis();
 		System.out.println("\n\nTotal execution time (from process running to termination): " 
 					+ Utilities.msToString(totalEndTime - totalStartTime));
-		
-		outputToFile(fileLocation, frequencyTable);
 		
 	}
 
