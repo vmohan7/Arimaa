@@ -76,16 +76,16 @@ public class MonteCarlo {
 		state = new ArimaaState(gameBoard, move); 
 		
 		int moveCount = 1;
+		gameBoard.playFullClear(state.getNextMove(), state.getCurr());
 		while( !gameBoard.isGameOver() ) {
-			System.out.println(state.getNextMove());
 			System.out.println(state.getCurr());
-			possibleMoves = engine.genRootMoves(state.getCurr());
+			
+			possibleMoves = engine.genRootMoves(gameBoard);
 			if (possibleMoves.size() == 0) break; //Game Over does not seem to capture this
 			
-			move = agents[player].selectMove(state, possibleMoves);
-			gameBoard = new GameState();
-			gameBoard.playFullClear(state.getNextMove(), state.getCurr());
-			ArimaaState nextState = new ArimaaState(state.getCurr(), gameBoard, move);
+			ArimaaState nextState = new ArimaaState(state.getCurr(), gameBoard, null);
+			move = agents[player].selectMove(nextState, possibleMoves);
+			nextState = new ArimaaState(state.getCurr(), gameBoard, move);
 			
 			Utilities.TDUpdate(state, nextState, 0, ETA, weights);
 			player = (player + 1)%agents.length;
@@ -96,10 +96,11 @@ public class MonteCarlo {
 				agent.setWeights(weights);
 
 			moveCount++;
+			
+			gameBoard.playFullClear(state.getNextMove(), state.getCurr());
 		}
 
-		System.out.println(state.getNextMove());
-		System.out.println(state.getCurr());
+		//System.out.println(state.getCurr());
 		Utilities.TDUpdate(state, null, moveCount % 2 == 0 ? 1 : 0 , ETA, weights);
 	}
 	
