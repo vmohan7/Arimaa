@@ -3,9 +3,8 @@ package ArimaaEngineInterface;
 import java.io.*;
 import java.util.*;
 
-import feature_extractor.FeatureConstants;
-
 import montecarlo.ReflexAgent;
+import montecarlo.Utilities;
 import ai_util.*;
 
 
@@ -25,10 +24,12 @@ public class ArimaaEngineInterface {
 		send_message("chat "+msg);
 	}
 	
+	private double[] weights = new double[Utilities.TOTAL_FEATURES];
+	
 	private void control() {
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));	
-		GameControl gc = new GameControl( new ReflexAgent(new double[FeatureConstants.NUM_FEATURES], false) );
+		GameControl gc = new GameControl( new ReflexAgent(weights, false) );
 
 		while (true) {
 			try {
@@ -68,8 +69,9 @@ public class ArimaaEngineInterface {
 				}
 				else if (AEIcommand.command.equals("newgame")) {
 					send_message("log starting new game");
-					//Create agent based on paremeters from setoption
+					
 					gc.reset();
+					gc.setAgent( new ReflexAgent(weights, false) ); //weights pointer should be the same, but this does not hurt
 				}
 				else if (AEIcommand.command.equals("makemove")) {
 					String move_text = AEIcommand.getRestOfCommand();
@@ -109,9 +111,26 @@ public class ArimaaEngineInterface {
 
 	private void set_option(String name, String value) {
 		if (name.equals("weights")){
-			//readWeights
+			setWeights(value);
 		}
 		
+	}
+	
+	private void setWeights(String fileLoc){
+			try {
+				Scanner reader = new Scanner( (new File(fileLoc)).getAbsoluteFile() );
+				int counter = 0;
+				while(reader.hasNext()){ //for a valid file, it needs TOTAL_FEATURES WEIGHTS
+					weights[counter] = reader.nextDouble();
+					counter++;
+				}
+				reader.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				System.exit(1); //cannot continue
+			}
+			
+			
 	}
 
 	public static void main(String args[]) {

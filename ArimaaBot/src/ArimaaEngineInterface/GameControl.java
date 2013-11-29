@@ -61,13 +61,11 @@ public class GameControl {
 		if (isFirst){
 			FirstMove first_move = new FirstMove();
 			if (w_state == null){
-				w_state = first_move.getFirstMove(new GameState() , System.currentTimeMillis());
-				return w_state;
+				return first_move.getFirstMove(new GameState() , System.currentTimeMillis());
 			} else {
 				GameState temp = new GameState(w_state, "");
 				temp.playPASS(temp);
-				b_state = first_move.getFirstMove(temp , System.currentTimeMillis());
-				return b_state;
+				return first_move.getFirstMove(temp , System.currentTimeMillis());
 			}
 		}
 		
