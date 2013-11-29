@@ -1,0 +1,93 @@
+package ArimaaEngineInterface;
+
+import montecarlo.AbstractAgent;
+import utilities.helper_classes.ArimaaState;
+import ai_util.LogFile;
+import arimaa3.ArimaaEngine;
+import arimaa3.ArimaaMove;
+import arimaa3.FirstMove;
+import arimaa3.GameState;
+import arimaa3.MoveList;
+
+public class GameControl {
+	
+	private ArimaaState state;
+	private ArimaaEngine engine;
+	private boolean isFirst;
+	private AbstractAgent agent;
+	
+	private String w_state, b_state;
+	public GameControl(AbstractAgent agent){
+		this.agent = agent;
+		reset();
+	}
+	
+	public void reset(){
+		engine = new ArimaaEngine();
+		state = new ArimaaState(new GameState(), null);
+		isFirst = true;
+		w_state = null;
+		b_state = null;
+	}
+	
+	public void setAgent(AbstractAgent a){
+		agent = a;
+	}
+	
+	public void getMove(String move){
+		LogFile.message("Recieved Move: " + move);
+		
+		if (isFirst){
+			if (w_state == null){
+				w_state = move;
+				return;
+			} else {
+				b_state = move;
+				state = new ArimaaState(new GameState(w_state, b_state), null);
+				isFirst = false;
+				return;
+			}
+		}
+		
+		ArimaaMove bestMove = new ArimaaMove(move);
+		updateBoard(bestMove);
+	}
+	
+	public String sendMove(){
+		long start_time = System.currentTimeMillis();
+		
+		if (isFirst){
+			FirstMove first_move = new FirstMove();
+			if (w_state == null){
+				w_state = first_move.getFirstMove(new GameState() , System.currentTimeMillis());
+				return w_state;
+			} else {
+				GameState temp = new GameState(w_state, "");
+				temp.playPASS(temp);
+				b_state = first_move.getFirstMove(temp , System.currentTimeMillis());
+				state = new ArimaaState(new GameState(w_state, b_state), null);
+				isFirst = false;
+				return b_state;
+			}
+		}
+		
+		MoveList moves = engine.genRootMoves(state.getCurr());
+		ArimaaMove bestMove = agent.selectMove(state, moves);
+		
+		// remove any pass words, as arimaa-online doesn't want them
+		String final_move = bestMove.toOfficialArimaaNotation( state.getCurr() ).replaceAll(" pass", "");
+		updateBoard(bestMove);
+		
+		long elapsed_time = System.currentTimeMillis() - start_time;
+		LogFile.message("Elapsed time: " + elapsed_time + " ms");
+		
+		return final_move;
+	}
+	
+	private void updateBoard(ArimaaMove move){
+		GameState next = new GameState();
+		next.playFullClear(move, state.getCurr());
+		
+		state = new ArimaaState(state.getCurr(), next, null);
+	}
+}
