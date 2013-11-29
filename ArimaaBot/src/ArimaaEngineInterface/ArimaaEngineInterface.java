@@ -3,14 +3,11 @@ package ArimaaEngineInterface;
 import java.io.*;
 import java.util.*;
 
-import utilities.helper_classes.ArimaaState;
+import feature_extractor.FeatureConstants;
 
 import montecarlo.ReflexAgent;
 import ai_util.*;
-import arimaa3.ArimaaEngine;
-import arimaa3.ArimaaMove;
-import arimaa3.GameState;
-import arimaa3.MoveList;
+
 
 public class ArimaaEngineInterface {
 	// All messages must by sent thru here so they get logged
@@ -31,7 +28,7 @@ public class ArimaaEngineInterface {
 	private void control() {
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));	
-		GameControl gc = new GameControl( new ReflexAgent(null, false) );
+		GameControl gc = new GameControl( new ReflexAgent(new double[FeatureConstants.NUM_FEATURES], false) );
 
 		while (true) {
 			try {
@@ -71,49 +68,29 @@ public class ArimaaEngineInterface {
 				}
 				else if (AEIcommand.command.equals("newgame")) {
 					send_message("log starting new game");
+					//Create agent based on paremeters from setoption
 					gc.reset();
 				}
-
 				else if (AEIcommand.command.equals("makemove")) {
 					String move_text = AEIcommand.getRestOfCommand();
 					gc.getMove(move_text);
 				}
-
-				else if (AEIcommand.command.equals("chat")) {
-					//String chatMessage = AEIcommand.getRestOfCommand();
-					//info.chat(chatMessage);
-				}
-
-				else if (AEIcommand.command.equals("setposition")) {
-					//should only be first
-					String position_text = AEIcommand.getRestOfCommand();
-					//info.newStartPosition(position_text);
-					//Check what it looks like
-					throw new Exception(position_text);
-				}
-
 				else if (AEIcommand.command.equals("setoption")) {
 					//TODO check if weights is given for agents
 					String name = AEIcommand.arguments[2];
 					String value = AEIcommand.arguments[4];
-					//set_option(name, value);
+					set_option(name, value);
 				}
 
 				else if (AEIcommand.command.equals("go")) {
-					/*
-					if (AEIcommand.getRestOfCommand().equals("ponder")) {
-						//info.ShrinkRules();
-					} else {
-					*/
-						send_message("log starting search");
+					send_message("log starting search");
 						
-						send_message("bestmove " + gc.sendMove() );
-					//}
+					send_message("bestmove " + gc.sendMove() );
 				}
-				// Try sending command on to the engine
 				else {
+					//May see setposition??????
 					// Unknown command received, just log it and ignore the
-					// command
+					LogFile.message("Unknown command " + AEIcommand.command);
 				}
 
 			} // Loop forever
@@ -128,6 +105,13 @@ public class ArimaaEngineInterface {
 				LogFile.message(stackTrace);
 			}
 		}
+	}
+
+	private void set_option(String name, String value) {
+		if (name.equals("weights")){
+			//readWeights
+		}
+		
 	}
 
 	public static void main(String args[]) {

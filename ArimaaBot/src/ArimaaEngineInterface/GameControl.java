@@ -7,6 +7,7 @@ import arimaa3.ArimaaEngine;
 import arimaa3.ArimaaMove;
 import arimaa3.FirstMove;
 import arimaa3.GameState;
+import arimaa3.GenTurn;
 import arimaa3.MoveList;
 
 public class GameControl {
@@ -50,6 +51,7 @@ public class GameControl {
 		}
 		
 		ArimaaMove bestMove = new ArimaaMove(move);
+		bestMove.steps = 4;
 		updateBoard(bestMove);
 	}
 	
@@ -65,8 +67,6 @@ public class GameControl {
 				GameState temp = new GameState(w_state, "");
 				temp.playPASS(temp);
 				b_state = first_move.getFirstMove(temp , System.currentTimeMillis());
-				state = new ArimaaState(new GameState(w_state, b_state), null);
-				isFirst = false;
 				return b_state;
 			}
 		}
@@ -75,18 +75,21 @@ public class GameControl {
 		ArimaaMove bestMove = agent.selectMove(state, moves);
 		
 		// remove any pass words, as arimaa-online doesn't want them
-		String final_move = bestMove.toOfficialArimaaNotation( state.getCurr() ).replaceAll(" pass", "");
-		updateBoard(bestMove);
+		GenTurn gt = new GenTurn();
+		String final_move = gt.getOfficialArimaaNotation(state.getCurr(), bestMove).replaceAll(" pass", "");
 		
 		long elapsed_time = System.currentTimeMillis() - start_time;
 		LogFile.message("Elapsed time: " + elapsed_time + " ms");
-		
+
 		return final_move;
 	}
 	
 	private void updateBoard(ArimaaMove move){
 		GameState next = new GameState();
 		next.playFullClear(move, state.getCurr());
+		
+		LogFile.message(move.toString());
+		LogFile.message(next.toBoardString());
 		
 		state = new ArimaaState(state.getCurr(), next, null);
 	}
