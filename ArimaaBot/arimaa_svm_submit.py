@@ -11,7 +11,7 @@ numTrials = 1
 
 # Submit job for each training set size
 # The -N argument to qsub gives the job name
-for exampleSetSize in xrange(10, 110, 10):
+for exampleSetSize in xrange(50, 110, 10):
     memory = exampleSetSize/2;
     for model in [1,6,7]:
         for trialIndex in xrange(numTrials):
