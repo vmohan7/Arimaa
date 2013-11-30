@@ -2,9 +2,13 @@ package montecarlo;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
+import java.util.Scanner;
+
+import naive_bayes.NBHypothesis;
 
 import utilities.helper_classes.ArimaaState;
 
@@ -15,24 +19,33 @@ import arimaa3.GameState;
 import arimaa3.MoveList;
 
 public class MonteCarlo {
+	
+	public static final int AGENT = 0;
+	public static final int OUTPUT = 1;
+	public static final int NUMTRAILS = 2;
+	public static final int NBTABLE = 3;
 
 	/**
 	 * @param args - The first string should be the location of the output. The second string is the number of trails
 	 */
 	public static void main(String[] args) {
-		if (args.length != 2){
-			System.out.println("Error in usage - 2 string: location of output followed by number of trails");
+		if (args.length < 3){
+			System.out.println("Error in usage - 3 (optional 4) string: <agent #> <location of output> <number of trails> <location of NB freq table - if needed>");
+			System.out.println("agent 1 = Reflex");
+			System.out.println("agent 2 = Naive Bayes Reflex");
+			System.out.println("agent 3 = Naive Bayes ply-4");
 			System.exit(1);
 		}
-		int numGames = Integer.parseInt(args[1]);
+		int agent = Integer.parseInt(args[AGENT]);
+		int numGames = Integer.parseInt(args[NUMTRAILS]);
 
 		double[] weights = new double[Utilities.TOTAL_FEATURES];
-		train(numGames, weights);
+		train(agent, numGames, weights,  args.length >= 4 ? args[NBTABLE] : null);
 
-		outputWeights(weights, new File(args[0]) );
+		outputWeights(weights, new File(args[OUTPUT]));
 	}
 	
-	public static void outputWeights(double[] weights, File output) {
+	public static void outputWeights(double[] weights, File output ) {
 		try {
 			BufferedWriter writer = new BufferedWriter( new FileWriter(output.getAbsoluteFile()) );
 			
@@ -50,7 +63,7 @@ public class MonteCarlo {
 	public static final double VARIANCE = .01; 
 	public static final double ETA = .1; 
 	
-	public static void train(int numGames, double[] weights){
+	public static void train(int agent, int numGames, double[] weights, String fqtbl){
 		Random rand = new Random();
 		for (int i = 0; i < weights.length; i++){
 			weights[i] = VARIANCE*rand.nextGaussian(); //normal belief about the world
@@ -58,21 +71,61 @@ public class MonteCarlo {
 		
 		for (int i = 0; i < numGames; i++){
 			System.out.println("Running game # " + (i+1) );
-			runTrial(weights);
+			runTrial(agent, weights, fqtbl);
 		}
 	}
+	
+	public static final int MAX_DEPTH = 4;
+	
+	private static AbstractAgent getTrainingAgent(int agent, double[] weights, String fqtbl){
+		if (agent == 1) {
+			return new ReflexAgent(weights, true);
+		} else if (agent == 2){
+			return new NaiveReflexAgent(weights, true, getPredictor(fqtbl) );
+		} else if (agent == 3) {
+			return new NAVVCarlo(weights, true, MAX_DEPTH, getPredictor(fqtbl) );
+		}
+			
+		return null;
+	}
+	
+	private static final int YCOUNT = 2;
+	private static NBHypothesis getPredictor(String fqtbl){
+		try {
+			Scanner reader = new Scanner( (new File(fqtbl)).getAbsoluteFile() );
+			long numNeg = reader.nextLong();
+			long numPos = reader.nextLong();
+			reader.nextLine(); //read the end of the line
+			
+			long[][] fCounts = new long[YCOUNT][];
+			for(int i = 0; i < YCOUNT; i++){ //for a valid file, it needs 2 lines
+				String [] counts = reader.nextLine().split(" ");
+				fCounts[i] = new long[counts.length];
+				for(int j = 0; j < counts.length; j++){
+					fCounts[i][j] = Long.parseLong(counts[j]); 
+				}
+			}
+			reader.close();
+			
+			return new NBHypothesis(fCounts, numNeg, numPos);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.exit(1); //cannot continue
+		}
+		
+		return null; //cannot get here
+	}
 
-	private static void runTrial(double[] weights) {
+	private static void runTrial(int a, double[] weights, String fqtbl) {
 		GameState gameBoard = getRandomStart();
 		// 0 is white, 1 is black
-		ReflexAgent []agents  = { new ReflexAgent(weights, true), new ReflexAgent(weights, true) };
-		int player = 1; // we start with black in the loop
+		AbstractAgent agent  = getTrainingAgent(a, weights, fqtbl);
 		ArimaaState state = new ArimaaState(gameBoard, null);
 		ArimaaEngine engine = new ArimaaEngine();
 		MoveList possibleMoves = engine.genRootMoves(state.getCurr());
 		
 		//white needs to make the first move to initialize the state for TD
-		ArimaaMove move = agents[0].selectMove(state, possibleMoves);
+		ArimaaMove move = agent.selectMove(state, possibleMoves);
 		state = new ArimaaState(gameBoard, move); 
 		
 		int moveCount = 1;
@@ -84,16 +137,14 @@ public class MonteCarlo {
 			if (possibleMoves.size() == 0) break; //Game Over does not seem to capture this
 			
 			ArimaaState nextState = new ArimaaState(state.getCurr(), gameBoard, null);
-			move = agents[player].selectMove(nextState, possibleMoves);
+			move = agent.selectMove(nextState, possibleMoves);
 			nextState = new ArimaaState(state.getCurr(), gameBoard, move);
 			
 			Utilities.TDUpdate(state, nextState, 0, ETA, weights);
-			player = (player + 1)%agents.length;
 			state = nextState;
 			
 			//Should be the same pointer, but let's be explicit about the update
-			for (ReflexAgent agent: agents) 
-				agent.setWeights(weights);
+			agent.setWeights(weights);
 
 			moveCount++;
 			

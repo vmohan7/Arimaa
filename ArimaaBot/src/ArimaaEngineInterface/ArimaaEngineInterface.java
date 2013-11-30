@@ -129,8 +129,6 @@ public class ArimaaEngineInterface {
 				e.printStackTrace();
 				System.exit(1); //cannot continue
 			}
-			
-			
 	}
 
 	public static void main(String args[]) {
