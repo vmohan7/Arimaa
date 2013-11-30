@@ -53,6 +53,8 @@ public class ArimaaState {
 	 * */
 	public void update(ArimaaMove nextNextMove) {
 		prev = curr;
+		prevPrevMove = prevMove;
+		prevMove = nextMove;
 		
 		GameState next = new GameState();
 		next.playFullClear(nextMove, curr); 
