@@ -28,7 +28,7 @@ public abstract class AbstractSearchAgent extends AbstractAgent{
 		double maxAlpha = Double.NEGATIVE_INFINITY;
 		
 		for(ArimaaMove move : moves){
-			double a = AlphaBeta(new ArimaaState(arimaaState.getPrev(), arimaaState.getCurr(), move) , maxDepth, maxAlpha, Double.POSITIVE_INFINITY, false);
+			double a = AlphaBeta(new ArimaaState(arimaaState.getPrev(), arimaaState.getCurr(), move) , maxDepth - 1, maxAlpha, Double.POSITIVE_INFINITY, false);
 			if (maxAlpha < a){
 				maxAlpha = a;
 				bestMove = move;
