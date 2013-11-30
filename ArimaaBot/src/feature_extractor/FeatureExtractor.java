@@ -6,18 +6,30 @@ public class FeatureExtractor implements FeatureConstants {
 	
 	/* Starting game state from which we play current_move */
 	private GameState prev;
-	
+	//TODO: remove prev_prev stuff from everywhere once we're sure we
+	//don't need it
 	private GameState prev_prev;
+	private ArimaaMove prevMove;
+	private ArimaaMove prevPrevMove;
 	
 	/* Piece id to type mapping for the current game state (curr). E.g. if piece_types[3] = 4, this means
 	 * that piece id 3 (black cat) is of piece type 4 for the current GameState. This changes every time 
 	 * extractFeatures() is called. */
 	private byte piece_types[];
 		
-	public FeatureExtractor(GameState prev, GameState prev_prev) {
+	/**
+	 * 
+	 * @param prev
+	 * @param prev_prev
+	 * @param prevMove move (by expert) to get to prev game state
+	 * @param prevPrevMove move (by expert) to get to prev_prev game state
+	 */
+	public FeatureExtractor(GameState prev, GameState prev_prev, ArimaaMove prevMove, ArimaaMove prevPrevMove) {
 		this.prev = prev;
 		this.prev_prev = null;
 		piece_types = null;
+		this.prevMove = prevMove;
+		this.prevPrevMove = prevPrevMove;
 	}
 
 	/*

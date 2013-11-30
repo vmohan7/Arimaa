@@ -32,7 +32,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	    String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
 	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
 	    GameState startState = new GameState(white,black);
-	    FeatureExtractor fe = new FeatureExtractor(startState, null);
+	    FeatureExtractor fe = new FeatureExtractor(startState, null, null, null);
 	    BitSet bs = fe.extractFeatures(new ArimaaMove("Db2n Ha2n Ha3n Hh2n"));
 	    
 //	    System.out.println(fe.featureVector.toString());
@@ -50,7 +50,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	@Test
 	public void testMovementFeatures2() {
 	    GameState startState = new GameState(tests[2]);
-	    FeatureExtractor fe = new FeatureExtractor(startState, null);
+	    FeatureExtractor fe = new FeatureExtractor(startState, null, null, null);
 	    BitSet bs = fe.extractFeatures(new ArimaaMove("db6e dc6x ce5s ce4s ce3s"));
 
 	    assertTrue(bs.get(339));
@@ -366,7 +366,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing1() {
 		GameState prev = new GameState(tests[3]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("Ra5n"));
 		GameState curr = new GameState();
 		curr.playFull(new ArimaaMove("Ra5n"), prev);
@@ -380,7 +380,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing2() {
 		GameState prev = new GameState(tests[4]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra5n"));
 		GameState curr = new GameState();
 		curr.playFull(new ArimaaMove("ra5n"), prev);
@@ -394,7 +394,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing3() {
 		GameState prev = new GameState(tests[5]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ra4n"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();
@@ -409,7 +409,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing4a() {
 		GameState prev = new GameState(tests[6]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ca5n"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();
@@ -424,7 +424,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing4b() {
 		GameState prev = new GameState(tests[6]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ca5n"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();
@@ -438,7 +438,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing5() {
 		GameState prev = new GameState(tests[5]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ra4n ra5n"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();
@@ -452,7 +452,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing6() {
 		GameState prev = new GameState(tests[7]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ma6n ma7e"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();
@@ -469,7 +469,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing7() {
 		GameState prev = new GameState(tests[8]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ca4n ca5n"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();

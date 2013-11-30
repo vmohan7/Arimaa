@@ -50,7 +50,7 @@ public class HypothesisTest {
 	 * @param hyp The hypothesis
 	 * @param arimaaState The state containing the expert move */
 	private static void evaluateMoveOrdering(AggregateResults ar, AbstractHypothesis hyp, ArimaaState arimaaState){
-		FeatureExtractor fe = new FeatureExtractor(arimaaState.getCurr(), arimaaState.getPrev());
+		FeatureExtractor fe = new FeatureExtractor(arimaaState.getCurr(), arimaaState.getPrev(), arimaaState.getPrevMove(), arimaaState.getPrevPrevMove());
 		ArimaaEngine ai = new ArimaaEngine(); //TODO see if this is stupidly slow
 		MoveList possibleMoves = ai.genRootMoves(arimaaState.getCurr());
 		
