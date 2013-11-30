@@ -1,0 +1,30 @@
+
+============== PARALLELIZING USING CORN ===================
+The python and expect scripts with "corn" in their names allow you to use ssh to execute Naive Bayes training jobs on corn and save the outputs locally. The .exp file assumes that you have expect in /usr/bin/expect. If you don't have expect, you can do all this on myth, since the myths have expect in /usr/bin . 
+1. Run this command in the current directory: echo "my_username = \"[YOUR SUNETID]\"; my_password = \"[YOUR SUNET PASSWORD]\"" > passwords.py
+2. Configure the name and location of your mysql-connector jar file in arimaa_nb_corn.exp. 
+3. Configure the parameters in arimaa_nb_corn.py. 
+4. Run python arimaa_nb_corn.py from the Arimaa/Testing directory.
+5. The outputs of each train+test cycle will be stored locally in nicely named files. You can indirectly see which cycles are done by looking at the files (e.g. using tail) or by running ps to see which processes are still running. 
+
+============= PARALLELIZING USING BARLEY ==================
+The python and bash scripts with "barley" in their names allow you to submit Naive Bayes training jobs to the Barley queue.
+1. Copy over the entire Java project to corn. 
+2. Configure the name and location of your mysql-connector jar file in arimaa_nb_barley.sh. 
+3. Edit arimaa_nb_submit.py to configure your parameters -- namely, the range of example sizes to use and the number of trials per size. 
+4. Run python arimaa_nb_barley.py from the Arimaa/Testing directory to submit the jobs. 
+5. While the jobs are queued, check on their status using qstat. See man qstat for more details. 
+6. After the jobs are finished, the output will be written to output files (named arimaa_nb_<num-examples>_<trial number>.o<job-id>). 
+
+
+----------------
+If you need to compile or run the Java program, here's how you do it. In the classpath arguments, replace "./mysql-connector-java-5.1.26-bin.jar" with the path to your jar file if it is different. 
+# Compile from ArimaaBot dir.
+javac -d bin -classpath ./mysql-connector-java-5.1.26-bin.jar:./src:./ src/naive_bayes/NBMain.java 
+javac -d bin -classpath ./mysql-connector-java-5.1.26-bin.jar:./liblinear-1.94.jar:./src:./ src/svm/SVMMain.java  
+
+# Run from the ArimaaBot dir, assuming you have compiled class files in bin/. Of course, configure the arguments to NBMain according to your needs. Also, you can leave out the -Xmx500000000 argument according to your needs. 
+# Arguments: <min-example-set-size> <max-example-set-size> <increment> 
+# e.g. to train on example sets of size 10, 15, and 20, use arguments '10 20 5' 
+# e.g. to train on a single example set of 20 games, use arguments '20 20 0'
+java -Xmx500000000 -classpath ./mysql-connector-java-5.1.26-bin.jar:./bin:./ naive_bayes.NBMain <three-arguments>

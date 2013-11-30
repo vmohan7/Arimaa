@@ -2,7 +2,7 @@ package naive_bayes;
 
 import java.util.BitSet;
 
-import utilities.GameData;
+import utilities.AbstractGameData;
 import utilities.GameParser;
 import utilities.helper_classes.ArimaaState;
 import utilities.helper_classes.GameInfo;
@@ -38,7 +38,7 @@ public class NBTrain {
 	 * non-expert training examples. Everything is zero-indexed, and the 0th row is for non-expert moves. 
 	 * E.g. frequencies[1][10] represents the frequency count of feature 10 in expert moves.
 	 */
-	public long[][] train(GameData trainGames){
+	public long[][] train(AbstractGameData trainGames){
 		
 		long[][] frequencyTable = new long[2][FeatureConstants.NUM_FEATURES];
 		ArimaaEngine myEngine = new ArimaaEngine(); // used to generate all possible moves

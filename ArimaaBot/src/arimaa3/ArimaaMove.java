@@ -8,6 +8,13 @@ public class ArimaaMove extends ArimaaBaseClass implements Comparable {
   public long piece_bb[] = new long[12];
   public int steps;
   public int move_ordering_value;
+  
+  /* Arzav's code:
+   * Array of bytes to hold the source indices (0-63) for at most 4 
+   * steps in the current turn/move.
+   */
+  public byte[] stepSources = {-1, -1, -1, -1};
+  /* ------ */
 
   public ArimaaMove() {
   }
@@ -315,7 +322,11 @@ public class ArimaaMove extends ArimaaBaseClass implements Comparable {
 
     // Steps are always 4
     this.steps = 4;
-
+    
+    /* Arzav's code: */
+    int stepNumber = 0;
+    /* ------ */
+    
     // Break the move into its component parts
     StringTokenizer tokenizer = new StringTokenizer(move_text);
 
@@ -347,6 +358,10 @@ public class ArimaaMove extends ArimaaBaseClass implements Comparable {
         int to_index = from_index + dir_offset[direction];
         this.piece_bb[piece_type] ^= 1L << from_index;
         this.piece_bb[piece_type] ^= 1L << to_index;
+        
+        /* Arzav's code: */
+        stepSources[stepNumber++] = (byte) from_index;
+        /* ------ */
       }
 
     }
