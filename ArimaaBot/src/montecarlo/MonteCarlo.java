@@ -75,7 +75,7 @@ public class MonteCarlo {
 		}
 	}
 	
-	public static final int MAX_DEPTH = 2;
+	public static final int MAX_DEPTH = 3;
 	
 	private static AbstractAgent getTrainingAgent(int agent, double[] weights, String fqtbl){
 		if (agent == 1) {
