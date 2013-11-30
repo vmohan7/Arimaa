@@ -60,7 +60,7 @@ public abstract class AbstractSearchAgent extends AbstractAgent{
 			for(ArimaaMove move: moves){
 				GameState gs = new GameState();
 				gs.playFullClear(move, state.getCurr());
-				beta = Math.min(alpha, AlphaBeta(new ArimaaState(state.getCurr(), next, move) , depth - 1, alpha, beta, !myTurn) );
+				beta = Math.min(beta, AlphaBeta(new ArimaaState(state.getCurr(), next, move) , depth - 1, alpha, beta, !myTurn) );
 				if (beta <= alpha)
 					break; // alpha cut off
 			}
