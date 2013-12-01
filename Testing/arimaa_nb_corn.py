@@ -2,6 +2,7 @@
 
 import os
 import passwords
+# import time
 
 ## Variables to configure ##
 
@@ -12,18 +13,32 @@ USERNAME = passwords.my_username
 PASSWORD = passwords.my_password
 
 # Number of trials for each sample set size
-NUM_TRIALS = 1
+NUM_TRIALS = 4
 
 # Number of examples in first test
-START_SIZE = 1
+START_SIZE = 10
 
 # Number of examples in last test (inclusive)
-END_SIZE = 10
+END_SIZE = 50
 
 # Increment by which to increase number of examples in successive tests
-INCR_SIZE = 1
+INCR_SIZE = 10
+
+# Keeps track of which corn machine to use
+counter = 0
 
 for exampleSetSize in range(START_SIZE, END_SIZE + 1, INCR_SIZE):
     for trialIndex in range(NUM_TRIALS):
-        os.system("/usr/bin/expect arimaa_nb_corn.exp %d %d %d %s '%s' >> cornNB%d_%d.txt &" 
-            % (exampleSetSize, exampleSetSize, 1, USERNAME, PASSWORD, exampleSetSize, trialIndex))
+        os.system("/usr/bin/expect -d -f arimaa_nb_corn.exp %d %d %d %s '%s' '%s' >> NBcorn10-50.txt &" 
+            % (exampleSetSize, exampleSetSize, 1, USERNAME, PASSWORD, getCornMachine(counter)))
+        counter = counter + 1
+        # time.sleep(10)
+
+# There are 30 corn machines. This function returns a string corresponding 
+# to the 'next' corn machine. e.g. '01'
+def getCornMachine(a):
+    a = a % 30 + 1
+    if a < 10:
+        return '0' + str(a)
+    else: 
+        return str(a)

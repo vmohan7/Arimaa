@@ -14,11 +14,13 @@ set endSize [lindex $argv 1]
 set incrSize [lindex $argv 2]
 set username [lindex $argv 3]
 set password [lindex $argv 4]
+set machineNumber [lindex $argv 5]
 
-set timeout 30
+set timeout 60
 
-log_user 0
-spawn ssh $username@corn.stanford.edu 
+# log_user 0
+log_user 1
+spawn ssh $username@corn$machineNumber.stanford.edu 
 expect "Password: "
 send "$password\r"
 
@@ -32,4 +34,6 @@ set timeout -1
 # send "java -Xmx500000000 -classpath $JAR_PATH:./bin:./ naive_bayes.NBMain $startSize $endSize $incrSize\r"
 send "java -classpath $JAR_PATH:./bin:./ naive_bayes.NBMain $startSize $endSize $incrSize\r"
 set timeout -1
-expect "Total execution time"
+expect "TRAIN"
+
+send "exit\r"

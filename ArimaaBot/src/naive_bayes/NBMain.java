@@ -21,7 +21,7 @@ public class NBMain {
 	
 	/* If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
-	public static final boolean PARSEABLE_OUTPUT = false;
+	public static final boolean PARSEABLE_OUTPUT = true;
 	
 	private static void trainAndTest(int numGames){
 		Utilities.printInfo("-------------------------------");
