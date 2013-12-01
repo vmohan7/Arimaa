@@ -18,11 +18,13 @@ set machineNumber [lindex $argv 5]
 
 set timeout 60
 
-# log_user 0
-log_user 1
+log_user 0
+# log_user 1
 spawn ssh $username@corn$machineNumber.stanford.edu 
-expect "Password: "
-send "$password\r"
+
+# Don't need to input password when ssh'ing from myth to corn
+# expect "Password: "
+# send "$password\r"
 
 expect "%"
 send "cd $ARIMAABOT_DIR\r"
@@ -40,6 +42,9 @@ expect {
     send "exit\r"
   }
   "illed" {
+    send "exit\r"
+  }
+  "Exception" {
     send "exit\r"
   }
 }
