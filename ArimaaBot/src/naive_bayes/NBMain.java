@@ -2,6 +2,7 @@ package naive_bayes;
 
 import utilities.GameData;
 import utilities.HypothesisTest;
+import utilities.MyDB;
 import utilities.helper_classes.Utilities;
 
 public class NBMain {
@@ -21,7 +22,7 @@ public class NBMain {
 	
 	/* If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
-	public static final boolean PARSEABLE_OUTPUT = true;
+	public static final boolean PARSEABLE_OUTPUT = false;
 	
 	private static void trainAndTest(int numGames){
 		Utilities.printInfo("-------------------------------");
@@ -57,6 +58,8 @@ public class NBMain {
 		Utilities.printInfo("\n------------------------");
 		Utilities.printInfo("------END OF ROUND------");
 		Utilities.printInfo("------------------------\n\n");
+		
+		myGameData.close();
 	}
 
 	// Instructions to redirect console output to file:
@@ -82,6 +85,8 @@ public class NBMain {
 		for (int x = startSize; x <= endSize; x += increment) {
 			trainAndTest(x);
 		}
+		
+		MyDB.close();
 		
 		final long totalEndTime = System.currentTimeMillis();
 		Utilities.printInfo("\n\nTotal execution time (from process running to termination): " 

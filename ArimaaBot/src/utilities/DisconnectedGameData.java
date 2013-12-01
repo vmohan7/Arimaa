@@ -50,6 +50,15 @@ public class DisconnectedGameData implements AbstractGameData {
 		return numGames;
 	}
 	
+	/** Close the ResultSet object that internally serves the game data. */
+	public void close(){
+		try {
+			filteredGames.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private String getConCatIds(ArrayList<Integer> gameIds) {
 		if (gameIds == null || gameIds.size() == 0){
 			return "''";

@@ -36,6 +36,7 @@ public class MyDB {
 	
 	public static void close() {
 		try {
+			stmt.close();
 			con.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
