@@ -11,6 +11,7 @@ Testing/passwords.py*
 Testing/corn*.txt
 Testing/barley*.txt
 Testing/*.o*
+Plotting/*.csv
 
 # OS Files #
 .DS_Store
