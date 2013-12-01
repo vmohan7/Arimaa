@@ -6,11 +6,15 @@ import naive_bayes.NBMain;
 
 public class Utilities {
 	
+	/* If set to false, then log statements will be printed. If set to true, then only 
+	 * results will be reported, in a csv-importable format. */
+	public static boolean PARSEABLE_OUTPUT = false;
+	
 	/** Prints message without appending a new line. Use this for any message logging 
 	 * that is not meant to be machine-parseable. 
 	 * @param msg Message for human to read */
 	public static void printInfoInline(String msg){
-		if (!NBMain.PARSEABLE_OUTPUT)
+		if (!PARSEABLE_OUTPUT)
 			System.out.print(msg);
 	}
 
@@ -18,7 +22,7 @@ public class Utilities {
 	 * that is not meant to be machine-parseable. 
 	 * @param msg Message for human to read */
 	public static void printInfo(String msg){
-		if (!NBMain.PARSEABLE_OUTPUT)
+		if (!PARSEABLE_OUTPUT)
 			System.out.println(msg);
 	}
 
@@ -26,7 +30,7 @@ public class Utilities {
 	 * meant to be machine-parseable. 
 	 * @param msg Message for parser to read */	
 	public static void printParseable(String msg){
-		if (NBMain.PARSEABLE_OUTPUT)
+		if (PARSEABLE_OUTPUT)
 			System.out.println(msg);		
 	}
 	
