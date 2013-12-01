@@ -25,8 +25,8 @@ public abstract class AbstractNAVVSearch extends AbstractSearchAgent {
 	@Override
 	protected MoveList getMoves(ArimaaState state) {
 		FeatureExtractor fe = new FeatureExtractor(state.getCurr(), state.getPrev());
-		MoveList moves = engine.genRootMoves(state.getCurr());
-		PriorityQueue<MoveOrder> minMoves = top10Percent(fe, moves);
+		MoveList moves = engine.genRootMoves(state.getCurr()); //TODO pass in as a parameter
+		PriorityQueue<MoveOrder> minMoves = topMoves(fe, moves);
 		MoveList bestMoves = new MoveList(minMoves.size());
 		
 		for(MoveOrder mo : minMoves){
@@ -36,9 +36,9 @@ public abstract class AbstractNAVVSearch extends AbstractSearchAgent {
 		return bestMoves;
 	}
 
-	private PriorityQueue<MoveOrder> top10Percent(FeatureExtractor fe, MoveList moves){
-		//int topk =  (int) Math.ceil(moves.size() * .1);
-		int topk =  (int) Math.ceil(moves.size() * .2);
+	private PriorityQueue<MoveOrder> topMoves(FeatureExtractor fe, MoveList moves){
+		//int topk =  (int) Math.ceil(moves.size() * 0.1);
+		int topk =  (int) Math.ceil(moves.size() * 0.2);
 		//int topk = 30;
 		
 		PriorityQueue<MoveOrder> minPQ = new PriorityQueue<MoveOrder>( topk + 1, new MoveOrder(true) );
@@ -58,10 +58,10 @@ public abstract class AbstractNAVVSearch extends AbstractSearchAgent {
 			
 		}
 		
-		return minPQ;
+		return maxPQ;
 	}
 
-	private class MoveOrder implements Comparator<MoveOrder>{
+	class MoveOrder implements Comparator<MoveOrder>{
 		
 		public ArimaaMove move;
 		public double weight;
@@ -80,11 +80,17 @@ public abstract class AbstractNAVVSearch extends AbstractSearchAgent {
 
 		@Override
 		public int compare(MoveOrder move1, MoveOrder move2) {
-			int w = (int) (move1.weight - move2.weight);
+			int w = 0;
+			if (move1.weight < move2.weight)
+				w = -1;
+			else if (move1.weight > move2.weight)
+				w = 1;
+			
+			
 			if (isMin)
-				return -w;
+				return w;
 			else 
-				return  w; //reverses the ordering to get the max at the top
+				return -w; //reverses the ordering to get the max at the top
 		}
 		
 	}
