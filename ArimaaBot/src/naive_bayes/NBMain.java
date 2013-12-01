@@ -19,40 +19,44 @@ public class NBMain {
 
 	private static final double TRAIN_FRACTION = 0.7;
 	
+	/* If set to false, then log statements will be printed. If set to true, then only 
+	 * results will be reported, in a csv-importable format. */
+	public static final boolean PARSEABLE_OUTPUT = false;
+	
 	private static void trainAndTest(int numGames){
-		System.out.println("-------------------------------");
-		System.out.println("------START OF ROUND (" + (numGames) + ")------");
-		System.out.println("-------------------------------\n");
+		Utilities.printInfo("-------------------------------");
+		Utilities.printInfo("------START OF ROUND (" + (numGames) + ")------");
+		Utilities.printInfo("-------------------------------\n");
 		final long startTime = System.currentTimeMillis();
 		
-		System.out.println("Training and testing on " + numGames + " games...");
+		Utilities.printInfo("Training and testing on " + numGames + " games...");
 		
 		GameData myGameData = new GameData(numGames, TRAIN_FRACTION);
-		System.out.println("Finished fetching game data");
+		Utilities.printInfo("Finished fetching game data");
 		
 		NBTrain trainingModel = new NBTrain();
-		System.out.println("Created the NB model");
+		Utilities.printInfo("Created the NB model");
 
 		long[][] frequencyTable = trainingModel.train(myGameData);
-		System.out.println("Just finished training!");
+		Utilities.printInfo("Just finished training!");
 		
-		System.out.println("About to evaluate model: creating a hypothesis...");
+		Utilities.printInfo("About to evaluate model: creating a hypothesis...");
 		NBHypothesis myHypothesis = new NBHypothesis( frequencyTable, 
 				trainingModel.getNumNonExpertMoves(), trainingModel.getNumExpertMoves() );
 		
-		System.out.println("\nTesting hypothesis on TEST set...");
+		Utilities.printInfo("\nTesting hypothesis on TEST set...");
 		myGameData.setMode(GameData.Mode.TEST);
 		HypothesisTest.test(myHypothesis, myGameData);
 		
-		System.out.println("\nTesting hypothesis on TRAIN set...");
+		Utilities.printInfo("\nTesting hypothesis on TRAIN set...");
 		myGameData.setMode(GameData.Mode.TRAIN);
 		HypothesisTest.test(myHypothesis, myGameData);
 		
 		final long endTime = System.currentTimeMillis();
-		System.out.println("Round execution time: " + Utilities.msToString(endTime - startTime));
-		System.out.println("\n------------------------");
-		System.out.println("------END OF ROUND------");
-		System.out.println("------------------------\n\n");
+		Utilities.printInfo("Round execution time: " + Utilities.msToString(endTime - startTime));
+		Utilities.printInfo("\n------------------------");
+		Utilities.printInfo("------END OF ROUND------");
+		Utilities.printInfo("------------------------\n\n");
 	}
 
 	// Instructions to redirect console output to file:
@@ -80,7 +84,7 @@ public class NBMain {
 		}
 		
 		final long totalEndTime = System.currentTimeMillis();
-		System.out.println("\n\nTotal execution time (from process running to termination): " 
+		Utilities.printInfo("\n\nTotal execution time (from process running to termination): " 
 					+ Utilities.msToString(totalEndTime - totalStartTime));
 		
 	}
