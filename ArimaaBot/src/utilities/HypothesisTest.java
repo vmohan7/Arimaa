@@ -62,43 +62,42 @@ public class HypothesisTest {
 	 * The client should ensure that GameData is in the correct mode (train or test)
 	 * before calling this method. 
 	 * @param hyp The evaluation hypothesis 
-	 * @param gd The testing game data 
-	 * */
-	public static void test(AbstractHypothesis hyp, GameData gd) { //TODO: rename
+	 * @param gd The testing game data */
+	public static void test(AbstractHypothesis hyp, AbstractGameData gd) { //rename
 		
 		AggregateResults totalScore = new AggregateResults();
 		threadsRunning = new Semaphore(MAX_NUM_THREADS);
 		ArrayList<Thread> threads = new ArrayList<Thread>();
 		int count = 0;
 		while (gd.hasNextGame()) {
+			final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
+			Utilities.printInfoInline("Testing game # " + ++count + "..."); //time will be appended in-line
+			
 			GameInfo gi = gd.getNextGame();
-			Thread t = new Thread( new AggregateThread(gi, count, hyp, totalScore) );
-			t.start();
-			count++;
-			threads.add(t);
-//			int cores = Runtime.getRuntime().availableProcessors() - FREE_CORES; //do based on the number of cores to limit memory usage
-//			ArrayList<Thread> threads = new ArrayList<Thread>();
-//			
-//			//Create the threads
-//			for (int i = 0; i < cores && gd.hasNextGame(); i++){
-//				count++;
-//				GameInfo gi = gd.getNextGame();
-//				Thread t = new Thread( new AggregateThread(gi, count, hyp, totalScore) );
-//				t.start();
-//				threads.add(t);
-//			}
-//			
-//			//Wait for all the threads to finish
-//			for(Thread t: threads){
-//				try { t.join(); }
-//				catch (InterruptedException e) { e.printStackTrace(); }
-//			}
+			GameParser gp = new GameParser(gi);
+			
+			AggregateResults ar = new AggregateResults();
+			while (gp.hasNextGameState())
+				evaluateMoveOrdering(ar, hyp, gp.getNextGameState());
+			
+			totalScore.addResult(ar);
+			//???? print ar moves for game????
+			
+			final long endTime = System.currentTimeMillis();
+			Utilities.printInfo("testing took " + Utilities.msToString(endTime - startTime)); //this is appended to "Testing on game #x..."
 		}
-		for(Thread t: threads){
-			try { t.join(); }
-			catch (InterruptedException e) { e.printStackTrace(); }
-		}
-		System.out.println(totalScore); //prints the statistics stored in AggregateResults
+		
+		Utilities.printInfo(totalScore.toString()); //prints the statistics stored in AggregateResults
+		
+		// Print machine-parseable hypothesis evaluation stats
+		// Format: num-games,{TEST|TRAIN},percentile,proportion-in-top-5%
+		String parseable = String.format("%d,%s,%f,%f", 
+										gd.getNumGames(), 
+										gd.getMode().name(), 
+										totalScore.getAvgEvaluation() * 100, 
+										(double) totalScore.numInTop5Percent / totalScore.numExpertMoves);
+
+		Utilities.printParseable(parseable);
 	}
 	
 	/** Given an arimaaState, we run evaluations on the 16k moves
@@ -134,7 +133,7 @@ public class HypothesisTest {
 	 */
 	static class AggregateResults {
 		
-		public static final double TOP5PERCENT = 0.05;
+		public static final double TOP5PERCENT = 0.05; // do we want to change this to top 10%?
 		
 		private int numInTop5Percent = 0; //number of moves where we classified in the top 5%
 		private double sumPercent = 0;  //sum used for average percentile

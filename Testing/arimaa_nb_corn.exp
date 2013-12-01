@@ -1,7 +1,7 @@
 #!/usr/bin/expect -f
 
 # ---- PARAMETERS TO CONFIGURE HERE ---- #
-set ARIMAABOT_DIR "~/cs229/Arimaa/ArimaaBot"
+set ARIMAABOT_DIR "/afs/ir.stanford.edu/users/v/h/vhchoksi/cs229/Arimaa/ArimaaBot"
 
 # mysql-connector .jar path relative to ARIMAABOT_DIR
 set JAR_PATH "./mysql-connector-java-5.1.26-bin.jar"
@@ -14,6 +14,8 @@ set endSize [lindex $argv 1]
 set incrSize [lindex $argv 2]
 set username [lindex $argv 3]
 set password [lindex $argv 4]
+
+set timeout 30
 
 log_user 0
 spawn ssh $username@corn.stanford.edu 
