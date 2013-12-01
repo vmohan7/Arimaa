@@ -24,6 +24,10 @@ Setting up liblinear
 - Right click on the ArimaaBot project in Eclipse's project browser and select Build Path -> Configure Build Path
 - In the Libraries tab, select "Add External Jar" and browse for your newly downloaded .jar file. 
 
+Setting up libsvm
+- Download the libsvm jar file https://github.com/cjlin1/libsvm/tree/master/java
+- Flow the steps for liblinear above 
+
 Migrating Data:
 - Get zip from Google Drive
 - Unzip

@@ -25,7 +25,7 @@ public class HypothesisTest {
 		int count = 0;
 		while (gd.hasNextGame()) {
 			final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
-			System.out.print("Testing game # " + ++count + "..."); //time will be appended in-line
+			Utilities.printInfoInline("Testing game # " + ++count + "..."); //time will be appended in-line
 			
 			GameInfo gi = gd.getNextGame();
 			GameParser gp = new GameParser(gi);
@@ -38,10 +38,20 @@ public class HypothesisTest {
 			//???? print ar moves for game????
 			
 			final long endTime = System.currentTimeMillis();
-			System.out.println("testing took " + Utilities.msToString(endTime - startTime)); //this is appended to "Testing on game #x..."
+			Utilities.printInfo("testing took " + Utilities.msToString(endTime - startTime)); //this is appended to "Testing on game #x..."
 		}
 		
-		System.out.println(totalScore); //prints the statistics stored in AggregateResults
+		Utilities.printInfo(totalScore.toString()); //prints the statistics stored in AggregateResults
+		
+		// Print machine-parseable hypothesis evaluation stats
+		// Format: num-games,{TEST|TRAIN},percentile,proportion-in-top-5%
+		String parseable = String.format("%d,%s,%f,%f", 
+										gd.getNumGames(), 
+										gd.getMode().name(), 
+										totalScore.getAvgEvaluation() * 100, 
+										(double) totalScore.numInTop5Percent / totalScore.numExpertMoves);
+
+		Utilities.printParseable(parseable);
 	}
 	
 	/** Given an arimaaState, we run evaluations on the 16k moves
@@ -77,7 +87,7 @@ public class HypothesisTest {
 	 */
 	static class AggregateResults {
 		
-		public static final double TOP5PERCENT = 0.05;
+		public static final double TOP5PERCENT = 0.05; // do we want to change this to top 10%?
 		
 		private int numInTop5Percent = 0; //number of moves where we classified in the top 5%
 		private double sumPercent = 0;  //sum used for average percentile
