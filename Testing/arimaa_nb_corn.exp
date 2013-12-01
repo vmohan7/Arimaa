@@ -34,6 +34,12 @@ set timeout -1
 # send "java -Xmx500000000 -classpath $JAR_PATH:./bin:./ naive_bayes.NBMain $startSize $endSize $incrSize\r"
 send "java -classpath $JAR_PATH:./bin:./ naive_bayes.NBMain $startSize $endSize $incrSize\r"
 set timeout -1
-expect "TRAIN"
 
-send "exit\r"
+expect {
+  "TRAIN" {
+    send "exit\r"
+  }
+  "illed" {
+    send "exit\r"
+  }
+}
