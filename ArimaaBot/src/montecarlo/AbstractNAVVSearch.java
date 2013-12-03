@@ -39,7 +39,8 @@ public abstract class AbstractNAVVSearch extends AbstractSearchAgent {
 	private PriorityQueue<MoveOrder> topMoves(FeatureExtractor fe, MoveList moves){
 		//int topk =  (int) Math.ceil(moves.size() * 0.1);
 		//int topk =  (int) Math.ceil(moves.size() * 0.2);
-		int topk = 30;
+		//int topk = 30;
+		int topk = 5;
 		
 		PriorityQueue<MoveOrder> minPQ = new PriorityQueue<MoveOrder>( topk + 1, new MoveOrder(true) );
 		PriorityQueue<MoveOrder> maxPQ = new PriorityQueue<MoveOrder>( topk + 1, new MoveOrder(false) );

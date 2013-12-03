@@ -1,6 +1,11 @@
 package montecarlo;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.BitSet;
+import java.util.Scanner;
+
+import naive_bayes.NBHypothesis;
 
 import utilities.helper_classes.ArimaaState;
 
@@ -73,6 +78,33 @@ public class Utilities {
 			weights[i] += features[i]*r*eta*wi; //update weights
 		}
 
+	}
+	
+	private static final int YCOUNT = 2;
+	public static NBHypothesis getNBPredictor(String fqtbl){
+		try {
+			Scanner reader = new Scanner( (new File(fqtbl)).getAbsoluteFile() );
+			long numNeg = reader.nextLong();
+			long numPos = reader.nextLong();
+			reader.nextLine(); //read the end of the line
+			
+			long[][] fCounts = new long[YCOUNT][];
+			for(int i = 0; i < YCOUNT; i++){ //for a valid file, it needs 2 lines
+				String [] counts = reader.nextLine().split(" ");
+				fCounts[i] = new long[counts.length];
+				for(int j = 0; j < counts.length; j++){
+					fCounts[i][j] = Long.parseLong(counts[j]); 
+				}
+			}
+			reader.close();
+			
+			return new NBHypothesis(fCounts, numNeg, numPos);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.exit(1); //cannot continue
+		}
+		
+		return null; //cannot get here
 	}
 	
 }

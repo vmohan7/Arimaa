@@ -2,13 +2,10 @@ package montecarlo;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
-import java.util.Scanner;
-
-import naive_bayes.NBHypothesis;
 
 import utilities.helper_classes.ArimaaState;
 
@@ -24,6 +21,8 @@ public class MonteCarlo {
 	public static final int OUTPUT = 1;
 	public static final int NUMTRAILS = 2;
 	public static final int NBTABLE = 3;
+	
+	public static final int MAX_DEPTH = 2;
 
 	/**
 	 * @param args - The first string should be the location of the output. The second string is the number of trails
@@ -33,7 +32,7 @@ public class MonteCarlo {
 			System.out.println("Error in usage - 3 (optional 4) string: <agent #> <location of output> <number of trails> <location of NB freq table - if needed>");
 			System.out.println("agent 1 = Reflex");
 			System.out.println("agent 2 = Naive Bayes Reflex");
-			System.out.println("agent 3 = Naive Bayes ply-4");
+			System.out.println("agent 3 = Naive Bayes ply-" + MAX_DEPTH);
 			System.exit(1);
 		}
 		int agent = Integer.parseInt(args[AGENT]);
@@ -75,46 +74,18 @@ public class MonteCarlo {
 		}
 	}
 	
-	public static final int MAX_DEPTH = 2;
-	
 	private static AbstractAgent getTrainingAgent(int agent, double[] weights, String fqtbl){
 		if (agent == 1) {
 			return new ReflexAgent(weights, true);
 		} else if (agent == 2){
-			return new NaiveReflexAgent(weights, true, getPredictor(fqtbl) );
+			return new NaiveReflexAgent(weights, true, Utilities.getNBPredictor(fqtbl) );
 		} else if (agent == 3) {
-			return new NAVVCarlo(weights, true, MAX_DEPTH, getPredictor(fqtbl) );
+			return new NAVVCarlo(weights, true, MAX_DEPTH, Utilities.getNBPredictor(fqtbl) );
 		}
 			
 		return null;
 	}
-	
-	private static final int YCOUNT = 2;
-	private static NBHypothesis getPredictor(String fqtbl){
-		try {
-			Scanner reader = new Scanner( (new File(fqtbl)).getAbsoluteFile() );
-			long numNeg = reader.nextLong();
-			long numPos = reader.nextLong();
-			reader.nextLine(); //read the end of the line
-			
-			long[][] fCounts = new long[YCOUNT][];
-			for(int i = 0; i < YCOUNT; i++){ //for a valid file, it needs 2 lines
-				String [] counts = reader.nextLine().split(" ");
-				fCounts[i] = new long[counts.length];
-				for(int j = 0; j < counts.length; j++){
-					fCounts[i][j] = Long.parseLong(counts[j]); 
-				}
-			}
-			reader.close();
-			
-			return new NBHypothesis(fCounts, numNeg, numPos);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			System.exit(1); //cannot continue
-		}
-		
-		return null; //cannot get here
-	}
+
 
 	private static void runTrial(int a, double[] weights, String fqtbl) {
 		GameState gameBoard = getRandomStart();
@@ -152,7 +123,7 @@ public class MonteCarlo {
 		}
 
 		System.out.println(state.getCurr());
-		Utilities.TDUpdate(state, null, moveCount % 2 == 0 ? 1 : 0 , ETA, weights);
+		Utilities.TDUpdate(state, null, 1 , ETA, weights);
 	}
 	
 	private static GameState getRandomStart(){

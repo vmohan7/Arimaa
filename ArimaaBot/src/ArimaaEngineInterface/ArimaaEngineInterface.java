@@ -3,8 +3,9 @@ package ArimaaEngineInterface;
 import java.io.*;
 import java.util.*;
 
-import montecarlo.ReflexAgent;
-import montecarlo.Utilities;
+import naive_bayes.NBHypothesis;
+
+import montecarlo.*;
 import ai_util.*;
 
 
@@ -25,6 +26,17 @@ public class ArimaaEngineInterface {
 	}
 	
 	private double[] weights = new double[Utilities.TOTAL_FEATURES];
+	private int bot_type = 0; //invalid type
+	private NBHypothesis hyp = null;
+	
+	/*
+	 * 
+	 * Bot 1 = Reflex Agent
+	 * Bot 2 = Naive Reflex Agent
+	 * Bot 3 = Alpha Beta Reflex Agent
+	 * Bot 4 = NAVVClueless
+	 * 
+	 */
 	
 	private void control() {
 
@@ -68,10 +80,17 @@ public class ArimaaEngineInterface {
 
 				}
 				else if (AEIcommand.command.equals("newgame")) {
-					send_message("log starting new game");
+					send_message("log starting new game using bot " + bot_type);
 					
 					gc.reset();
-					gc.setAgent( new ReflexAgent(weights, false) ); //weights pointer should be the same, but this does not hurt
+					if (bot_type == 1)
+						gc.setAgent( new ReflexAgent(weights, false) ); 
+					else if (bot_type == 2)
+						gc.setAgent(new NaiveReflexAgent(weights, false, hyp));
+					else if (bot_type == 3)
+						gc.setAgent(new NAVVCarlo(weights, false, 2, hyp));
+					else if (bot_type == 4)
+						gc.setAgent(new NAVVClueless(null, false, 2, hyp));
 				}
 				else if (AEIcommand.command.equals("makemove")) {
 					String move_text = AEIcommand.getRestOfCommand();
@@ -112,6 +131,10 @@ public class ArimaaEngineInterface {
 	private void set_option(String name, String value) {
 		if (name.equals("weights")){
 			setWeights(value);
+		} else if (name.equals("nb") ){
+			hyp = Utilities.getNBPredictor(value);
+		} else if (name.equals("type") ){
+			bot_type = Integer.parseInt(value);
 		}
 		
 	}

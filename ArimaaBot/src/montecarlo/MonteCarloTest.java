@@ -17,8 +17,9 @@ public class MonteCarloTest {
 		minPQ.add(temp.new MoveOrder(null, 0.5) );
 		minPQ.add(temp.new MoveOrder(null, 0.6) );
 		
-		System.out.println( "First weight " + minPQ.remove().weight);
-		System.out.println( "Second weight " + minPQ.remove().weight);
+		assertEquals(minPQ.remove(), 0.5);
+		assertEquals(minPQ.remove(), 0.6);
+
 	}
 
 }
