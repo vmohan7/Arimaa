@@ -125,7 +125,7 @@ public class MonteCarlo {
 		}
 
 		System.out.println(state.getCurr());
-		Utilities.TDUpdate(state, null, moveCount % 2 == 0 ? 1 : 0 , ETA, weights);
+		Utilities.TDUpdate(state, null, 1  , ETA, weights);
 	}
 	
 	private static GameState getRandomStart(){
