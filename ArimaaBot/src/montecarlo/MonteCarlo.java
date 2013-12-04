@@ -100,6 +100,7 @@ public class MonteCarlo {
 		state = new ArimaaState(gameBoard, move); 
 		
 		int moveCount = 1;
+		gameBoard = new GameState();
 		gameBoard.playFullClear(state.getNextMove(), state.getCurr());
 		while( !gameBoard.isGameOver() ) {
 			System.out.println(state.getCurr());
@@ -111,19 +112,20 @@ public class MonteCarlo {
 			move = agent.selectMove(nextState, possibleMoves);
 			nextState = new ArimaaState(state.getCurr(), gameBoard, move);
 			
-			//Utilities.TDUpdate(state, nextState, 0, ETA, weights);
+			Utilities.TDUpdate(state, nextState, 0, ETA, weights);
 			state = nextState;
 			
 			//Should be the same pointer, but let's be explicit about the update
 			agent.setWeights(weights);
 
 			moveCount++;
-			
+
+			gameBoard = new GameState();
 			gameBoard.playFullClear(state.getNextMove(), state.getCurr());
 		}
 
 		System.out.println(state.getCurr());
-		Utilities.TDUpdate(state, null, 1 , ETA, weights);
+		Utilities.TDUpdate(state, null, moveCount % 2 == 0 ? 1 : 0 , ETA, weights);
 	}
 	
 	private static GameState getRandomStart(){
