@@ -112,7 +112,7 @@ public class MonteCarlo {
 			move = agent.selectMove(nextState, possibleMoves);
 			nextState = new ArimaaState(state.getCurr(), gameBoard, move);
 			
-			Utilities.TDUpdate(state, nextState, 0, ETA, weights);
+			//Utilities.TDUpdate(state, nextState, 0, ETA, weights);
 			state = nextState;
 			
 			//Should be the same pointer, but let's be explicit about the update
