@@ -2,6 +2,8 @@ package utilities.helper_classes;
 
 import java.util.concurrent.TimeUnit;
 
+import arimaa3.GameState;
+import feature_extractor.FeatureExtractor;
 import naive_bayes.NBMain;
 
 public class Utilities {
@@ -73,4 +75,33 @@ public class Utilities {
 		return false;
 	}
 
+	/** Calculates the piece type (e.g. 3) for each piece id (e.g. black dog) for the current game state.
+	 * @return byte[] containing the above calculation (for each id) */
+	public static byte[] calculatePieceTypes(GameState curr){
+		byte[] pieceTypes = new byte[curr.piece_bb.length];
+		
+		for (int i = 0; i < 2; i++){ // calculate for rabbits 
+			byte numStronger = FeatureExtractor.countOneBits(curr.stronger_enemy_bb[i]);
+			if (numStronger < 5)
+				pieceTypes[i] = 7;
+			else if (numStronger < 7)
+				pieceTypes[i] = 6;
+			else
+				pieceTypes[i] = 5;
+		}
+		
+		for (int i = 2; i < 12; i++){ // calculate for non-rabbits
+			byte numStronger = FeatureExtractor.countOneBits(curr.stronger_enemy_bb[i]);
+			switch (numStronger) {
+				case 0: pieceTypes[i] = 0; break;
+				case 1: pieceTypes[i] = 1; break;
+				case 2: pieceTypes[i] = 2; break;
+				case 3: case 4: pieceTypes[i] = 3; break;
+				default: pieceTypes[i] = 4; break;
+			}
+		}
+		
+		return pieceTypes;
+	}
+	
 }

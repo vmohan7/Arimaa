@@ -1,8 +1,8 @@
 package feature_extractor;
 
-import java.util.ArrayList;
 import java.util.BitSet;
 
+import utilities.helper_classes.Utilities;
 import ai_util.Util;
 import arimaa3.ArimaaMove;
 import arimaa3.GameState;
@@ -97,7 +97,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 		/* We want types before a potential capture (we're "threatening" to capture these types);
 		 * do it once outside the loop and pass in */
 		byte[] oppPieceTypes = SteppingOnTrapsExtractor.getPieceTypesForPlayer(
-									opponent, calculatePieceTypes(curr)
+									opponent, Utilities.calculatePieceTypes(curr)
 								); 
 		
 		for (ArimaaMove move : moveList) {//seems to avoid null moves...
@@ -105,6 +105,9 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 			postCapture.play(move, currOppPass); //was playFullClear -- no longer
 			recordCaptureMove(curr, postCapture, move.steps, bitset, offset, opponent, oppPieceTypes);
 		}
+		
+		System.gc(); //suggest to the JVM that it clean up this huge moveList...
+		//TODO: Is this bad? Will it affect performance?
 	}
 	
 	 /** The bitset is updated as follows: <br>
@@ -126,14 +129,21 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	//TODO: figure out which trap resulted in the capture... (using trap 2 currently)
 	private void recordCaptureMove(GameState preCapture, GameState postCapture, int numSteps,
 						BitSet toUpdate, int bitOffset, int opponent, byte[] oppPieceTypes) { 
-		short captured = getCapturesFromStates(preCapture, postCapture,	opponent, oppPieceTypes);
+		
+		int capturesAndTraps = getCapturesFromStates(preCapture, postCapture,	opponent, oppPieceTypes);
+		
+		short captured = (short)capturesAndTraps; //truncate to get captures
+		short traps = (short)(capturesAndTraps >>> Short.SIZE); //shift to get traps
 		
 		while (captured != 0) { //keep "popping" most-significant ones until there aren't any left.			
 			int type = Util.FirstOne(captured);
 			captured ^= (1 << type); //turn off the type-bit just considered (faster than & ~?)
-			int trap = getTrapNumber(preCapture, postCapture); //2
+			int trap = Util.FirstOne(traps);
+			traps ^= (1 << trap);
 			
 			if (type >= Byte.SIZE) type -= Byte.SIZE; // 0 <= type < Byte.Size (8)
+			if (trap >= Byte.SIZE) trap -= Byte.SIZE;
+			
 			int bitToSet = bitOffset + 32 * trap + 8 * (numSteps - 1) + type; //TODO: remove hardcoding
 			toUpdate.set(bitToSet);
 		}
@@ -141,18 +151,26 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	}
 	
 	
-	/** @return a short containing information as follows:
-	 * The least-significant byte has 1s at the positions of captured types <br>
-	 * e.g. if a piece of "Type 2: Non-rabbit, 2 opponent pieces stronger" is captured,
-	 * then 1 << 2 (the 3rd bit) is set.<br>
-	 * The most-significant byte has the same information but is only set if
-	 * there are two captures of the same piece-type (impossible to have more than
-	 * 2 captures)
+	/** @return an int containing information as follows: <p>
+	 * The most-significant short contains the trap information. The least-significant
+	 * short contains the captures information.<br>
+	 * Within each short, the least-significant byte has the 1st capture (trap / piece type),
+	 * and the most-significant byte has the 2nd capture (if it exists). <br>
+	 * Piece types are set as follows: e.g. if a piece of "Type 2: Non-rabbit, 2 opponent
+	 * pieces stronger" is captured, then 1 << 2 (the 3rd bit) is set. Note that the two 
+	 * is successfully recovered by Util.FirstOne(int/long).<br>
+	 * Traps are also set intuitively: 1 << trap is set if trap \in {0, 1, 2, 3} was "used"
+	 * for the capture. ("Used" in quotes because of our approximation.) <p>
+	 * <i>(Note: impossible to have more than 2 captures)</i>
 	 * */
-	private short getCapturesFromStates(GameState preCapture, GameState postCapture,
+	private int getCapturesFromStates(GameState preCapture, GameState postCapture,
 													int opponent, byte[] oppPieceTypes) {
+		// the idea is to store the traps and the captures, and then merge
+		// them into an integer before returning
 		short captures = 0;
-	
+		short traps = 0;
+		
+		boolean alreadyCaptured = false;
 		for (int i = opponent; i < 12; i += 2) { //TODO: fix hardcoding
 			int preCaptureCount = Util.PopCnt(preCapture.piece_bb[i]);
 			int postCaptureCount = Util.PopCnt(postCapture.piece_bb[i]);
@@ -163,104 +181,65 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 			switch (numCaptures) {
 				case 0:
 					break;
+					
 				case 2:
 					captures |= (1 << (pieceType + Byte.SIZE)); 
+					int trap = getTrapNumber(preCapture, postCapture, i, false);
+					traps |= (1 << (trap + Byte.SIZE));
 					//fall through
+					
 				case 1:
+					trap = getTrapNumber(preCapture, postCapture, i, true);
+					if (alreadyCaptured) { //use the second byte
+						pieceType += Byte.SIZE;
+						trap += Byte.SIZE;
+					}
+					
 					captures |= (1 << pieceType);
+					traps |= (1 << trap);
+					alreadyCaptured = true;
 					break;
 			}
 		}
 		
-		return captures;
+		return captures | (traps << Short.SIZE);
 	}
 	
-	/** Deduces the trap number used in capturing ... this seems impossible */
-	private int getTrapNumber(GameState preCapture, GameState postCapture) {
-		return 2;
-	}
-	
-	// Calculates the piece type (e.g. 3) for each piece id (e.g. black dog) for the current game state.
-	//TODO: Merge w/ FeatureExtractor's method
-	private byte[] calculatePieceTypes(GameState curr){
-		byte[] pieceTypes = new byte[curr.piece_bb.length];
+	/** Deduces the trap number used in capturing ... this seems impossible 
+	 * So we approximate: assume the closest trap to the capture! */
+	/* TODO: Fix this approximation and test it once we have the chance */
+	private int getTrapNumber(GameState preCapture, GameState postCapture, 
+										int arimaaPieceType, boolean firstPiece) {
 		
-		for (int i = 0; i < 2; i++){ // calculate for rabbits 
-			byte numStronger = FeatureExtractor.countOneBits(curr.stronger_enemy_bb[i]);
-			if (numStronger < 5)
-				pieceTypes[i] = 7;
-			else if (numStronger < 7)
-				pieceTypes[i] = 6;
-			else
-				pieceTypes[i] = 5;
+		long preBB = preCapture.piece_bb[arimaaPieceType];
+		int indexOfCap = Util.FirstOne(preBB);
+		preBB ^= (1L << indexOfCap); //turn off that bit
+		if (firstPiece) assert(preBB == 0);
+		
+		if (!firstPiece) { //assume there were two captures, and get the second one
+			int indexOfCap2 = Util.FirstOne(preBB);
+			return nearestTrap(indexOfCap2);
 		}
 		
-		for (int i = 2; i < 12; i++){ // calculate for non-rabbits
-			byte numStronger = FeatureExtractor.countOneBits(curr.stronger_enemy_bb[i]);
-			switch (numStronger) {
-				case 0: pieceTypes[i] = 0; break;
-				case 1: pieceTypes[i] = 1; break;
-				case 2: pieceTypes[i] = 2; break;
-				case 3: case 4: pieceTypes[i] = 3; break;
-				default: pieceTypes[i] = 4; break;
-			}
-		}
-		
-		return pieceTypes;
+		return nearestTrap(indexOfCap);
 	}
 	
-
-
-
-
-
-	// -------------- "INEFFICIENT" but trying to get this to work --------------- //
-	private void recordCaptureMoveInefficient(GameState preCapture, GameState postCapture, 
-			int numSteps, BitSet toUpdate, int bitOffset, int opponent, byte[] oppPieceTypes) {
+	/** Returns the nearest trap for a board index (0 - 63)*/
+	static int nearestTrap(int boardIndex) { //TODO: change privacy once done testing
+		long index = 1L << boardIndex;
+		for (int trap = 0; trap < QUADRANT.length; trap++)
+			if ((QUADRANT[trap] & index) != 0) return trap;
 		
-		final int MAX_NUM_CAPTURES = 2;
-		ArrayList<Integer> trapsUsed = new ArrayList<Integer>(MAX_NUM_CAPTURES); //updated in place
-		ArrayList<Integer> captured = new ArrayList<Integer>(MAX_NUM_CAPTURES); //updated in place
-		
-		getCapturesFromStatesInefficient(preCapture, postCapture, 
-					opponent, oppPieceTypes, captured, trapsUsed);
-		assert(trapsUsed.size() == captured.size());
-		
-		for (int i = 0; i < captured.size(); i++) {			
-			int type = captured.get(i);
-			int trap = trapsUsed.get(i);
-			
-			int bitToSet = bitOffset + 32 * trap + 8 * (numSteps - 1) + type; //TODO: remove hardcoding
-			toUpdate.set(bitToSet);
-		}
+		assert(false);
+		return -1;
 	}
 	
-	private void getCapturesFromStatesInefficient(GameState preCapture, GameState postCapture, 
-			int opponent, byte[] oppPieceTypes, ArrayList<Integer> captured, 
-												ArrayList<Integer> trapsUsed) {
-		
-		for (int piece = opponent; piece < 12; piece += 2) {
-			int preCaptureCount = Util.PopCnt(preCapture.piece_bb[piece]);
-			int postCaptureCount = Util.PopCnt(postCapture.piece_bb[piece]);
-			int numCaptures = preCaptureCount - postCaptureCount; //numCaptures >= 0
-			
-			int pieceType = oppPieceTypes[piece / 2]; //TODO: use all pieceTypes instead of just opp?
-			
-			if (numCaptures != 0) {
-				for (int capt = 0; capt < numCaptures; capt++)
-					captured.add(pieceType);
-				
-				updateTrapsUsedInefficient(preCapture, postCapture, piece, trapsUsed);
-			}
-		}
-	}
-	
-	private void updateTrapsUsedInefficient(GameState preCapture, GameState postCapture,
-												int piece, ArrayList<Integer> trapsUsed) {
-		
-	}
-
 }
+
+	
+
+
+
 
 
 // Garbage / stuff that may come in handy later

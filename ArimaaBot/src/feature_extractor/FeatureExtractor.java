@@ -1,5 +1,7 @@
 package feature_extractor;
 import java.util.BitSet;
+
+import utilities.helper_classes.Utilities;
 import arimaa3.*;
 
 public class FeatureExtractor implements FeatureConstants {
@@ -7,17 +9,11 @@ public class FeatureExtractor implements FeatureConstants {
 	/* Starting game state from which we play current_move */
 	private GameState prev;
 	
-	private GameState prev_prev;
-	
-	/* Piece id to type mapping for the current game state (curr). E.g. if piece_types[3] = 4, this means
-	 * that piece id 3 (black cat) is of piece type 4 for the current GameState. This changes every time 
-	 * extractFeatures() is called. */
-	private byte piece_types[];
+	private GameState prev_prev;	
 		
 	public FeatureExtractor(GameState prev, GameState prev_prev) {
 		this.prev = prev;
 		this.prev_prev = null;
-		piece_types = null;
 	}
 
 	/*
@@ -39,10 +35,11 @@ public class FeatureExtractor implements FeatureConstants {
 	 */
 	public BitSet extractFeatures(ArimaaMove current_move, GameState curr) {
 		BitSet featureVector = new BitSet(NUM_FEATURES);
-		piece_types = new byte[12];
-
-
-		calculatePieceTypes(curr);
+		
+		/* Piece id to type mapping for the current game state (curr). E.g. if piece_types[3] = 4, this means
+		 * that piece id 3 (black cat) is of piece type 4 for the current GameState. This changes every time 
+		 * extractFeatures() is called. */
+		byte[] piece_types = Utilities.calculatePieceTypes(curr); //Neema made this local to merge methods across this and CaptureThreatsExtractor
 
 		// feature extraction subroutine calls here
 		
@@ -50,6 +47,7 @@ public class FeatureExtractor implements FeatureConstants {
 		(new TrapExtractor(prev, curr)).updateBitSet(featureVector);
 		(new FreezingExtractor(prev, curr, piece_types)).updateBitSet(featureVector);
 		(new SteppingOnTrapsExtractor(prev, curr, piece_types)).updateBitSet(featureVector);
+		(new CaptureThreatsExtractor(prev, curr)).updateBitSet(featureVector);
 		return featureVector;
 	}
 	
@@ -62,31 +60,6 @@ public class FeatureExtractor implements FeatureConstants {
 		index = index & 0x07; //reduces all rows to the same indices as first row
 		index = (index > 3) ? 7 - index : index;
 		return index + (row << 2);
-	}
-
-	// Calculates the piece type (e.g. 3) for each piece id (e.g. black dog) for the current game state.
-	private void calculatePieceTypes(GameState curr){
-		
-		for (int i = 0; i < 2; i++){ // calculate for rabbits 
-			byte numStronger = countOneBits(curr.stronger_enemy_bb[i]);
-			if (numStronger < 5)
-				piece_types[i] = 7;
-			else if (numStronger < 7)
-				piece_types[i] = 6;
-			else
-				piece_types[i] = 5;
-		}
-		
-		for (int i = 2; i < 12; i++){ // calculate for non-rabbits
-			byte numStronger = countOneBits(curr.stronger_enemy_bb[i]);
-			switch (numStronger) {
-				case 0: piece_types[i] = 0; break;
-				case 1: piece_types[i] = 1; break;
-				case 2: piece_types[i] = 2; break;
-				case 3: case 4: piece_types[i] = 3; break;
-				default: piece_types[i] = 4; break;
-			}
-		}
 	}
 	
 	public static byte countOneBits(long n) {
