@@ -9,7 +9,7 @@ import arimaa3.GameState;
 import arimaa3.GenCaptures;
 import arimaa3.MoveList;
 
-//TODO: Make this class as efficient as possible--I can totally see this being a bottleneck.
+/** Make this class as efficient as possible--I can totally see this being a bottleneck. */
 public class CaptureThreatsExtractor extends AbstractExtractor {
 	
 	private GameState prev, curr;
@@ -68,10 +68,24 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 		return FeatureRange.CAPTURE_THREATS_END;
 	}
 	
+	
+	
+	
+	
+	
+	// ===========================================================================================
+	// ========================== PRIVATE METHODS -- Read no further! :D =========================
+	// ===========================================================================================
+	
+	
+	/* *************************************************
+	 * ********** START Threatens Cap Methods ********** 
+	 * ************************************************* */
 	/** Overloaded method-wrapper to give default bitset offset
 	 * (See other method below for more comments). */
 	private void threatensCap(BitSet bitset) {
 		threatensCap(curr, bitset, CaptureThreats.THREATENS_CAP_OFFSET);
+		System.gc(); //suggest to the JVM that it clean up this huge moveList... Is this bad? Will it affect performance?
 	}
 	
 	/** Updates the bitset with the THREATENS CAP features 
@@ -81,9 +95,11 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	 *   <i>[Added mainly to support using this method later to update small bitsets (offset 0)
 	 *   to pass information to other methods.]</i>*/
 	private void threatensCap(GameState curr, BitSet bitset, int offset) {
-		int jeffBachersSize = 400000; //TODO: Figure out what the maximum size can be and use instead... (definitely way less than 400,000?)
+		int neemaSize = 4000; //try Neema's size first -- to save memory and computation time!
+		int jeffBachersSize = 400000; //upper bound provided by Jeff
+		
 		boolean completeTurn = false; //allows us to get captures with fewer than 4 moves
-		MoveList moveList = new MoveList(jeffBachersSize);
+		MoveList moveList = new MoveList(neemaSize); //will be populated with all capture threats
 		
 		GenCaptures captures = new GenCaptures();
 		
@@ -92,7 +108,14 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 		int opponent = curr.player;
 		GameState currOppPass = new GameState();
 		currOppPass.playPASS(curr); //copies curr into currPassOpp before playing pass
-		captures.genCaptures(currOppPass, moveList, completeTurn); //fills moveList with capture threats
+		try {
+			captures.genCaptures(currOppPass, moveList, completeTurn); //fills moveList with capture threats
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
+			moveList = new MoveList(jeffBachersSize);
+			captures.genCaptures(currOppPass, moveList, completeTurn); //fills moveList with capture threats
+		}
+		
 		
 		/* We want types before a potential capture (we're "threatening" to capture these types);
 		 * do it once outside the loop and pass in */
@@ -105,9 +128,6 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 			postCapture.play(move, currOppPass); //was playFullClear -- no longer
 			recordCaptureMove(curr, postCapture, move.steps, bitset, offset, opponent, oppPieceTypes);
 		}
-		
-		System.gc(); //suggest to the JVM that it clean up this huge moveList...
-		//TODO: Is this bad? Will it affect performance?
 	}
 	
 	 /** The bitset is updated as follows: <br>
@@ -125,8 +145,6 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	/* Sorry for all of these parameters...but I didn't want to make assumptions and mess up
 	 * any recalculations of parameters, etc. 
 	 * Also, pardon the cryptic bit manipulations... */
-	//TODO: Suggest better bit manipulations/information passing
-	//TODO: figure out which trap resulted in the capture... (using trap 2 currently)
 	private void recordCaptureMove(GameState preCapture, GameState postCapture, int numSteps,
 						BitSet toUpdate, int bitOffset, int opponent, byte[] oppPieceTypes) { 
 		
@@ -171,12 +189,12 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 		short traps = 0;
 		
 		boolean alreadyCaptured = false;
-		for (int i = opponent; i < 12; i += 2) { //TODO: fix hardcoding
+		for (int i = opponent; i < oppPieceTypes.length * 2; i += 2) {
 			int preCaptureCount = Util.PopCnt(preCapture.piece_bb[i]);
 			int postCaptureCount = Util.PopCnt(postCapture.piece_bb[i]);
 			int numCaptures = preCaptureCount - postCaptureCount; //numCaptures >= 0
 			
-			int pieceType = oppPieceTypes[i / 2]; //TODO: use all pieceTypes instead of just opp?
+			int pieceType = oppPieceTypes[i / 2];
 			
 			switch (numCaptures) {
 				case 0:
@@ -207,7 +225,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	
 	/** Deduces the trap number used in capturing ... this seems impossible 
 	 * So we approximate: assume the closest trap to the capture! */
-	/* TODO: Fix this approximation and test it once we have the chance */
+	/* Fix this approximation and test it once we have the chance */
 	private int getTrapNumber(GameState preCapture, GameState postCapture, 
 										int arimaaPieceType, boolean firstPiece) {
 		
@@ -225,7 +243,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	}
 	
 	/** Returns the nearest trap for a board index (0 - 63)*/
-	static int nearestTrap(int boardIndex) { //TODO: change privacy once done testing
+	static int nearestTrap(int boardIndex) {
 		long index = 1L << boardIndex;
 		for (int trap = 0; trap < QUADRANT.length; trap++)
 			if ((QUADRANT[trap] & index) != 0) return trap;
@@ -233,27 +251,24 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 		assert(false);
 		return -1;
 	}
+	/* *************************************************
+	 * *********** END Threatens Cap Methods *********** 
+	 * ************************************************* */
+	
+	// ===========================================================================================
+	
+	
+	/* *************************************************
+	 * ********** START Threatens Cap Methods ********** 
+	 * ************************************************* */
+
+	
+	//TODO: Implement more methods! :D
+	
+	
+	/* *************************************************
+	 * *********** END Threatens Cap Methods *********** 
+	 * ************************************************* */
+	
 	
 }
-
-	
-
-
-
-
-
-// Garbage / stuff that may come in handy later
-
-// -- PRINT captured moves in a MoveList
-//System.out.println("Capture Moves: ");
-//System.out.println("Initial board: \n" + currPassOpp.toBoardString() + "\n");
-//for (ArimaaMove move : moveList) {
-//	if (move == null) continue;
-//	
-//	GameState currCopy = new GameState();
-//	currCopy.playFullClear(move, currPassOpp);
-//	
-//	System.out.println(move.toString());
-//	System.out.println(currCopy.toBoardString());
-//}
-//System.out.println();
