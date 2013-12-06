@@ -3,7 +3,7 @@ package feature_extractor;
 import java.util.BitSet;
 import arimaa3.GameState;
 
-public class TrapExtractor extends AbstractExtractor {
+public class TrapExtractor extends AbstractTrapExtractor {
 
 	private GameState prev, curr;
 	
@@ -23,7 +23,7 @@ public class TrapExtractor extends AbstractExtractor {
 	 *  <br> -For each player's half, only one bit will be turned on, corresponding to the <i>status change</i>:
 	 *  <br> [This bit is TrapStatus.NUM_STATUSES * prevStatus + currStatus (our version of change-encoding) into the player's half] */
 	@Override
-	public void updateBitSet(BitSet bitset) { //HAS NOT BEEN TESTED. Test me! :D
+	public void updateBitSet(BitSet bitset) { //TODO: HAS NOT BEEN TESTED. Test me! :D
 		int startOfRange = startOfRange(); //used later
 		int numFeatures = endOfRange() - startOfRange + 1;
 		int whiteOffset = 0;
@@ -55,26 +55,4 @@ public class TrapExtractor extends AbstractExtractor {
 		return FeatureRange.TRAP_STATUS_END;
 	}
 	
-	/** Returns a byte containing one of the TrapStatus.NUM_STATUSES possible
-	 * trap statuses (number of pieces on trap, elephant?, etc).
-	 * @param state The current board
-	 * @param trapNum Lower left, upper left, lower right, upper right
-	 * @param playerNum PL_WHITE, PL_BLACK */
-	public static byte getTrapStatus(GameState state, int trapNum, int playerNum) { //remove static, make private
-		long player_trap_bb = TOUCH_TRAP[trapNum] & state.colour_bb[playerNum]; // all white or black pieces touching trap #trapNum
-		byte numPieces = FeatureExtractor.countOneBits(player_trap_bb);
-		assert(numPieces <= 4); //shouldn't be more than 4 pieces touching a trap...
-		
-		boolean elephant = isElephantTouchingTrap(state, trapNum, playerNum);
-		return TrapStatus.convertToStatus(numPieces, elephant);
-	}
-	
-	/** Returns whether an elephant for the given player (in the current game state)
-	 * is on any of the four spaces adjacent to the given trap. */
-	public static boolean isElephantTouchingTrap(GameState state, int trapNum, int playerNum) { //remove static once done testing, make private
-		int boardNum = playerNum == PL_WHITE ? PT_WHITE_ELEPHANT : PT_BLACK_ELEPHANT;
-		long elephant_bb = state.piece_bb[boardNum];
-		//System.out.printf("%x\n", elephant_bb);
-		return (elephant_bb & TOUCH_TRAP[trapNum]) != 0;
-	}
 }

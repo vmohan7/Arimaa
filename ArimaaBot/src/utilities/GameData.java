@@ -5,10 +5,11 @@ import java.sql.SQLException;
 
 import utilities.helper_classes.GameInfo;
 
-public class GameData {
+public class GameData implements AbstractGameData {
 	private ResultSet filteredGames; 
 	private int firstTestGame;
 	private Mode myMode;
+	private int numGames;
 	
 	private static final int RATING_THRESHOLD = 2100;
 	// For reference, there are 279K total games, and 5K where both players are rated > 2100. 
@@ -18,16 +19,29 @@ public class GameData {
 			"AND black_rating >= %d ORDER BY RAND() LIMIT %d ) g_ids " +
 			"INNER JOIN games ON games.id = g_ids.id"; 
 	
-	public static enum Mode {
-		TRAIN, TEST;
-	}
-	
 	public GameData(int numGames, double trainFraction){
+		this.numGames = numGames;
 		this.firstTestGame = (int) (trainFraction * numGames) + 1;
 		filteredGames = MyDB.executeQuery(String.format(myQuery, RATING_THRESHOLD, RATING_THRESHOLD, numGames));
 		setMode(Mode.TRAIN);
 	}
 	
+	/** Close the ResultSet object that internally serves the game data. */
+	public void close(){
+		try {
+			filteredGames.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public int getNumGames(){
+		return numGames;
+	}
+	
+	public Mode getMode(){
+		return myMode;
+	}
 	
 	public boolean hasNextGame(){
 		try {

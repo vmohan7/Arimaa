@@ -9,7 +9,7 @@ JAR_PATH=../ArimaaBot/mysql-connector-java-5.1.26-bin.jar
 
 # mail to this address
 #$ -M vhchoksi@stanford.edu
-# send mail on begin, end, suspend
+# send mail on beginning, ending, or suspension of job
 #$ -m bes
 
 # tell grid engine to use current directory

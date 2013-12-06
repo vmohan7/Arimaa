@@ -1,7 +1,7 @@
 #!/usr/bin/expect -f
 
 # ---- PARAMETERS TO CONFIGURE HERE ---- #
-set ARIMAABOT_DIR "~/cs229/Arimaa/ArimaaBot"
+set ARIMAABOT_DIR "/afs/ir.stanford.edu/users/v/h/vhchoksi/cs229/Arimaa/ArimaaBot"
 
 # mysql-connector .jar path relative to ARIMAABOT_DIR
 set JAR_PATH "./mysql-connector-java-5.1.26-bin.jar"
@@ -14,11 +14,17 @@ set endSize [lindex $argv 1]
 set incrSize [lindex $argv 2]
 set username [lindex $argv 3]
 set password [lindex $argv 4]
+set machineNumber [lindex $argv 5]
+
+set timeout 60
 
 log_user 0
-spawn ssh $username@corn.stanford.edu 
-expect "Password: "
-send "$password\r"
+# log_user 1
+spawn ssh $username@corn$machineNumber.stanford.edu 
+
+# Don't need to input password when ssh'ing from myth to corn
+# expect "Password: "
+# send "$password\r"
 
 expect "%"
 send "cd $ARIMAABOT_DIR\r"
@@ -30,4 +36,15 @@ set timeout -1
 # send "java -Xmx500000000 -classpath $JAR_PATH:./bin:./ naive_bayes.NBMain $startSize $endSize $incrSize\r"
 send "java -classpath $JAR_PATH:./bin:./ naive_bayes.NBMain $startSize $endSize $incrSize\r"
 set timeout -1
-expect "Total execution time"
+
+expect {
+  "TRAIN" {
+    send "exit\r"
+  }
+  "illed" {
+    send "exit\r"
+  }
+  "Exception" {
+    send "exit\r"
+  }
+}

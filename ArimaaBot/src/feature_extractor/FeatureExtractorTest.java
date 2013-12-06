@@ -89,8 +89,8 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 			
 			boolean whiteEleph = false, blackEleph = false;
 			for (int trap = 0; trap < 4; trap++) {
-				whiteEleph = whiteEleph || TrapExtractor.isElephantTouchingTrap(gsWhite, trap, PL_WHITE);
-				blackEleph = blackEleph || TrapExtractor.isElephantTouchingTrap(gsBlack, trap, PL_BLACK);
+				whiteEleph = whiteEleph || AbstractTrapExtractor.isElephantTouchingTrap(gsWhite, trap, PL_WHITE);
+				blackEleph = blackEleph || AbstractTrapExtractor.isElephantTouchingTrap(gsBlack, trap, PL_BLACK);
 			}
 			
 			boolean onTrap = (neighboringTrapSpots & (1L << board)) != 0;
@@ -125,8 +125,8 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 			int gameW = game * 2;
 			int gameB = gameW + 1;
 			for (int trap = 0; trap < 4; trap++) {
-				byte wStatus = TrapExtractor.getTrapStatus(gs, trap, PL_WHITE);
-				byte bStatus = TrapExtractor.getTrapStatus(gs, trap, PL_BLACK);
+				byte wStatus = AbstractTrapExtractor.getTrapStatus(gs, trap, PL_WHITE);
+				byte bStatus = AbstractTrapExtractor.getTrapStatus(gs, trap, PL_BLACK);
 				
 				assertTrue(wStatus == whitesBlacksStatuses[gameW][trap]);
 				assertTrue(bStatus == whitesBlacksStatuses[gameB][trap]);

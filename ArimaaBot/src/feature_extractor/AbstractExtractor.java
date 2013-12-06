@@ -1,6 +1,5 @@
 package feature_extractor;
 
-import arimaa3.Constants;
 import java.util.BitSet;
 
 
