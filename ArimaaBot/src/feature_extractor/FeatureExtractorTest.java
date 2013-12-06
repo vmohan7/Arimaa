@@ -432,7 +432,8 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		curr.playFull(new ArimaaMove("ra6n ca5n"), prev);
 //		System.out.println(curr.toBoardString());
 //		System.out.println(featureVector);
-		assertTrue(featureVector.nextSetBit(FeatureRange.FREEZING_START) == -1);
+		assertTrue(featureVector.nextSetBit(FeatureRange.FREEZING_START) > FeatureRange.FREEZING_END
+				|| featureVector.nextSetBit(FeatureRange.FREEZING_START) == -1);
 	}
 	
 	@Test
@@ -446,7 +447,8 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		curr.playFull(new ArimaaMove("ra6n ra7n ra4n ra5n"), prev);
 //		System.out.println(curr.toBoardString());
 //		System.out.println(featureVector);
-		assertTrue(featureVector.nextSetBit(FeatureRange.FREEZING_START) == -1);
+		assertTrue(featureVector.nextSetBit(FeatureRange.FREEZING_START) > FeatureRange.FREEZING_END
+				|| featureVector.nextSetBit(FeatureRange.FREEZING_START) == -1);
 	}
 	
 	@Test
