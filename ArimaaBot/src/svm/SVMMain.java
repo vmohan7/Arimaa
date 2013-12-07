@@ -70,7 +70,7 @@ public class SVMMain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		myGameData.close();
 	}
 
 	private static void printTestData(boolean isSvm, String modelFile, int num_games, File gameIds) {
@@ -98,6 +98,7 @@ public class SVMMain {
 		myGameData = new DisconnectedGameData(num_games, gIds, true);
 		System.out.println("\nTesting hypothesis on TRAINING games...");
 		HypothesisTest.test(myHypothesis, myGameData);
+		myGameData.close();
 	}
 	
 	private static AbstractHypothesis evaluateLibSvm(String modelFile, int num_games, File gameIds){
