@@ -12,7 +12,7 @@ import arimaa3.MoveList;
 /** Make this class as efficient as possible--I can totally see this being a bottleneck. */
 public class CaptureThreatsExtractor extends AbstractExtractor {
 	
-	private GameState prev, curr;
+	private GameState /*prev,*/ curr;
 	
 	/* Excerpt from Wu on Capture Threats
 	 * ----------------------------------
@@ -42,7 +42,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	 * @param prev The previous game state (leading to curr)
 	 * @param curr The current game state to be analyzed */
 	public CaptureThreatsExtractor(GameState prev, GameState curr) {
-		this.prev = prev;
+		//this.prev = prev;
 		this.curr = curr;
 	}
 	

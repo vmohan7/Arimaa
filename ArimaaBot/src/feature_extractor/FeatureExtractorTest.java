@@ -3,7 +3,6 @@ package feature_extractor;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 
 import org.junit.Test;
@@ -230,8 +229,8 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	    String blackReplaceTest = "1b ee8 ee7";
 	    startState = new GameState(whiteReplaceTest, blackReplaceTest);
 	    
-	    long moveBitBoardReplaceTest = (1L << startState.getIndex(2, 4)) //e3
-	    							| (1L << startState.getIndex(1, 4)); //e2
+//	    long moveBitBoardReplaceTest = (1L << startState.getIndex(2, 4)) //e3
+//	    							| (1L << startState.getIndex(1, 4)); //e2
 	    //TODO: detect replacement, uncomment this. (is this reasonable to do?)		
 	    //testMoveCorrectness("Ee2n Ee1n", moveBitBoardReplaceTest, startState);
 	}
@@ -607,8 +606,8 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		GameState currSource = new GameState();
 		currSource.playFull(prevMove, prevSource);
 		ArimaaMove currMove = new ArimaaMove("ra7s hb7s pass");
-		System.out.println(prevSource.toBoardString());
-		System.out.println(currSource.toBoardString());
+//		System.out.println(prevSource.toBoardString());
+//		System.out.println(currSource.toBoardString());
 		
 		PreviousMovesExtractor pme = new PreviousMovesExtractor(null, null, null, null, prevSource, prevMove);
 		BitSet fv = new BitSet();
