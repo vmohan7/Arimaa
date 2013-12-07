@@ -117,7 +117,7 @@ public interface FeatureConstants extends Constants {
 	
 	
 	/** FeatureRange contains the constants describing the <i>start</i> and <i>end</i>
-	 *  indices (in the FeatureExtractor's BitSet) of the different AbstractExtractor subclasses. */
+	 *  indices inclusive (in the FeatureExtractor's BitSet) of the different AbstractExtractor subclasses. */
 	public static class FeatureRange {
 		
 		/** There are 1040 Position Movement features set by the PositionMovementExtractor class. */
@@ -135,13 +135,14 @@ public interface FeatureConstants extends Constants {
 		/** There are 704 Capture Threats features set by the CaptureThreatsExtractor class. */
 		public static final int CAPTURE_THREATS_START = 1776, CAPTURE_THREATS_END = 2479;
 		
-		/** The index of the last feature in the vector */
-		/* Update to the last feature as features are added*/
-		public static final int MAX_END = CAPTURE_THREATS_END;
+		/** There are 128 Previous Moves features set by the PreviousMovesExtractor class. */
+		public static final int PREV_MOVES_START = 2480, PREV_MOVES_END = 2607;
 		
+		/** The index of the last feature in the vector */
+		/* TODO: Update to the last feature as features are added*/
+		public static final int MAX_END = PREV_MOVES_END;
 	}
 	
-
 	/** The total number of features in our feature vector. */
 	public static final int NUM_FEATURES = FeatureRange.MAX_END + 1;
 	
@@ -151,4 +152,9 @@ public interface FeatureConstants extends Constants {
 	/** There are 8 piece types as described in David Wu's paper pg 25. */
 	public static final int NUM_PIECE_TYPES = 8;
 	
+	/** 
+	 * Number of closeness score values for current move compared with previous move
+	 * called LAST_CLOSENESS. 
+	 **/
+	public static final int NUM_CLOSENESS_SCORES = 64;
 }

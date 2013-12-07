@@ -1,5 +1,6 @@
 package utilities.helper_classes;
 
+import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
 import arimaa3.GameState;
@@ -7,6 +8,9 @@ import feature_extractor.FeatureExtractor;
 import naive_bayes.NBMain;
 
 public class Utilities {
+	
+	public static final String col_text = "abcdefgh";
+	public static final String dir_text = "nsewx";
 	
 	/* If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
@@ -73,6 +77,32 @@ public class Utilities {
 		
 		//TODO: what if 0 seconds only?
 		return false;
+	}
+	
+	public static byte[] getStepSources(String move_text) {
+		
+		byte[] stepSources = {-1, -1, -1, -1};
+		StringTokenizer tokenizer = new StringTokenizer(move_text);
+		int stepNumber = 0;
+		
+		while (tokenizer.hasMoreTokens()) {
+			String move = tokenizer.nextToken();
+
+			if (move.equals("pass")) {
+				break;
+			}
+
+			// Convert the text move to numbers
+			int col = col_text.indexOf(move.substring(1, 2));
+			int row = Integer.parseInt(move.substring(2, 3)) - 1;
+			int direction = dir_text.indexOf(move.substring(3, 4));
+
+			//If not a capture
+			if (direction != 4)
+				stepSources[stepNumber++] = (byte) (row * 8 + col);
+		}
+		
+		return stepSources;
 	}
 
 	/** Calculates the piece type (e.g. 3) for each piece id (e.g. black dog) for the current game state.
