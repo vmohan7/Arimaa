@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import naive_bayes.NBMain;
+
 import libsvm.svm;
 import libsvm.svm_model;
 
@@ -16,6 +18,7 @@ import de.bwaldvogel.liblinear.Model;
 import utilities.AbstractHypothesis;
 import utilities.DisconnectedGameData;
 import utilities.HypothesisTest;
+import utilities.helper_classes.Utilities;
 
 
 public class SVMMain {
@@ -30,6 +33,8 @@ public class SVMMain {
 		if (args.length < 4){
 			printErrorMessage();
 		} else{
+			Utilities.PARSEABLE_OUTPUT = true; //Change to input later
+			
 			File gameFile = new File( args[GAMEIDS] );
 			int num_games = Integer.parseInt(args[NUM_GAMES]); 
 			
@@ -54,10 +59,10 @@ public class SVMMain {
 		DisconnectedGameData myGameData = new DisconnectedGameData(num_games, null, false);
 		
 		SVMTrain trainingModel = new SVMTrain(dataFile);
-		System.out.println("Created the SVM model");
+		Utilities.printInfo("Created the SVM model");
 		
 		trainingModel.train(myGameData);
-		System.out.println("Just finished creating the training file!");
+		Utilities.printInfo("Just finished creating the training file!");
 		
 		//Prints out game ids to file
 		try {
@@ -91,11 +96,11 @@ public class SVMMain {
 		}
 		
 		DisconnectedGameData myGameData = new DisconnectedGameData(num_games, gIds, false);
-		System.out.println("\nTesting hypothesis on " + num_games +" TEST games...");
+		Utilities.printInfo("\nTesting hypothesis on " + num_games +" TEST games...");
 		HypothesisTest.test(myHypothesis, myGameData);
 		
 		myGameData = new DisconnectedGameData(num_games, gIds, true);
-		System.out.println("\nTesting hypothesis on TRAINING games...");
+		Utilities.printInfo("\nTesting hypothesis on TRAINING games...");
 		HypothesisTest.test(myHypothesis, myGameData);
 	}
 	
@@ -107,7 +112,7 @@ public class SVMMain {
 			e.printStackTrace();
 		}
 		
-		System.out.println("Finished loading SVM model...");
+		Utilities.printInfo("Finished loading SVM model...");
 		
 		return new SVMHypothesis( model );
 	}
@@ -121,7 +126,7 @@ public class SVMMain {
 			e.printStackTrace();
 		}
 		
-		System.out.println("Finished loading SVM (class#=" + model.getNrClass() + ")...");
+		Utilities.printInfo("Finished loading SVM (class#=" + model.getNrClass() + ")...");
 		
 		return new SVMLinearHypothesis( model );
 	}
