@@ -86,6 +86,7 @@ public class SVMMain {
 		try {
 			Scanner scan = new Scanner(gameIds);
 			while(scan.hasNext()){ gIds.add(scan.nextInt()); }
+			scan.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
