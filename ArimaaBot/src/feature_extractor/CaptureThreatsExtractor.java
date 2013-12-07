@@ -152,7 +152,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 						BitSet toUpdate, int bitOffset, int opponent, byte[] oppPieceTypes) {
 		
 		final int TRAP_SIZE = NUM_THREAT_CAP_FEATURES / TRAP.length;
-		final int STEP_SIZE = TRAP_SIZE / 4; //4 is the max number of steps per move
+		final int STEP_SIZE = TRAP_SIZE / NUM_STEPS_IN_MOVE;
 		
 		int capturesAndTraps = getCapturesFromStates(preCapture, postCapture,	opponent, oppPieceTypes);
 		

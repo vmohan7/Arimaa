@@ -63,6 +63,7 @@ public class FeatureExtractor implements FeatureConstants {
 		(new SteppingOnTrapsExtractor(prev, curr, piece_types)).updateBitSet(featureVector);
 		(new CaptureThreatsExtractor(prev, curr)).updateBitSet(featureVector);
 		(new PreviousMovesExtractor(prev_prev_prev, prevPrevMove, prev_prev, prevMove, prev, current_move)).updateBitSet(featureVector);
+		(new GoalThreatsExtractor(curr)).updateBitSet(featureVector);
 		return featureVector;
 	}
 	
