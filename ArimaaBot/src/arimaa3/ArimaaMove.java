@@ -11,7 +11,7 @@ public class ArimaaMove extends ArimaaBaseClass implements Comparable {
   
   /* Arzav's code:
    * Array of bytes to hold the source indices (0-63) for at most 4 
-   * steps in the current turn/move.
+   * steps in the current turn/move. Works for only expert moves.
    */
   public byte[] stepSources = {-1, -1, -1, -1};
   /* ------ */

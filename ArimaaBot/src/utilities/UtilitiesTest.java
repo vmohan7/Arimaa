@@ -95,15 +95,23 @@ public class UtilitiesTest {
 		assertTrue(gp.hasNextGameState());
 		
 		int loopCount = 0;
+		GameState prevPrev = null;
 		GameState prev = null;
+		ArimaaMove prevPrevMove = null, prevMove = null, nextMove = null;
 		ArimaaState as = null; //init to silence compiler xD--this is initialized in the loop
 		while (gp.hasNextGameState()) {
 			as = gp.getNextGameState();
+			assertTrue(as.getPrevPrev() == prevPrev);
 			assertTrue(as.getPrev() == prev);
+			assertTrue(as.getPrevMove() == prevMove);
+			assertTrue(as.getPrevPrevMove() == prevPrevMove);
 			
 			System.out.println(as.getCurr().toBoardString());
 			
 			prev = as.getCurr();
+			prevPrev = as.getPrev();
+			prevMove = as.getNextMove();
+			prevPrevMove = as.getPrevMove();
 			loopCount++;
 		}
 		
@@ -129,4 +137,18 @@ public class UtilitiesTest {
 		//assertTrue(Utilities.msToString(951_000_000).equals("11 days, 10 minutes"));
 	}
 
+	@Test
+	public void testStepSources1() {
+		assertArrayEquals(new byte[] {11, 10, 15, -1}, Utilities.getStepSources("Rd2n Rc2e Rc3x Ch2s"));
+	}
+	
+	@Test
+	public void testStepSources2() {
+		assertArrayEquals(new byte[] {17, 9, 17, -1}, Utilities.getStepSources("rb3e rc3x Hb2n Hb3w"));
+	}
+	
+	@Test
+	public void testStepSources3() {
+		assertArrayEquals(new byte[] {34, -1, -1, -1}, Utilities.getStepSources("dc5s"));
+	}
 }

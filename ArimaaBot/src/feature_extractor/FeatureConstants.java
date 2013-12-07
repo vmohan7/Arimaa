@@ -65,7 +65,7 @@ public interface FeatureConstants extends Constants {
 	}
 	
 	/** FeatureRange contains the constants describing the <i>start</i> and <i>end</i>
-	 *  indices (in the FeatureExtractor's BitSet) of the different AbstractExtractor subclasses. */
+	 *  indices inclusive (in the FeatureExtractor's BitSet) of the different AbstractExtractor subclasses. */
 	public static class FeatureRange {
 		
 		/** There are 1040 Position Movement features set by the PositionMovementExtractor class. */
@@ -86,11 +86,13 @@ public interface FeatureConstants extends Constants {
 	
 	
 	/** The total number of features in our feature vector. UPDATE this as we add more features. */
-	public static final int NUM_FEATURES = FeatureRange.STEPPING_TRAP_END + 1;
+	public static final int NUM_FEATURES = FeatureRange.PREV_MOVES_END + 1;
 	
 	/** There are 32 locations on the board taking left-right symmetry into account. */
 	public static final int NUM_LOCATIONS = 32;
 	
 	/** There are 8 piece types as described in David Wu's paper pg 25. */
 	public static final int NUM_PIECE_TYPES = 8;
+	
+	public static final int NUM_CLOSENESS_SCORES = 64;
 }

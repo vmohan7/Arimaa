@@ -30,7 +30,7 @@ public class NBUnitTest {
 		
 //		System.out.println(curr.toBoardString());
 		
-		ArimaaState myState = new ArimaaState(null, curr, null, null, new ArimaaMove("Rb6n Rb7e"));
+		ArimaaState myState = new ArimaaState(null, null, curr, null, null, new ArimaaMove("Rb6n Rb7e"));
 		// contrive an ArimaaState
 		
 		ArimaaEngine myEngine = new ArimaaEngine();

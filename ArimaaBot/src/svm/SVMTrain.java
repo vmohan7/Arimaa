@@ -80,7 +80,7 @@ public class SVMTrain implements FeatureConstants {
 		ArimaaMove expertMove = myState.getNextMove();
 		
 		// Extract features for the expert move
-		FeatureExtractor myExtractor = new FeatureExtractor(myState.getCurr(), myState.getPrev());
+		FeatureExtractor myExtractor = new FeatureExtractor(myState.getCurr(), myState.getPrev(), myState.getPrevPrev(), myState.getPrevMove(), myState.getPrevPrevMove());
 		BitSet featureVector = myExtractor.extractFeatures(expertMove); // extract features from expert move
 		outputToFile(featureVector, true);
 		numExpertMoves++;

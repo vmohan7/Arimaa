@@ -6,9 +6,8 @@ public class FeatureExtractor implements FeatureConstants {
 	
 	/* Starting game state from which we play current_move */
 	private GameState prev;
-	//TODO: remove prev_prev stuff from everywhere once we're sure we
-	//don't need it
 	private GameState prev_prev;
+	private GameState prev_prev_prev;
 	private ArimaaMove prevMove;
 	private ArimaaMove prevPrevMove;
 	
@@ -21,12 +20,14 @@ public class FeatureExtractor implements FeatureConstants {
 	 * 
 	 * @param prev
 	 * @param prev_prev
+	 * @param prev_prev_prev
 	 * @param prevMove move (by expert) to get to prev game state
 	 * @param prevPrevMove move (by expert) to get to prev_prev game state
 	 */
-	public FeatureExtractor(GameState prev, GameState prev_prev, ArimaaMove prevMove, ArimaaMove prevPrevMove) {
+	public FeatureExtractor(GameState prev, GameState prev_prev, GameState prev_prev_prev, ArimaaMove prevMove, ArimaaMove prevPrevMove) {
 		this.prev = prev;
-		this.prev_prev = null;
+		this.prev_prev = prev_prev;
+		this.prev_prev_prev = prev_prev_prev;
 		piece_types = null;
 		this.prevMove = prevMove;
 		this.prevPrevMove = prevPrevMove;
@@ -62,6 +63,7 @@ public class FeatureExtractor implements FeatureConstants {
 		(new TrapExtractor(prev, curr)).updateBitSet(featureVector);
 		(new FreezingExtractor(prev, curr, piece_types)).updateBitSet(featureVector);
 		(new SteppingOnTrapsExtractor(prev, curr, piece_types)).updateBitSet(featureVector);
+		(new PreviousMovesExtractor(prev_prev_prev, prevPrevMove, prev_prev, prevMove, prev, current_move)).updateBitSet(featureVector);
 		return featureVector;
 	}
 	

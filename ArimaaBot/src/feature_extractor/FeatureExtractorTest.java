@@ -3,6 +3,7 @@ package feature_extractor;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	    String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
 	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
 	    GameState startState = new GameState(white,black);
-	    FeatureExtractor fe = new FeatureExtractor(startState, null, null, null);
+	    FeatureExtractor fe = new FeatureExtractor(startState, null, null, null, null);
 	    BitSet bs = fe.extractFeatures(new ArimaaMove("Db2n Ha2n Ha3n Hh2n"));
 	    
 //	    System.out.println(fe.featureVector.toString());
@@ -50,7 +51,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	@Test
 	public void testMovementFeatures2() {
 	    GameState startState = new GameState(tests[2]);
-	    FeatureExtractor fe = new FeatureExtractor(startState, null, null, null);
+	    FeatureExtractor fe = new FeatureExtractor(startState, null, null, null, null);
 	    BitSet bs = fe.extractFeatures(new ArimaaMove("db6e dc6x ce5s ce4s ce3s"));
 
 	    assertTrue(bs.get(339));
@@ -366,7 +367,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing1() {
 		GameState prev = new GameState(tests[3]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("Ra5n"));
 		GameState curr = new GameState();
 		curr.playFull(new ArimaaMove("Ra5n"), prev);
@@ -380,7 +381,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing2() {
 		GameState prev = new GameState(tests[4]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra5n"));
 		GameState curr = new GameState();
 		curr.playFull(new ArimaaMove("ra5n"), prev);
@@ -394,7 +395,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing3() {
 		GameState prev = new GameState(tests[5]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ra4n"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();
@@ -409,7 +410,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing4a() {
 		GameState prev = new GameState(tests[6]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ca5n"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();
@@ -424,7 +425,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing4b() {
 		GameState prev = new GameState(tests[6]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ca5n"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();
@@ -438,7 +439,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing5() {
 		GameState prev = new GameState(tests[5]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ra4n ra5n"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();
@@ -452,7 +453,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing6() {
 		GameState prev = new GameState(tests[7]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ma6n ma7e"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();
@@ -469,7 +470,7 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	public void testFreezing7() {
 		GameState prev = new GameState(tests[8]);
 		prev.compute_tertiary_bitboards();
-		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null);
+		FeatureExtractor fe = new FeatureExtractor(prev, null, null, null, null);
 		BitSet featureVector = fe.extractFeatures(new ArimaaMove("ra6n ra7n ca4n ca5n"));
 //		System.out.println(prev.toBoardString());
 		GameState curr = new GameState();
@@ -482,4 +483,75 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		assertTrue(featureVector.get(1689));
 	}
 	
+	@Test
+	public void testPrevMoves1() {
+		GameState prevPrevSource = new GameState(tests[2]);
+		ArimaaMove prevPrevMove = new ArimaaMove("Rh1n Rh2n Rh3n Rh4w");
+//		System.out.println(prevPrevSource.toBoardString());
+		GameState prevSource = new GameState();
+		prevSource.playFull(prevPrevMove, prevPrevSource);
+		ArimaaMove prevMove = new ArimaaMove("rg7s eb7w pass");
+//		System.out.println(prevSource.toBoardString());
+		GameState currSource = new GameState();
+		currSource.playFull(prevMove, prevSource);
+//		System.out.println(currSource.toBoardString());
+		ArimaaMove currMove = new ArimaaMove("Rd1n Rd2w Cd7s");
+		PreviousMovesExtractor pme = new PreviousMovesExtractor(prevPrevSource, prevPrevMove, prevSource, prevMove, currSource, currMove);
+		assertArrayEquals(new byte[] {7, 6, 14, 22}, pme.prevPrevStepSources);
+		assertArrayEquals(new byte[] {52, 54, 53, 49}, pme.prevStepSources);
+		assertArrayEquals(new byte[] {3, 2, 51, -1}, pme.currStepSources);
+		BitSet fv = new BitSet();
+		pme.updateBitSet(fv);
+		assertTrue(fv.get(FeatureRange.PREV_MOVES_START + 3 + 1 + 2 + 2));
+		assertTrue(fv.get(FeatureRange.PREV_MOVES_START + FeatureConstants.NUM_CLOSENESS_SCORES + 1));
+	}
+	
+	@Test
+	public void testPrevMoves2() {
+		GameState prevPrevSource = new GameState(tests[2]);
+		ArimaaMove prevPrevMove = new ArimaaMove("Rh1n Rh2n Rh3n Rc5n Rc6x");
+//		System.out.println(prevPrevSource.toBoardString());
+		GameState prevSource = new GameState();
+		prevSource.playFull(prevPrevMove, prevPrevSource);
+		ArimaaMove prevMove = new ArimaaMove("db5s eb7w pass");
+//		System.out.println(prevSource.toBoardString());
+		GameState currSource = new GameState();
+		currSource.playFull(prevMove, prevSource);
+//		System.out.println(currSource.toBoardString());
+		ArimaaMove currMove = new ArimaaMove("Rh4n Cd7s Rd1n");
+		PreviousMovesExtractor pme = new PreviousMovesExtractor(prevPrevSource, prevPrevMove, prevSource, prevMove, currSource, currMove);
+		assertArrayEquals(new byte[] {7, 15, 23, 34}, pme.prevPrevStepSources);
+		assertArrayEquals(new byte[] {52, 33, 53, 49}, pme.prevStepSources);
+		assertArrayEquals(new byte[] {3, 31, 51, -1}, pme.currStepSources);
+		BitSet fv = new BitSet();
+		pme.updateBitSet(fv);
+		assertTrue(fv.get(FeatureRange.PREV_MOVES_START + 3 + 2 + 2));
+		assertTrue(fv.get(FeatureRange.PREV_MOVES_START + FeatureConstants.NUM_CLOSENESS_SCORES + 1 + 2 + 3 + 1));
+	}
+	
+	@Test
+	public void testPrevMoves3() {
+		// data from first game in "games" relation
+	    String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
+	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
+	    GameState prevSource = new GameState(white,black);
+		ArimaaMove prevMove = new ArimaaMove("Ee2n Md2n Hh2n pass");
+		GameState currSource = new GameState();
+		currSource.playFull(prevMove, prevSource);
+		ArimaaMove currMove = new ArimaaMove("ra7s hb7s pass");
+		System.out.println(prevSource.toBoardString());
+		System.out.println(currSource.toBoardString());
+		
+		PreviousMovesExtractor pme = new PreviousMovesExtractor(null, null, null, null, prevSource, prevMove);
+		BitSet fv = new BitSet();
+		pme.updateBitSet(fv);
+		assertTrue(fv.get(FeatureRange.PREV_MOVES_START));
+		assertTrue(fv.get(FeatureRange.PREV_MOVES_START + FeatureConstants.NUM_CLOSENESS_SCORES));
+		
+		fv = new BitSet();
+		pme = new PreviousMovesExtractor(null, null, prevSource, prevMove, currSource, currMove);
+		pme.updateBitSet(fv);
+		assertTrue(fv.get(FeatureRange.PREV_MOVES_START));
+		assertTrue(fv.get(FeatureRange.PREV_MOVES_START + FeatureConstants.NUM_CLOSENESS_SCORES));
+	}
 }
