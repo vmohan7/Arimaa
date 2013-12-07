@@ -96,11 +96,11 @@ public class SVMTrain implements FeatureConstants {
 		MoveList allPossibleMoves = myEngine.genRootMoves(myState.getCurr()); // upper limit of 400,000 possible moves
 		// Note: for optimization, we should consider reducing this number from 400,000 to 40,000-50,000
 		
+		randomlyPermuteFirstK(allPossibleMoves, MIN_NON_EXPERT_MOVES);
 		ArimaaMove[] allMoves = allPossibleMoves.move_list;
-		randomlyPermuteFirstK(allMoves, MIN_NON_EXPERT_MOVES);
 		
 		//always consider these moves -- NOTE: we consider 1 less if the expert move falls in the first k
-		int nonExpertBound = Math.min(MIN_NON_EXPERT_MOVES, allMoves.length);
+		int nonExpertBound = Math.min(MIN_NON_EXPERT_MOVES, allPossibleMoves.size());
 		for (int move = 0; move < nonExpertBound; move++) {
 			ArimaaMove possibleMove = allMoves[move];
 			if (!possibleMove.equals(expertMove)){
@@ -111,7 +111,7 @@ public class SVMTrain implements FeatureConstants {
 		}
 		
 		//randomly discard at the discard rate the rest of the moves
-		for (int move = MIN_NON_EXPERT_MOVES; move < allMoves.length; move++) {
+		for (int move = MIN_NON_EXPERT_MOVES; move < allPossibleMoves.size(); move++) {
 			ArimaaMove possibleMove = allMoves[move];
 			if (!possibleMove.equals(expertMove)){
 				// skip the move if we are discarding, with expectation DISCARD_RATE
@@ -148,15 +148,15 @@ public class SVMTrain implements FeatureConstants {
 	/** Generates a random permutation for the first k elements of allMoves, 
 	 * or up to k, if there are fewer than k elements. (Note that this random permutation
 	 * is extensible to a random permutation of all n moves.) */
-	private void randomlyPermuteFirstK(ArimaaMove[] allMoves, int k) {
-		int bound = Math.min(allMoves.length, k);
+	private void randomlyPermuteFirstK(MoveList allMoves, int k) {
+		int bound = Math.min(allMoves.size(), k);
 		for (int i = 0; i < bound; i++) {
 			//swap with any of the elements after and including i
-			int swapIndex = i + rgen.nextInt(allMoves.length - i);
+			int swapIndex = i + rgen.nextInt(allMoves.size() - i);
 			
-			ArimaaMove temp = allMoves[swapIndex];
-			allMoves[swapIndex] = allMoves[i];
-			allMoves[i] = temp;
+			ArimaaMove temp = allMoves.move_list[swapIndex];
+			allMoves.move_list[swapIndex] = allMoves.move_list[i];
+			allMoves.move_list[i] = temp;
 		}
 	}
 

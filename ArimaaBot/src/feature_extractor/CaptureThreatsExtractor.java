@@ -55,7 +55,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	public void updateBitSet(BitSet bitset) {
 		//might need to have some more information passed around later on...
 		threatensCap(bitset); 
-		System.gc(); //suggest to the JVM that it clean up this huge moveList...
+		//System.gc(); //suggest to the JVM that it clean up this huge moveList...
 	}
 
 	@Override
@@ -96,11 +96,12 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	 *   <i>[Added mainly to support using this method later to update small bitsets (offset 0)
 	 *   to pass information to other methods.]</i>*/
 	private void threatensCap(GameState curr, BitSet bitset, int offset) {
-		int neemaSize = 4000; //try Neema's size first -- to save memory and computation time!
+		int neemaSize1 = 100;
+		int neemaSize2 = 4000; //try Neema's size first -- to save memory and computation time!
 		int jeffBachersSize = 400000; //upper bound provided by Jeff
 		
 		boolean completeTurn = false; //allows us to get captures with fewer than 4 moves
-		MoveList moveList = new MoveList(neemaSize); //will be populated with all capture threats
+		MoveList moveList = new MoveList(neemaSize1); //will be populated with all capture threats
 		
 		GenCaptures captures = new GenCaptures();
 		
@@ -112,10 +113,19 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 		
 		try {
 			captures.genCaptures(currOppPass, moveList, completeTurn); //fills moveList with capture threats
+			//System.out.println(moveList.size());
 		}
 		catch (ArrayIndexOutOfBoundsException e) {
-			moveList = new MoveList(jeffBachersSize);
-			captures.genCaptures(currOppPass, moveList, completeTurn); //fills moveList with capture threats
+			try {
+				Utilities.printInfo("Resizing move-list to " + neemaSize2 + " in CaptureThreatsExtractor!");
+				moveList = new MoveList(neemaSize2);
+				captures.genCaptures(currOppPass, moveList, completeTurn); //fills moveList with capture threats
+			}
+			catch (ArrayIndexOutOfBoundsException e2) {
+				Utilities.printInfo("Resizing move-list to " + jeffBachersSize + " in CaptureThreatsExtractor!");
+				moveList = new MoveList(jeffBachersSize);
+				captures.genCaptures(currOppPass, moveList, completeTurn); //fills moveList with capture threats
+			}
 		}
 		
 		

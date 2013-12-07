@@ -33,7 +33,7 @@ public class SVMMain {
 		if (args.length < 4){
 			printErrorMessage();
 		} else{
-			Utilities.PARSEABLE_OUTPUT = true; //Change to input later
+			Utilities.PARSEABLE_OUTPUT = false; //Change to input later
 			
 			File gameFile = new File( args[GAMEIDS] );
 			int num_games = Integer.parseInt(args[NUM_GAMES]); 
