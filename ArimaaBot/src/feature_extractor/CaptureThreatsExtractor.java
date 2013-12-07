@@ -55,6 +55,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	public void updateBitSet(BitSet bitset) {
 		//might need to have some more information passed around later on...
 		threatensCap(bitset); 
+		System.gc(); //suggest to the JVM that it clean up this huge moveList...
 	}
 
 	@Override
@@ -77,6 +78,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	// ========================== PRIVATE METHODS -- Read no further! :D =========================
 	// ===========================================================================================
 	
+	private static final int NUM_THREAT_CAP_FEATURES = CaptureThreats.INVITES_CAP_MOVED_OFFSET - CaptureThreats.THREATENS_CAP_OFFSET;
 	
 	/* *************************************************
 	 * ********** START Threatens Cap Methods ********** 
@@ -85,7 +87,6 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	 * (See other method below for more comments). */
 	private void threatensCap(BitSet bitset) {
 		threatensCap(curr, bitset, CaptureThreats.THREATENS_CAP_OFFSET);
-		System.gc(); //suggest to the JVM that it clean up this huge moveList... Is this bad? Will it affect performance?
 	}
 	
 	/** Updates the bitset with the THREATENS CAP features 
@@ -108,6 +109,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 		int opponent = curr.player;
 		GameState currOppPass = new GameState();
 		currOppPass.playPASS(curr); //copies curr into currPassOpp before playing pass
+		
 		try {
 			captures.genCaptures(currOppPass, moveList, completeTurn); //fills moveList with capture threats
 		}
@@ -130,6 +132,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 		}
 	}
 	
+	
 	 /** The bitset is updated as follows: <br>
 	 *  ->For each trap, for each step, the piece type. (32 * trap + 8 * step + type) <br> 
 	 *  -><i>[32 is the number of bits taken by all (step,type) combinations. 8 is the number</i>
@@ -146,7 +149,10 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	 * any recalculations of parameters, etc. 
 	 * Also, pardon the cryptic bit manipulations... */
 	private void recordCaptureMove(GameState preCapture, GameState postCapture, int numSteps,
-						BitSet toUpdate, int bitOffset, int opponent, byte[] oppPieceTypes) { 
+						BitSet toUpdate, int bitOffset, int opponent, byte[] oppPieceTypes) {
+		
+		final int TRAP_SIZE = NUM_THREAT_CAP_FEATURES / TRAP.length;
+		final int STEP_SIZE = TRAP_SIZE / 4; //4 is the max number of steps per move
 		
 		int capturesAndTraps = getCapturesFromStates(preCapture, postCapture,	opponent, oppPieceTypes);
 		
@@ -162,7 +168,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 			if (type >= Byte.SIZE) type -= Byte.SIZE; // 0 <= type < Byte.Size (8)
 			if (trap >= Byte.SIZE) trap -= Byte.SIZE;
 			
-			int bitToSet = bitOffset + 32 * trap + 8 * (numSteps - 1) + type; //TODO: remove hardcoding
+			int bitToSet = bitOffset + TRAP_SIZE * trap + STEP_SIZE * (numSteps - 1) + type;
 			toUpdate.set(bitToSet);
 		}
 		
@@ -259,7 +265,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	
 	
 	/* *************************************************
-	 * ********** START Threatens Cap Methods ********** 
+	 * *********** START Invites Cap Methods *********** 
 	 * ************************************************* */
 
 	
@@ -267,7 +273,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	
 	
 	/* *************************************************
-	 * *********** END Threatens Cap Methods *********** 
+	 * ************ END Invites Cap Methods ************ 
 	 * ************************************************* */
 	
 	
