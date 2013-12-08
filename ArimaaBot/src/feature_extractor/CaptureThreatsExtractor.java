@@ -14,6 +14,9 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	
 	private GameState /*prev,*/ curr;
 	
+	/** The feature vector--used to reduce number of parameters being passed (for clarity) */
+	private BitSet featureVector;
+	
 	/* Excerpt from Wu on Capture Threats
 	 * ----------------------------------
 	 * Threatening and defending the capture of a piece plays a key role in many tactics.
@@ -53,8 +56,10 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	 *  */
 	@Override
 	public void updateBitSet(BitSet bitset) {
+		featureVector = bitset;
+		
 		//might need to have some more information passed around later on...
-		threatensCap(bitset); 
+		threatensCap();  
 		//System.gc(); //suggest to the JVM that it clean up this huge moveList...
 	}
 
@@ -85,17 +90,16 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	 * ************************************************* */
 	/** Overloaded method-wrapper to give default bitset offset
 	 * (See other method below for more comments). */
-	private void threatensCap(BitSet bitset) {
-		threatensCap(curr, bitset, CaptureThreats.THREATENS_CAP_OFFSET);
+	private void threatensCap() {
+		threatensCap(curr, CaptureThreats.THREATENS_CAP_OFFSET);
 	}
 	
 	/** Updates the bitset with the THREATENS CAP features 
 	 * @param curr is the GameState after the move is made (will be used to determine threats) 
-	 * @param bitset is the bitset to be updated (as per recordMove)
 	 * @param offset is the offset into the bit-vector where the bits will be updated <br>
 	 *   <i>[Added mainly to support using this method later to update small bitsets (offset 0)
 	 *   to pass information to other methods.]</i>*/
-	private void threatensCap(GameState curr, BitSet bitset, int offset) {
+	private void threatensCap(GameState curr, int offset) {
 		int neemaSize1 = 100;
 		int neemaSize2 = 4000; //try Neema's size first -- to save memory and computation time!
 		int jeffBachersSize = 400000; //upper bound provided by Jeff
@@ -138,7 +142,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 		for (ArimaaMove move : moveList) {//seems to avoid null moves...
 			GameState postCapture = new GameState();
 			postCapture.play(move, currOppPass); //was playFullClear -- no longer
-			recordCaptureMove(curr, postCapture, move.steps, bitset, offset, opponent, oppPieceTypes);
+			recordCaptureMove(curr, postCapture, move.steps, offset, opponent, oppPieceTypes);
 		}
 	}
 	
@@ -150,7 +154,6 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	 *  @param preCapture the GameState before any capture (the "threatening, original" game state)
 	 *  @param postCapture the GameState after a capturing move has been played
 	 *  @param numSteps the number of steps in the move from pre to postCapture
-	 *  @param toUpdate the BitSet that will be updated (as above)
 	 *  @param bitOffset the offset into the BitSet relative to which point bits will be set
 	 *  @param opponent PL_WHITE or PL_BLACK (the opponent, whose piece are potentially captured)
 	 *  @param oppPieceTypes the Wu-piece-type array of <i>opponent</i> piece types
@@ -159,7 +162,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 	 * any recalculations of parameters, etc. 
 	 * Also, pardon the cryptic bit manipulations... */
 	private void recordCaptureMove(GameState preCapture, GameState postCapture, int numSteps,
-						BitSet toUpdate, int bitOffset, int opponent, byte[] oppPieceTypes) {
+											int bitOffset, int opponent, byte[] oppPieceTypes) {
 		
 		final int TRAP_SIZE = NUM_THREAT_CAP_FEATURES / TRAP.length;
 		final int STEP_SIZE = TRAP_SIZE / NUM_STEPS_IN_MOVE;
@@ -179,7 +182,7 @@ public class CaptureThreatsExtractor extends AbstractExtractor {
 			if (trap >= Byte.SIZE) trap -= Byte.SIZE;
 			
 			int bitToSet = bitOffset + TRAP_SIZE * trap + STEP_SIZE * (numSteps - 1) + type;
-			toUpdate.set(bitToSet);
+			featureVector.set(bitToSet);
 		}
 		
 	}
