@@ -110,4 +110,15 @@ public class DisconnectedGameData implements AbstractGameData {
 	public Mode getMode() {
 		return mode;
 	}
+
+	public boolean reset() {
+		try {
+			ids.clear();
+			return filteredGames.first();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 }

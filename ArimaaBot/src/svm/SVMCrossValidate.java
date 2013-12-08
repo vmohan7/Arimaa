@@ -36,12 +36,10 @@ public class SVMCrossValidate extends SVMMain {
 	
 	protected static void printTestData(String[] modelFiles, int num_games, File gameIds) {
 		
-		AbstractHypothesis myHypothesis;
-		if(isSvm)
-			myHypothesis = evaluateLibSvm(modelFile, num_games, gameIds);
-		else
-			myHypothesis = evaluateLibLinear(new File(modelFile), num_games, gameIds );
+		AbstractHypothesis[] myHypotheses = new AbstractHypothesis[modelFiles.length];
 		
+		for(int i = 0; i < modelFiles.length; i++)
+			myHypotheses[i] = evaluateLibLinear(new File(modelFiles[i]), num_games, gameIds );
 		
 		ArrayList<Integer> gIds = new ArrayList<Integer>();
 		try {
@@ -52,11 +50,12 @@ public class SVMCrossValidate extends SVMMain {
 		}
 		
 		DisconnectedGameData myGameData = new DisconnectedGameData(num_games, gIds, false);
-		System.out.println("\nTesting hypothesis on " + num_games +" TEST games...");
-		HypothesisTest.test(myHypothesis, myGameData);
+		System.out.println("\nTesting " + modelFiles.length + " hypotheses on " + num_games +" TEST games...");
 		
-		myGameData = new DisconnectedGameData(num_games, gIds, true);
-		System.out.println("\nTesting hypothesis on TRAINING games...");
-		HypothesisTest.test(myHypothesis, myGameData);
+		for(int i = 0; i < myHypotheses.length; i++) {
+			HypothesisTest.test(myHypotheses[i], myGameData);
+			if(!myGameData.reset())
+				throw new RuntimeException("No rows in the testing set!");
+		}
 	}
 }
