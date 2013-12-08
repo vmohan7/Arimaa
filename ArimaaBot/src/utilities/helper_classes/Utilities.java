@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 import arimaa3.GameState;
 import feature_extractor.FeatureExtractor;
-import naive_bayes.NBMain;
 
 public class Utilities {
 	

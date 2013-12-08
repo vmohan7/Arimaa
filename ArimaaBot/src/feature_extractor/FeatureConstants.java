@@ -138,9 +138,12 @@ public interface FeatureConstants extends Constants {
 		/** There are 128 Previous Moves features set by the PreviousMovesExtractor class. */
 		public static final int PREV_MOVES_START = 2480, PREV_MOVES_END = 2607;
 		
+		/** There are 6 Goal Threats features set by the GoalThreatsExtractor class. */
+		public static final int GOAL_THREATS_START = 2608, GOAL_THREATS_END = 2613;
+		
 		/** The index of the last feature in the vector */
 		/* TODO: Update to the last feature as features are added*/
-		public static final int MAX_END = PREV_MOVES_END;
+		public static final int MAX_END = GOAL_THREATS_END;
 	}
 	
 	/** The total number of features in our feature vector. */
@@ -151,6 +154,9 @@ public interface FeatureConstants extends Constants {
 	
 	/** There are 8 piece types as described in David Wu's paper pg 25. */
 	public static final int NUM_PIECE_TYPES = 8;
+	
+	/** 4 is the maximum number of steps in a move */
+	public static final int NUM_STEPS_IN_MOVE = 4;
 	
 	/** 
 	 * Number of closeness score values for current move compared with previous move

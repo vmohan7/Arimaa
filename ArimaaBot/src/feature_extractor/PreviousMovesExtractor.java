@@ -8,8 +8,6 @@ import arimaa3.ArimaaMove;
 import arimaa3.GameState;
 import arimaa3.GenTurn;
 
-import feature_extractor.FeatureConstants.FeatureRange;
-
 public class PreviousMovesExtractor extends AbstractExtractor {
 	
 	byte[] prevPrevStepSources;
