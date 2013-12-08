@@ -8,6 +8,7 @@ import java.util.Scanner;
 import utilities.AbstractHypothesis;
 import utilities.DisconnectedGameData;
 import utilities.HypothesisTest;
+import utilities.helper_classes.Utilities;
 
 public class SVMCrossValidate extends SVMMain {
 
@@ -29,8 +30,8 @@ public class SVMCrossValidate extends SVMMain {
 	}
 	
 	private static void printErrorMessage(){
-		System.out.println("Usage: <num_games> <game_ids_file> <data_file_1> <data_file_2> ...");
-		System.out.println("If optional parameter included in testing, then will use libsvm instead of liblinear");
+		System.err.println("Usage: <num_games> <game_ids_file> <data_file_1> <data_file_2> ...");
+		System.err.println("If optional parameter included in testing, then will use libsvm instead of liblinear");
 		System.exit(1);
 	}
 	
@@ -50,9 +51,10 @@ public class SVMCrossValidate extends SVMMain {
 		}
 		
 		DisconnectedGameData myGameData = new DisconnectedGameData(num_games, gIds, false);
-		System.out.println("\nTesting " + modelFiles.length + " hypotheses on " + num_games +" TEST games...");
+		Utilities.printInfo("\nTesting " + modelFiles.length + " hypotheses on " + num_games +" TEST games...");
 		
 		for(int i = 0; i < myHypotheses.length; i++) {
+			Utilities.printInfo("Testing model from " + modelFiles[i]);
 			HypothesisTest.test(myHypotheses[i], myGameData);
 			if(!myGameData.reset())
 				throw new RuntimeException("No rows in the testing set!");
