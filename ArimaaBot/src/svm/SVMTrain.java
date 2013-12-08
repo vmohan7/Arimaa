@@ -64,7 +64,7 @@ public class SVMTrain implements FeatureConstants {
 		while (trainGames.hasNextGame()){
 			final long startTime = System.currentTimeMillis();
 			
-			System.out.print("Training on game # " + ++count + "..."); //time will be appended in-line
+			Utilities.printInfoInline("Training on game # " + ++count + "..."); //time will be appended in-line
 			GameInfo trainGameInfo = trainGames.getNextGame();
 			GameParser myParser = new GameParser(trainGameInfo);
 			
@@ -77,7 +77,7 @@ public class SVMTrain implements FeatureConstants {
 			}
 			
 			final long endTime = System.currentTimeMillis();
-			System.out.println("training took " + Utilities.msToString(endTime - startTime));
+			Utilities.printInfo("training took " + Utilities.msToString(endTime - startTime));
 		}
 	}
 	
