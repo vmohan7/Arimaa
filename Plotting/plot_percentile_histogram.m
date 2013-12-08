@@ -1,3 +1,5 @@
+function M = plot_percentile_histogram(csvname)
+
 % Read data for the percentile of each expert move from a .csv file 
 % and create a histogram.
 

@@ -11,6 +11,7 @@ Testing/passwords.py*
 Testing/corn*.txt
 Testing/barley*.txt
 Testing/*.o*
+Testing/*.m~
 Plotting/*.csv
 Plotting/*.jpg
 Plotting/*.fig
