@@ -9,7 +9,7 @@ public class NBMain {
 	
 	/* ================ VALUES TO CONFIGURE ================ */
 	
-	private static final boolean RUN_FROM_COMMAND_LINE = false;
+	private static final boolean RUN_FROM_COMMAND_LINE = true;
 	
 	/* These values are used if RUN_FROM_COMMAND_LINE is false. They specify the size
 	 * of the example set for the start round and the end round, and the amount by which
