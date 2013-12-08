@@ -26,9 +26,10 @@ public class GenCaptures extends ArimaaBaseClass {
 
   // TODO: detect repeated positions in the captures!
 
+  //changed to protected by Neema
   private MoveList move_data;
-  private GameState saved_initial_position = null;
-  private RepetitionHashTable repetition = new RepetitionHashTable(19);
+  protected GameState saved_initial_position = null;
+  protected RepetitionHashTable repetition = new RepetitionHashTable(19);
   private GenSteps gen_steps = new GenSteps();
 
   public void genCaptures(GameState initial_position, MoveList move_list, boolean complete_turn) {
@@ -59,9 +60,10 @@ public class GenCaptures extends ArimaaBaseClass {
 
   }
 
+  //******** changed by Neema to protected *******
   // Statistics collection stuff
-  private long trap_precondition_calls = 0;
-  private long trap_precondition_false = 0;
+  protected long trap_precondition_calls = 0;
+  protected long trap_precondition_false = 0;
   private long gen_capture_calls = 0;
 
   public String getStats() {
@@ -325,7 +327,8 @@ public class GenCaptures extends ArimaaBaseClass {
 
   }
 
-  private boolean complete_turn;
+  //changed to protected by Neema
+  protected boolean complete_turn;
 
   private void record_move(GameState new_position) {
     long hash_code = new_position.getPositionHash();
