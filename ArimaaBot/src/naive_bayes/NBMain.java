@@ -7,15 +7,15 @@ import utilities.helper_classes.Utilities;
 
 public class NBMain {
 	
-	private static final boolean RUN_FROM_COMMAND_LINE = true;
+	private static final boolean RUN_FROM_COMMAND_LINE = false;
 	
 	/* These values are used if RUN_FROM_COMMAND_LINE is false. They specify the size
 	 * of the example set for the start round and the end round, and the amount by which
 	 * to increment the size of the example set. E.g. if {START_SIZE, END_SIZE, INCREMENT} 
 	 * == {10, 50, 10}, then the program will train on example sets of size 10, 20, ... 50. 
 	 */
-	private static final int START_SIZE = 10;
-	private static final int END_SIZE = 50;
+	private static final int START_SIZE = 2;
+	private static final int END_SIZE = 2;
 	private static final int INCREMENT = 10;
 
 	private static final double TRAIN_FRACTION = 0.7;
