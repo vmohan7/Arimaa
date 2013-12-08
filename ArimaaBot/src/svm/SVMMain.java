@@ -73,7 +73,7 @@ public class SVMMain {
 		
 	}
 
-	private static void printTestData(boolean isSvm, String modelFile, int num_games, File gameIds) {
+	protected static void printTestData(boolean isSvm, String modelFile, int num_games, File gameIds) {
 		
 		AbstractHypothesis myHypothesis;
 		if(isSvm)
@@ -99,7 +99,7 @@ public class SVMMain {
 		HypothesisTest.test(myHypothesis, myGameData);
 	}
 	
-	private static AbstractHypothesis evaluateLibSvm(String modelFile, int num_games, File gameIds){
+	protected static AbstractHypothesis evaluateLibSvm(String modelFile, int num_games, File gameIds){
 		svm_model model = null;
 		try {
 			model = svm.svm_load_model(modelFile);
@@ -113,7 +113,7 @@ public class SVMMain {
 	}
 
 	
-	private static AbstractHypothesis evaluateLibLinear(File modelFile, int num_games, File gameIds){
+	protected static AbstractHypothesis evaluateLibLinear(File modelFile, int num_games, File gameIds){
 		Model model = null;
 		try {
 			model = Model.load( modelFile );
