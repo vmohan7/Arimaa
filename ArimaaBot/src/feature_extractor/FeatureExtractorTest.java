@@ -3,11 +3,11 @@ package feature_extractor;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 
 import org.junit.Test;
 
+import utilities.GoalTestWrapper;
 import arimaa3.ArimaaMove;
 import arimaa3.Constants;
 import arimaa3.GameState;
@@ -229,8 +229,8 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 	    String blackReplaceTest = "1b ee8 ee7";
 	    startState = new GameState(whiteReplaceTest, blackReplaceTest);
 	    
-	    long moveBitBoardReplaceTest = (1L << startState.getIndex(2, 4)) //e3
-	    							| (1L << startState.getIndex(1, 4)); //e2
+//	    long moveBitBoardReplaceTest = (1L << startState.getIndex(2, 4)) //e3
+//	    							| (1L << startState.getIndex(1, 4)); //e2
 	    //TODO: detect replacement, uncomment this. (is this reasonable to do?)		
 	    //testMoveCorrectness("Ee2n Ee1n", moveBitBoardReplaceTest, startState);
 	}
@@ -606,8 +606,8 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		GameState currSource = new GameState();
 		currSource.playFull(prevMove, prevSource);
 		ArimaaMove currMove = new ArimaaMove("ra7s hb7s pass");
-		System.out.println(prevSource.toBoardString());
-		System.out.println(currSource.toBoardString());
+//		System.out.println(prevSource.toBoardString());
+//		System.out.println(currSource.toBoardString());
 		
 		PreviousMovesExtractor pme = new PreviousMovesExtractor(null, null, null, null, prevSource, prevMove);
 		BitSet fv = new BitSet();
@@ -621,4 +621,147 @@ public class FeatureExtractorTest implements Constants, FeatureConstants {
 		assertTrue(fv.get(FeatureRange.PREV_MOVES_START));
 		assertTrue(fv.get(FeatureRange.PREV_MOVES_START + FeatureConstants.NUM_CLOSENESS_SCORES));
 	}
+	
+	@Test
+	public void testGoalThreats() {
+		//Set-up board for use
+		String board = "12w %13 +-----------------+%138|                 |%137|                 |%136|   R             |%135|                 |%134|                 |%133|         D   r   |%132|                 |%131|                 |%13 +-----------------+%13   a b c d e f g h%13";
+		GameState gsEasy = new GameState(board);
+		
+		String whitePull1 = "1w Dd1 Dc1";
+		String blackPull1 = "1b rd2 ee1"; //elephant can pull dog d1 out of the way
+		GameState gsPull1 = new GameState(whitePull1, blackPull1);
+		gsPull1.playPASS(gsPull1); //testing black's ability to win
+		
+		String white = "1w Eb8 Rc6";
+		String black = "1b ea6 ea7 ee6 ee7 mc8 ed8"; //elephants preventing rabbit from moving
+		//this check could be more useful if winInNumSteps was strict ==, rather than <=
+		GameState gsRestricted = new GameState(white, black);
+		
+		String whitePull2 = "1w Dd1 Dc1";
+		String blackPull2 = "1b rd2 me2"; //camel can un-freeze rabbit
+		GameState gsPull2 = new GameState(whitePull2, blackPull2);
+		gsPull2.playPASS(gsPull2); //testing black's ability to win
+		
+		String whiteWinning = "1w Re8";
+		String blackWinning = "1b re1";
+		GameState gsWon = new GameState(whiteWinning, blackWinning);
+		
+		
+		//run actual tests!
+		GameState[] gsArr = { gsEasy, gsPull1, gsRestricted, gsPull2, gsWon };
+		testGoalTestWrapper(gsArr);
+		testGoalThreatsExtractor(gsArr);
+	}
+	
+	private void testGoalTestWrapper(GameState[] gsArr) {		
+		GameState gsEasy = gsArr[0];
+		GameState gsPull1 = gsArr[1];
+		GameState gsRestricted = gsArr[2];
+		GameState gsPull2 = gsArr[3];
+		GameState gsWon = gsArr[4];
+		
+		GoalTestWrapper gtw = new GoalTestWrapper();
+		assertTrue(gtw.canWin(gsEasy));
+		assertTrue(!gtw.winInNumSteps(gsEasy, 0));
+		assertTrue(!gtw.winInNumSteps(gsEasy, 1));
+		assertTrue(gtw.winInNumSteps(gsEasy, 2));
+		assertTrue(gtw.winInNumSteps(gsEasy, 3));
+		assertTrue(gtw.winInNumSteps(gsEasy, 4));
+		
+		GameState gsEasyPass =  new GameState();
+		gsEasyPass.playPASS(gsEasy);
+		assertTrue(gtw.canWin(gsEasyPass));
+		assertTrue(!gtw.winInNumSteps(gsEasyPass, 1));
+		assertTrue(gtw.winInNumSteps(gsEasyPass, 2));
+		
+				
+		//test pulling to allow win		
+		assertTrue(gtw.canWin(gsPull1));
+		assertTrue(!gtw.winInNumSteps(gsPull1, 0));
+		assertTrue(!gtw.winInNumSteps(gsPull1, 1));
+		assertTrue(!gtw.winInNumSteps(gsPull1, 2));
+		assertTrue(gtw.winInNumSteps(gsPull1, 3));
+		assertTrue(gtw.winInNumSteps(gsPull1, 4));
+		
+
+		//test restricted pulling to allow win.
+		assertTrue(!gtw.winInNumSteps(gsRestricted, 0));
+		assertTrue(!gtw.winInNumSteps(gsRestricted, 1));
+		assertTrue(!gtw.winInNumSteps(gsRestricted, 2));
+		assertTrue(!gtw.winInNumSteps(gsRestricted, 3));
+		assertTrue(gtw.winInNumSteps(gsRestricted, 4));
+		GameState gsRestrictedPass = new GameState();
+		gsRestrictedPass.playPASS(gsRestricted);
+		assertTrue(!gtw.canWin(gsRestrictedPass));
+
+		
+		//test moving and pulling to allow win
+		assertTrue(gtw.canWin(gsPull2));
+		assertTrue(!gtw.winInNumSteps(gsPull2, 3));
+		assertTrue(gtw.winInNumSteps(gsPull2, 4));
+		
+		
+		//test 0 steps 
+		assertTrue(gtw.winInNumSteps(gsWon, 0)); //white wins
+		GameState gsWonPass = new GameState();
+		gsWonPass.playPASS(gsWon);
+		assertTrue(gtw.winInNumSteps(gsWonPass, 0)); //black wins
+		
+		
+		//can't win any of the other games in 0 (after whatever passing--may be redundant)
+		assertTrue(!gtw.winInNumSteps(gsEasy, 0));
+		assertTrue(!gtw.winInNumSteps(gsRestricted, 0));
+		assertTrue(!gtw.winInNumSteps(gsPull1, 0));
+		assertTrue(!gtw.winInNumSteps(gsPull2, 0));
+	}
+	
+	private void testGoalThreatsExtractor(GameState[] gsArr) {
+		//Swap turns for each one, to simulate the fact that moves were *played* to generate the threat
+		for (int gs = 0; gs < gsArr.length; gs++)
+			gsArr[gs].playPASS(gsArr[gs]);
+		
+		GameState gsEasy = gsArr[0];
+		GameState gsPull1 = gsArr[1];
+		GameState gsRestricted = gsArr[2];
+		GameState gsPull2 = gsArr[3];
+		GameState gsWon = gsArr[4];
+		
+		GoalThreatsExtractor gteEasy = new GoalThreatsExtractor(gsEasy);
+		GoalThreatsExtractor gtePull1 = new GoalThreatsExtractor(gsPull1);
+		GoalThreatsExtractor gteRestricted = new GoalThreatsExtractor(gsRestricted);
+		GoalThreatsExtractor gtePull2 = new GoalThreatsExtractor(gsPull2);
+		GoalThreatsExtractor gteWon = new GoalThreatsExtractor(gsWon);
+		
+		int offset = FeatureRange.GOAL_THREATS_START;
+		BitSet bs = new BitSet(NUM_FEATURES);
+		
+		gteEasy.updateBitSet(bs);
+		assertTrue(bs.cardinality() == 2);
+		assertTrue(bs.get(offset + 2));
+		assertTrue(bs.get(offset + 5)); //allows win
+		bs.clear();
+		
+		gtePull1.updateBitSet(bs);
+		assertTrue(bs.cardinality() == 1);
+		assertTrue(bs.get(offset + 3));
+		bs.clear();
+		
+		gteRestricted.updateBitSet(bs);
+		assertTrue(bs.cardinality() == 1);
+		assertTrue(bs.get(offset + 4));
+		bs.clear();
+		
+		gtePull2.updateBitSet(bs);
+		assertTrue(bs.cardinality() == 1);
+		assertTrue(bs.get(offset + 4));
+		bs.clear();
+		
+		gteWon.updateBitSet(bs);
+		assertTrue(bs.cardinality() == 2);
+		assertTrue(bs.get(offset));
+		assertTrue(bs.get(offset + 5)); //allows win
+		bs.clear();
+	}
+	
 }

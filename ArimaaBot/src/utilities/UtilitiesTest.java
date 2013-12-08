@@ -13,7 +13,6 @@ import utilities.helper_classes.GameInfo;
 import utilities.helper_classes.Utilities;
 import arimaa3.ArimaaMove;
 import arimaa3.GameState;
-import feature_extractor.FeatureExtractor;
 
 public class UtilitiesTest {
 

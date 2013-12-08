@@ -1,11 +1,7 @@
 package feature_extractor;
 
 import java.util.BitSet;
-
-import arimaa3.ArimaaMove;
 import arimaa3.GameState;
-
-import feature_extractor.FeatureConstants.FeatureRange;
 
 public class FreezingExtractor extends AbstractExtractor {
 
