@@ -7,6 +7,8 @@ import utilities.helper_classes.Utilities;
 
 public class NBMain {
 	
+	/* ================ VALUES TO CONFIGURE ================ */
+	
 	private static final boolean RUN_FROM_COMMAND_LINE = false;
 	
 	/* These values are used if RUN_FROM_COMMAND_LINE is false. They specify the size
@@ -14,8 +16,8 @@ public class NBMain {
 	 * to increment the size of the example set. E.g. if {START_SIZE, END_SIZE, INCREMENT} 
 	 * == {10, 50, 10}, then the program will train on example sets of size 10, 20, ... 50. 
 	 */
-	private static final int START_SIZE = 2;
-	private static final int END_SIZE = 2;
+	private static final int START_SIZE = 10;
+	private static final int END_SIZE = 50;
 	private static final int INCREMENT = 10;
 
 	private static final double TRAIN_FRACTION = 0.7;
@@ -23,6 +25,12 @@ public class NBMain {
 	/* If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
 	public static final boolean PARSEABLE_OUTPUT = false;
+
+	/* If set to true, then the percentile of each expert move evaluated will be printed
+	 * in a csv-importable format. */
+	public static final boolean PRINT_PERCENTILES = false;
+	
+	/* ===================================================== */
 	
 	private static void trainAndTest(int numGames){
 		Utilities.printInfo("-------------------------------");
@@ -79,6 +87,7 @@ public class NBMain {
 		}
 		
 		Utilities.PARSEABLE_OUTPUT = NBMain.PARSEABLE_OUTPUT;
+		Utilities.PRINT_PERCENTILES = NBMain.PRINT_PERCENTILES;
 		
 		int startSize = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[0]) : START_SIZE;
 		int endSize = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[1]) : END_SIZE;
