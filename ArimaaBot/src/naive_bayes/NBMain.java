@@ -7,6 +7,8 @@ import utilities.helper_classes.Utilities;
 
 public class NBMain {
 	
+	/* ================ VALUES TO CONFIGURE ================ */
+	
 	private static final boolean RUN_FROM_COMMAND_LINE = true;
 	
 	/* These values are used if RUN_FROM_COMMAND_LINE is false. They specify the size
@@ -23,6 +25,12 @@ public class NBMain {
 	/* If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
 	public static final boolean PARSEABLE_OUTPUT = false;
+
+	/* If set to true, then the percentile of each expert move evaluated will be printed
+	 * in a csv-importable format. */
+	public static final boolean PRINT_PERCENTILES = false;
+	
+	/* ===================================================== */
 	
 	private static void trainAndTest(int numGames){
 		Utilities.printInfo("-------------------------------");
@@ -79,6 +87,7 @@ public class NBMain {
 		}
 		
 		Utilities.PARSEABLE_OUTPUT = NBMain.PARSEABLE_OUTPUT;
+		Utilities.PRINT_PERCENTILES = NBMain.PRINT_PERCENTILES;
 		
 		int startSize = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[0]) : START_SIZE;
 		int endSize = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[1]) : END_SIZE;

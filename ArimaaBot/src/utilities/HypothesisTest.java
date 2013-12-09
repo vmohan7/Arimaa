@@ -153,6 +153,7 @@ public class HypothesisTest {
 			if ( percentage <= TOP5PERCENT){
 				numInTop5Percent++;
 			}
+			Utilities.printPercentile("PERCENTILE," + (1.0 - percentage)); 
 		}
 		
 		public double getAvgEvaluation(){

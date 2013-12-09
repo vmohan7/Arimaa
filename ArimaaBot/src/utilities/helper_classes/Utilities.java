@@ -11,9 +11,13 @@ public class Utilities {
 	public static final String col_text = "abcdefgh";
 	public static final String dir_text = "nsewx";
 	
-	/* If set to false, then log statements will be printed. If set to true, then only 
+	/** If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
 	public static boolean PARSEABLE_OUTPUT = false;
+	
+	/** If set to true, then the percentile of each expert move evaluated will be printed
+	 * in a csv-importable format. */
+	public static boolean PRINT_PERCENTILES = false;
 	
 	/** Prints message without appending a new line. Use this for any message logging 
 	 * that is not meant to be machine-parseable. 
@@ -36,6 +40,13 @@ public class Utilities {
 	 * @param msg Message for parser to read */	
 	public static void printParseable(String msg){
 		if (PARSEABLE_OUTPUT)
+			System.out.println(msg);		
+	}
+	
+	/** Prints percentile report of percentile of evaluated expert move and appends a new line.
+	 * @param msg Percentile report for parser to read */	
+	public static void printPercentile(String msg){
+		if (PRINT_PERCENTILES)
 			System.out.println(msg);		
 	}
 	
