@@ -1,6 +1,6 @@
-
 ============== PARALLELIZING USING CORN ===================
-The python and expect scripts with "corn" in their names allow you to use ssh to execute Naive Bayes training jobs on corn and save the outputs locally. The .exp file assumes that you have expect in /usr/bin/expect. If you don't have expect, you can do all this on myth, since the myths have expect in /usr/bin . 
+The python and expect scripts with "corn" in their names allow you to use ssh to execute Naive Bayes training jobs on corn and save the outputs locally. You can run these scripts from your personal computer if you have expect installed; the program assumes that it's installed in /usr/bin/expect. However, I'd recommend running these on myth. You can use screen so that jobs continue running even after you quit terminal and go about your day. 
+
 1. Run this command in the current directory: echo "my_username = \"[YOUR SUNETID]\"; my_password = \"[YOUR SUNET PASSWORD]\"" > passwords.py
 2. Configure the name and location of your mysql-connector jar file in arimaa_nb_corn.exp. 
 3. Configure the parameters in arimaa_nb_corn.py. 

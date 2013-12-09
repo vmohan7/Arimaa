@@ -22,6 +22,18 @@ import utilities.helper_classes.Utilities;
 
 
 public class SVMMain {
+	
+	/* ================ VALUES TO CONFIGURE ================ */
+	
+	/* If set to false, then log statements will be printed. If set to true, then only 
+	 * results will be reported, in a csv-importable format. */
+	public static final boolean PARSEABLE_OUTPUT = false;
+
+	/* If set to true, then the percentile of each expert move evaluated will be printed
+	 * in a csv-importable format. */
+	public static final boolean PRINT_PERCENTILES = false;
+	
+	/* ===================================================== */
 
 	public static final int MODE = 0;
 	public static final int DATA_FILE = 1;
@@ -33,7 +45,8 @@ public class SVMMain {
 		if (args.length < 4){
 			printErrorMessage();
 		} else{
-			Utilities.PARSEABLE_OUTPUT = false; //Change to input later
+			Utilities.PARSEABLE_OUTPUT = SVMMain.PARSEABLE_OUTPUT;
+			Utilities.PRINT_PERCENTILES = SVMMain.PRINT_PERCENTILES;
 			
 			File gameFile = new File( args[GAMEIDS] );
 			int num_games = Integer.parseInt(args[NUM_GAMES]); 

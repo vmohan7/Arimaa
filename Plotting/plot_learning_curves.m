@@ -1,3 +1,5 @@
+function M = plot_learning_curves(csvname)
+
 % Read test and train error data from a .csv file and create a learning
 % curve plot. 
 
@@ -6,7 +8,7 @@
 % Column 3 is test set percentile
 % Column 4 is the proportion of expert moves ordered in top 5% (train)
 % Column 5 is the proportion of expert moves ordered in top 5% (test)
-M = csvread('learn.csv');
+M = csvread(csvname);
 
 %% Plot "percentile or expert move" learning curve
 
