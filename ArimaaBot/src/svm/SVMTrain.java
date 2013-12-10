@@ -23,7 +23,7 @@ public class SVMTrain implements FeatureConstants {
 	
 	private Random rgen = new Random(); //used for our discarding
 	private static final int MIN_NON_EXPERT_MOVES = 20;
-	private static final boolean DISCARDING = true;
+	private static final boolean DISCARDING = false;
 	private static final double DISCARD_RATE = .95;
 	
 	private long numExpertMoves;

@@ -1,4 +1,4 @@
-function M = plot_percentile_histogram(csvname)
+function h = plot_percentile_histogram(csvname, ymax)
 
 % Read data for the percentile of each expert move from a .csv file 
 % and create a histogram.
@@ -6,16 +6,17 @@ function M = plot_percentile_histogram(csvname)
 % M is a column vector of percentiles of all expert moves evaluated
 M = csvread(csvname);
 
-%% Plot "percentile or expert move" learning curve
-
 figure('Color',[1.0 1.0 1.0]);
 nBins = 100;
-% xValues = 0.00:.04:1.00;
 
-hist(M, nBins);
+[n,x] = hist(M, nBins);
+bar(x, n./sum(n),1,'hist'); % normalize y axis to give proportions instead of counts
+h = gca; % get a handle to the current axis
+axis([0 1 0 ymax]) % gives x min/max and y min/max for axis scaling: [xmin xmax ymin ymax]
 
-modelname = strsplit(csvname, {'/', '_'}); % the file name is Folder/model_number -- we want model
 
-title(strcat('Percentile rankings of expert moves (', modelname(2),')'), 'FontSize', 20);
+% modelname = strsplit(csvname, {'/', '_'}); % the file name is Folder/model_number -- we want model
+
+title('Percentile rankings of expert moves', 'FontSize', 20);
 xlabel('Percentile of expert move among all ordered moves', 'FontSize', 16);
-ylabel('Count', 'FontSize', 16);
+ylabel('Proportion', 'FontSize', 16);
