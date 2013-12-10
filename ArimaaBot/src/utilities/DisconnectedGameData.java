@@ -34,7 +34,9 @@ public class DisconnectedGameData implements AbstractGameData {
 	 * @param toInclude A boolean indicating whether to include or disclude the given game Ids
 	 */
 	public DisconnectedGameData(int numGames, ArrayList<Integer> gameIds, boolean toInclude) {
-		this.numGames = numGames + gameIds.size();
+		this.numGames = numGames;
+    if (gameIds != null) 
+      this.numGames += gameIds.size();
 		String gIds = getConCatIds(gameIds);
 		if (toInclude){
 			filteredGames = MyDB.executeQuery(String.format(includeQuery, RATING_THRESHOLD, RATING_THRESHOLD, gIds, gameIds.size() ));
