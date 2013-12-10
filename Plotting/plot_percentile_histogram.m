@@ -9,10 +9,12 @@ M = csvread(csvname);
 %% Plot "percentile or expert move" learning curve
 
 figure('Color',[1.0 1.0 1.0]);
-nBins = 25;
-% xValues = 0.00:.04:1.00;
+nBins = 100;
 
-hist(M, nBins);
+[n,x] = hist(M, nBins);
+bar(x, n./sum(n),1,'hist'); % normalize y axis to give proportions instead of counts
+axis([0 1 0 0.3]) % gives x min/max and y min/max for axis scaling: [xmin xmax ymin ymax]
+
 
 title('Percentile rankings of expert moves', 'FontSize', 20);
 xlabel('Percentile of expert move among all ordered moves', 'FontSize', 16);
