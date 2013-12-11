@@ -26,14 +26,15 @@ xVal = 0.10;
 vertLineX=[xVal,xVal];
 yMax = Y(min(find(X>xVal)))
 vertLineY=[0,yMax];
-plot(vertLineX,vertLineY,'--');
+plot(vertLineX,vertLineY,'--k');
 
 % Draw horizontal dotted line
 horizLineX=[0 xVal];
 horizLineY=[yMax yMax];
-plot(horizLineX, horizLineY, '--');
+plot(horizLineX, horizLineY, '--k');
 
-plot(xVal, yMax, '.');
+% Draw point where lines intersect
+plot(xVal, yMax, '.k');
 
 % TODO: come up with better title
 title('Proportion of expert moves in top n percent', 'FontSize', 20);
