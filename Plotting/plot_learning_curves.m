@@ -17,9 +17,10 @@ levelOfPerformanceY = linspace(top5PercentPerformance, top5PercentPerformance, l
 levelOfPerformanceX = linspace(xStartTick, xEndTick, linspaceSteps);
 
 
-%% Plot "percentile or expert move" learning curve
+%% Plot "percentile of expert move" learning curve
 
-figure('Color',[1.0 1.0 1.0]);
+% Set figure color and position
+figure('Color',[1.0 1.0 1.0],'Position', [100, 100, 750, 550]);
 
 % plot(M(:,1), M(:,[2 3]), 'LineWidth', 1.15, 'LineSmoothing','on');
 plot(M(:,1), M(:,[2 3]), 'LineWidth', 1);
@@ -29,9 +30,21 @@ title(plotTitle, 'FontSize', 20);
 xlabel('Number of training examples', 'FontSize', 16);
 set(gca, 'XTick', xStartTick:xStep:xEndTick); % set the x-tick marks according to input parameters
 ylabel('Percentile of expert move among all ordered moves', 'FontSize', 16);
-myLegend = legend('Training set', 'Testing set');
+
+
+hold on;
+
+% Draw dotted line showing convergence
+convVal=mean([M(end,2) M(end,3)]);
+convLineX = [min(M(:,1)) max(M(:,1))];
+convLineY = [convVal convVal];
+plot(convLineX,convLineY,'--k');
+
+myLegend = legend('Training set', 'Testing set', 'Approximate convergence');
 set(myLegend,'Location','SouthEast');
 set(myLegend, 'Fontsize', 16);
+
+hold off;
 
 
 %% Plot "proportion in top 5%" learning curve
