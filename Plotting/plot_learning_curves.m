@@ -1,4 +1,4 @@
-function M = plot_learning_curves(csvName, modelName, xStartTick, xEndTick, xStep)
+function M = plot_learning_curves(csvName, modelName, xStartTick, xEndTick, xStep, yMin, yMax)
 
 % Read test and train error data from a .csv file and create a learning
 % curve plot. 
@@ -30,6 +30,7 @@ title(plotTitle, 'FontSize', 20);
 xlabel('Number of training examples', 'FontSize', 16);
 set(gca, 'XTick', xStartTick:xStep:xEndTick); % set the x-tick marks according to input parameters
 ylabel('Percentile of expert move among all ordered moves', 'FontSize', 16);
+axis([0 xEndTick yMin yMax]) % gives x min/max and y min/max for axis scaling: [xmin xmax ymin ymax]
 
 
 hold on;

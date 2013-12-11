@@ -36,10 +36,9 @@ plot(horizLineX, horizLineY, '--k');
 % Draw point where lines intersect
 plot(xVal, yMax, '.k');
 
-% TODO: come up with better title
-title('Proportion of expert moves in top n percent', 'FontSize', 20);
-xlabel('n', 'FontSize', 16);
-ylabel('Proportion', 'FontSize', 16);
+title('Proportion of expert moves evaluated at top of ranking', 'FontSize', 20);
+xlabel('Top percent of move ranking', 'FontSize', 16);
+ylabel('Proportion of expert moves', 'FontSize', 16);
 
 % Change x axis to display percents (e.g. 20% instead of 0.2)
 x_labels=100*str2num(get(gca,'XTickLabel'));
