@@ -1,6 +1,6 @@
-
 ============== PARALLELIZING USING CORN ===================
-The python and expect scripts with "corn" in their names allow you to use ssh to execute Naive Bayes training jobs on corn and save the outputs locally. The .exp file assumes that you have expect in /usr/bin/expect. If you don't have expect, you can do all this on myth, since the myths have expect in /usr/bin . 
+The python and expect scripts with "corn" in their names allow you to use ssh to execute Naive Bayes training jobs on corn and save the outputs locally. You can run these scripts from your personal computer if you have expect installed; the program assumes that it's installed in /usr/bin/expect. However, I'd recommend running these on myth. You can use screen so that jobs continue running even after you quit terminal and go about your day. 
+
 1. Run this command in the current directory: echo "my_username = \"[YOUR SUNETID]\"; my_password = \"[YOUR SUNET PASSWORD]\"" > passwords.py
 2. Configure the name and location of your mysql-connector jar file in arimaa_nb_corn.exp. 
 3. Configure the parameters in arimaa_nb_corn.py. 
@@ -21,7 +21,7 @@ The python and bash scripts with "barley" in their names allow you to submit Nai
 If you need to compile or run the Java program, here's how you do it. In the classpath arguments, replace "./mysql-connector-java-5.1.26-bin.jar" with the path to your jar file if it is different. 
 # Compile from ArimaaBot dir.
 javac -d bin -classpath ./mysql-connector-java-5.1.26-bin.jar:./src:./ src/naive_bayes/NBMain.java 
-javac -d bin -classpath ./mysql-connector-java-5.1.26-bin.jar:./liblinear-1.94.jar:./src:./ src/svm/SVMMain.java  
+javac -d bin -classpath ./mysql-connector-java-5.1.26-bin.jar:./liblinear-1.94.jar:./libsvm.jar:./src:./ src/svm/SVMMain.java  
 
 # Run from the ArimaaBot dir, assuming you have compiled class files in bin/. Of course, configure the arguments to NBMain according to your needs. Also, you can leave out the -Xmx500000000 argument according to your needs. 
 # Arguments: <min-example-set-size> <max-example-set-size> <increment> 

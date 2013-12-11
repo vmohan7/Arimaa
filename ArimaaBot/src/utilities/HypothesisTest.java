@@ -1,6 +1,8 @@
 package utilities;
 
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.concurrent.Semaphore;
 
 import arimaa3.ArimaaEngine;
 import arimaa3.ArimaaMove;
@@ -12,6 +14,49 @@ import utilities.helper_classes.Utilities;
 
 public class HypothesisTest {
 	
+    private static class AggregateThread implements Runnable {
+    	private int gameNumber;
+    	private GameParser gp;
+    	private AbstractHypothesis hyp;
+    	private AggregateResults totalScore;
+    	
+    	public AggregateThread(GameInfo gi, int gameNum, AbstractHypothesis hyp, AggregateResults total_results){
+    		gp = new GameParser(gi);
+    		gameNumber = gameNum;
+    		this.hyp = hyp;
+    		totalScore = total_results;
+    	}
+    	
+	    public void run() {
+	    	try {
+	    		
+				threadsRunning.acquire();
+				
+				final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
+				System.out.println("Testing game # " + gameNumber + "..."); 
+				
+				AggregateResults ar = new AggregateResults();
+				while (gp.hasNextGameState())
+					evaluateMoveOrdering(ar, hyp, gp.getNextGameState());
+				
+				totalScore.addResult(ar); //this method is synchronized so threading does not affect this
+				//???? print ar moves for game????
+				
+				final long endTime = System.currentTimeMillis();
+				System.out.println("Testing game # " + gameNumber + " took " + Utilities.msToString(endTime - startTime)); 
+				
+				threadsRunning.release();
+				
+	    	} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	    }
+    }
+	
+    public static final int FREE_CORES = 2;
+    private static final int MAX_NUM_THREADS = Runtime.getRuntime().availableProcessors() - FREE_CORES;
+    private static Semaphore threadsRunning;
+    
 	/** Runs evaluation based on the 30% of the data that is in GameData
 	 * Once we have run our tests, we print out the statistics.
 	 * The client should ensure that GameData is in the correct mode (train or test)
@@ -21,7 +66,8 @@ public class HypothesisTest {
 	public static void test(AbstractHypothesis hyp, AbstractGameData gd) { //rename
 		
 		AggregateResults totalScore = new AggregateResults();
-		
+		threadsRunning = new Semaphore(MAX_NUM_THREADS);
+		ArrayList<Thread> threads = new ArrayList<Thread>();
 		int count = 0;
 		while (gd.hasNextGame()) {
 			final long startTime = System.currentTimeMillis(); //for each test, we can say how long it took
@@ -60,7 +106,7 @@ public class HypothesisTest {
 	 * @param hyp The hypothesis
 	 * @param arimaaState The state containing the expert move */
 	private static void evaluateMoveOrdering(AggregateResults ar, AbstractHypothesis hyp, ArimaaState arimaaState){
-		FeatureExtractor fe = new FeatureExtractor(arimaaState.getCurr(), arimaaState.getPrev());
+		FeatureExtractor fe = new FeatureExtractor(arimaaState.getCurr(), arimaaState.getPrev(), arimaaState.getPrevPrev(), arimaaState.getPrevMove(), arimaaState.getPrevPrevMove());
 		ArimaaEngine ai = new ArimaaEngine(); //TODO see if this is stupidly slow
 		MoveList possibleMoves = ai.genRootMoves(arimaaState.getCurr());
 		
@@ -93,7 +139,8 @@ public class HypothesisTest {
 		private double sumPercent = 0;  //sum used for average percentile
 		private int numExpertMoves = 0; //number of expert moves
 		
-		public void addResult(AggregateResults otherAr){
+		//This method is synchronized because we are overwriting variables and don't want to lose information
+		public synchronized void addResult(AggregateResults otherAr){
 			numInTop5Percent += otherAr.getNumInTop5Percent();
 			sumPercent += otherAr.getSumPercent();
 			numExpertMoves += otherAr.getNumExpertMoves();
@@ -106,6 +153,7 @@ public class HypothesisTest {
 			if ( percentage <= TOP5PERCENT){
 				numInTop5Percent++;
 			}
+			Utilities.printPercentile("PERCENTILE," + (1.0 - percentage)); 
 		}
 		
 		public double getAvgEvaluation(){

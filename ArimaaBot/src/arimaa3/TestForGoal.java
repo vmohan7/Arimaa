@@ -107,7 +107,8 @@ public class TestForGoal extends ArimaaBaseClass {
     return false;
   }
 
-  private boolean test_individual_goal_square(GameState game, int goal_index,
+  //Neema changed the private keyword to protected (for use in his subclass). Please don't break.
+  protected boolean test_individual_goal_square(GameState game, int goal_index,
     int total_steps_available) {
 
     this.stack_depth = -1;
@@ -1543,8 +1544,9 @@ public class TestForGoal extends ArimaaBaseClass {
     return false;
   }
 
+// Neema changed this to protected also...!  
 // Check for unassisted rabbit dashes
-  boolean can_rabbit_run(GameState game, int steps) {
+  protected boolean can_rabbit_run(GameState game, int steps) {
 
     int player = game.player;
 

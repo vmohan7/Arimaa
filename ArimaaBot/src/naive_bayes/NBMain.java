@@ -2,9 +2,12 @@ package naive_bayes;
 
 import utilities.GameData;
 import utilities.HypothesisTest;
+import utilities.MyDB;
 import utilities.helper_classes.Utilities;
 
 public class NBMain {
+	
+	/* ================ VALUES TO CONFIGURE ================ */
 	
 	private static final boolean RUN_FROM_COMMAND_LINE = true;
 	
@@ -22,6 +25,12 @@ public class NBMain {
 	/* If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
 	public static final boolean PARSEABLE_OUTPUT = false;
+
+	/* If set to true, then the percentile of each expert move evaluated will be printed
+	 * in a csv-importable format. */
+	public static final boolean PRINT_PERCENTILES = false;
+	
+	/* ===================================================== */
 	
 	private static void trainAndTest(int numGames){
 		Utilities.printInfo("-------------------------------");
@@ -57,6 +66,8 @@ public class NBMain {
 		Utilities.printInfo("\n------------------------");
 		Utilities.printInfo("------END OF ROUND------");
 		Utilities.printInfo("------------------------\n\n");
+		
+		myGameData.close();
 	}
 
 	// Instructions to redirect console output to file:
@@ -75,6 +86,9 @@ public class NBMain {
 			return;
 		}
 		
+		Utilities.PARSEABLE_OUTPUT = NBMain.PARSEABLE_OUTPUT;
+		Utilities.PRINT_PERCENTILES = NBMain.PRINT_PERCENTILES;
+		
 		int startSize = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[0]) : START_SIZE;
 		int endSize = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[1]) : END_SIZE;
 		int increment = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[2]) : INCREMENT;
@@ -82,6 +96,8 @@ public class NBMain {
 		for (int x = startSize; x <= endSize; x += increment) {
 			trainAndTest(x);
 		}
+		
+		MyDB.close();
 		
 		final long totalEndTime = System.currentTimeMillis();
 		Utilities.printInfo("\n\nTotal execution time (from process running to termination): " 

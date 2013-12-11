@@ -132,7 +132,8 @@ public class SteppingOnTrapsExtractor extends AbstractTrapExtractor {
 	}
 	
 	/** Copies into a new array only the pieceTypes relevant to player player */
-	private byte[] getPieceTypesForPlayer(int player, byte[] pieceTypesToCopy) {
+	//TODO: Change modifiers here--this method is used elsewhere? merge somehow?
+	static byte[] getPieceTypesForPlayer(int player, byte[] pieceTypesToCopy) {
 		byte[] pieceTypes = new byte[pieceTypesToCopy.length / 2];
 		for (int i = player; i < pieceTypesToCopy.length; i += 2) 
 			pieceTypes[i / 2] = pieceTypesToCopy[i];

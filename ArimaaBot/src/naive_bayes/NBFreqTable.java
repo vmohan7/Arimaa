@@ -11,25 +11,25 @@ import utilities.helper_classes.Utilities;
 public class NBFreqTable {
 	
 	private static void train(int numGames, String fileLoc){
-		System.out.println("-------------------------------");
-		System.out.println("------START OF ROUND (" + (numGames) + ")------");
-		System.out.println("-------------------------------\n");
+		Utilities.printInfo("-------------------------------");
+		Utilities.printInfo("------START OF ROUND (" + (numGames) + ")------");
+		Utilities.printInfo("-------------------------------\n");
 		final long startTime = System.currentTimeMillis();
 		
 		DisconnectedGameData myGameData = new DisconnectedGameData(numGames, null, false);
-		System.out.println("Finished fetching game data");
+		Utilities.printInfo("Finished fetching game data");
 		
 		NBTrain trainingModel = new NBTrain();
-		System.out.println("Created the NB model");
+		Utilities.printInfo("Created the NB model");
 
 		long[][] frequencyTable = trainingModel.train(myGameData);
-		System.out.println("Just finished training!");
+		Utilities.printInfo("Just finished training!");
 		
 		final long endTime = System.currentTimeMillis();
-		System.out.println("Round execution time: " + Utilities.msToString(endTime - startTime));
-		System.out.println("\n------------------------");
-		System.out.println("------END OF ROUND------");
-		System.out.println("------------------------\n\n");
+		Utilities.printInfo("Round execution time: " + Utilities.msToString(endTime - startTime));
+		Utilities.printInfo("\n------------------------");
+		Utilities.printInfo("------END OF ROUND------");
+		Utilities.printInfo("------------------------\n\n");
 		
 		outputToFile(fileLoc, frequencyTable, trainingModel.getNumNonExpertMoves(), trainingModel.getNumExpertMoves());
 	}
@@ -63,7 +63,7 @@ public class NBFreqTable {
 		final long totalStartTime = System.currentTimeMillis();
 		
 		if (args.length != 2){
-			System.out.println("Error in NBFreqTable: expects 2 arguments...\n"
+			Utilities.printInfo("Error in NBFreqTable: expects 2 arguments...\n"
 					+ "Arguments: <num-examples> <location-to-write-frequency-table> \n"
 					);
 			return;
@@ -75,7 +75,7 @@ public class NBFreqTable {
 		train(numExamples, fileLocation);
 		
 		final long totalEndTime = System.currentTimeMillis();
-		System.out.println("\n\nTotal execution time (from process running to termination): " 
+		Utilities.printInfo("\n\nTotal execution time (from process running to termination): " 
 					+ Utilities.msToString(totalEndTime - totalStartTime));
 		
 	}

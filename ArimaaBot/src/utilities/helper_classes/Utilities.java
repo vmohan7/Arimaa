@@ -1,16 +1,29 @@
 package utilities.helper_classes;
 
+import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
-import naive_bayes.NBMain;
+import arimaa3.GameState;
+import feature_extractor.FeatureExtractor;
 
 public class Utilities {
+	
+	public static final String col_text = "abcdefgh";
+	public static final String dir_text = "nsewx";
+	
+	/** If set to false, then log statements will be printed. If set to true, then only 
+	 * results will be reported, in a csv-importable format. */
+	public static boolean PARSEABLE_OUTPUT = false;
+	
+	/** If set to true, then the percentile of each expert move evaluated will be printed
+	 * in a csv-importable format. */
+	public static boolean PRINT_PERCENTILES = false;
 	
 	/** Prints message without appending a new line. Use this for any message logging 
 	 * that is not meant to be machine-parseable. 
 	 * @param msg Message for human to read */
 	public static void printInfoInline(String msg){
-		if (!NBMain.PARSEABLE_OUTPUT)
+		if (!PARSEABLE_OUTPUT)
 			System.out.print(msg);
 	}
 
@@ -18,7 +31,7 @@ public class Utilities {
 	 * that is not meant to be machine-parseable. 
 	 * @param msg Message for human to read */
 	public static void printInfo(String msg){
-		if (!NBMain.PARSEABLE_OUTPUT)
+		if (!PARSEABLE_OUTPUT)
 			System.out.println(msg);
 	}
 
@@ -26,7 +39,14 @@ public class Utilities {
 	 * meant to be machine-parseable. 
 	 * @param msg Message for parser to read */	
 	public static void printParseable(String msg){
-		if (NBMain.PARSEABLE_OUTPUT)
+		if (PARSEABLE_OUTPUT)
+			System.out.println(msg);		
+	}
+	
+	/** Prints percentile report of percentile of evaluated expert move and appends a new line.
+	 * @param msg Percentile report for parser to read */	
+	public static void printPercentile(String msg){
+		if (PRINT_PERCENTILES)
 			System.out.println(msg);		
 	}
 	
@@ -68,5 +88,60 @@ public class Utilities {
 		//TODO: what if 0 seconds only?
 		return false;
 	}
+	
+	public static byte[] getStepSources(String move_text) {
+		
+		byte[] stepSources = {-1, -1, -1, -1};
+		StringTokenizer tokenizer = new StringTokenizer(move_text);
+		int stepNumber = 0;
+		
+		while (tokenizer.hasMoreTokens()) {
+			String move = tokenizer.nextToken();
 
+			if (move.equals("pass")) {
+				break;
+			}
+
+			// Convert the text move to numbers
+			int col = col_text.indexOf(move.substring(1, 2));
+			int row = Integer.parseInt(move.substring(2, 3)) - 1;
+			int direction = dir_text.indexOf(move.substring(3, 4));
+
+			//If not a capture
+			if (direction != 4)
+				stepSources[stepNumber++] = (byte) (row * 8 + col);
+		}
+		
+		return stepSources;
+	}
+
+	/** Calculates the piece type (e.g. 3) for each piece id (e.g. black dog) for the current game state.
+	 * @return byte[] containing the above calculation (for each id) */
+	public static byte[] calculatePieceTypes(GameState curr){
+		byte[] pieceTypes = new byte[curr.piece_bb.length];
+		
+		for (int i = 0; i < 2; i++){ // calculate for rabbits 
+			byte numStronger = FeatureExtractor.countOneBits(curr.stronger_enemy_bb[i]);
+			if (numStronger < 5)
+				pieceTypes[i] = 7;
+			else if (numStronger < 7)
+				pieceTypes[i] = 6;
+			else
+				pieceTypes[i] = 5;
+		}
+		
+		for (int i = 2; i < 12; i++){ // calculate for non-rabbits
+			byte numStronger = FeatureExtractor.countOneBits(curr.stronger_enemy_bb[i]);
+			switch (numStronger) {
+				case 0: pieceTypes[i] = 0; break;
+				case 1: pieceTypes[i] = 1; break;
+				case 2: pieceTypes[i] = 2; break;
+				case 3: case 4: pieceTypes[i] = 3; break;
+				default: pieceTypes[i] = 4; break;
+			}
+		}
+		
+		return pieceTypes;
+	}
+	
 }

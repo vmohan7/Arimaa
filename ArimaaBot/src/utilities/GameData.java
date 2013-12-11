@@ -26,6 +26,15 @@ public class GameData implements AbstractGameData {
 		setMode(Mode.TRAIN);
 	}
 	
+	/** Close the ResultSet object that internally serves the game data. */
+	public void close(){
+		try {
+			filteredGames.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public int getNumGames(){
 		return numGames;
 	}

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.Random;
 
 import utilities.GameParser;
 import utilities.DisconnectedGameData;
@@ -19,6 +20,11 @@ import arimaa3.MoveList;
 
 
 public class SVMTrain implements FeatureConstants {
+	
+	private Random rgen = new Random(); //used for our discarding
+	private static final int MIN_NON_EXPERT_MOVES = 20;
+	private static final boolean DISCARDING = false;
+	private static final double DISCARD_RATE = .95;
 	
 	private long numExpertMoves;
 	private long numNonExpertMoves;
@@ -58,7 +64,7 @@ public class SVMTrain implements FeatureConstants {
 		while (trainGames.hasNextGame()){
 			final long startTime = System.currentTimeMillis();
 			
-			System.out.print("Training on game # " + ++count + "..."); //time will be appended in-line
+			Utilities.printInfoInline("Training on game # " + ++count + "..."); //time will be appended in-line
 			GameInfo trainGameInfo = trainGames.getNextGame();
 			GameParser myParser = new GameParser(trainGameInfo);
 			
@@ -71,7 +77,7 @@ public class SVMTrain implements FeatureConstants {
 			}
 			
 			final long endTime = System.currentTimeMillis();
-			System.out.println("training took " + Utilities.msToString(endTime - startTime));
+			Utilities.printInfo("training took " + Utilities.msToString(endTime - startTime));
 		}
 	}
 	
@@ -80,7 +86,7 @@ public class SVMTrain implements FeatureConstants {
 		ArimaaMove expertMove = myState.getNextMove();
 		
 		// Extract features for the expert move
-		FeatureExtractor myExtractor = new FeatureExtractor(myState.getCurr(), myState.getPrev());
+		FeatureExtractor myExtractor = new FeatureExtractor(myState.getCurr(), myState.getPrev(), myState.getPrevPrev(), myState.getPrevMove(), myState.getPrevPrevMove());
 		BitSet featureVector = myExtractor.extractFeatures(expertMove); // extract features from expert move
 		outputToFile(featureVector, true);
 		numExpertMoves++;
@@ -89,17 +95,37 @@ public class SVMTrain implements FeatureConstants {
 		MoveList allPossibleMoves = myEngine.genRootMoves(myState.getCurr()); // upper limit of 400,000 possible moves
 		// Note: for optimization, we should consider reducing this number from 400,000 to 40,000-50,000
 		
-		for (ArimaaMove possibleMove : allPossibleMoves){
+		randomlyPermuteFirstK(allPossibleMoves, MIN_NON_EXPERT_MOVES);
+		ArimaaMove[] allMoves = allPossibleMoves.move_list;
+		
+		//always consider these moves -- NOTE: we consider 1 less if the expert move falls in the first k
+		int nonExpertBound = Math.min(MIN_NON_EXPERT_MOVES, allPossibleMoves.size());
+		for (int move = 0; move < nonExpertBound; move++) {
+			ArimaaMove possibleMove = allMoves[move];
 			if (!possibleMove.equals(expertMove)){
 				featureVector = myExtractor.extractFeatures(possibleMove); // extract features from non-expert move
 				outputToFile(featureVector, false);
-				numNonExpertMoves++;
+				numNonExpertMoves++;				
+			}
+		}
+		
+		//randomly discard at the discard rate the rest of the moves
+		for (int move = MIN_NON_EXPERT_MOVES; move < allPossibleMoves.size(); move++) {
+			ArimaaMove possibleMove = allMoves[move];
+			if (!possibleMove.equals(expertMove)){
+				// skip the move if we are discarding, with expectation DISCARD_RATE
+				if (DISCARDING && rgen.nextDouble() < DISCARD_RATE) continue;
+				
+				featureVector = myExtractor.extractFeatures(possibleMove); // extract features from non-expert move
+				outputToFile(featureVector, false);
+				numNonExpertMoves++;			
 			}
 		}
 		
 		writer.flush();
 	}
 	
+
 	/**
 	 * 
 	 * @param featureVector 
@@ -112,10 +138,25 @@ public class SVMTrain implements FeatureConstants {
 		// Warms the cockles of my heart
 		String sparseVector = isExpertMove ? "+1" : "-1"; 
 		for (int i = featureVector.nextSetBit(0); i != -1; i = featureVector.nextSetBit(i+1))
-		     sparseVector += (" " + i+1 + ":1"); //index is 1 based
+		     sparseVector += (" " + (i+1) + ":1"); //index is 1 based
 		
 		writer.write(sparseVector + "\n");
 	}
-
+	
+	
+	/** Generates a random permutation for the first k elements of allMoves, 
+	 * or up to k, if there are fewer than k elements. (Note that this random permutation
+	 * is extensible to a random permutation of all n moves.) */
+	private void randomlyPermuteFirstK(MoveList allMoves, int k) {
+		int bound = Math.min(allMoves.size(), k);
+		for (int i = 0; i < bound; i++) {
+			//swap with any of the elements after and including i
+			int swapIndex = i + rgen.nextInt(allMoves.size() - i);
+			
+			ArimaaMove temp = allMoves.move_list[swapIndex];
+			allMoves.move_list[swapIndex] = allMoves.move_list[i];
+			allMoves.move_list[i] = temp;
+		}
+	}
 
 }

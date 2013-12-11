@@ -11,6 +11,8 @@ public class DisconnectedGameData implements AbstractGameData {
 	private ArrayList<Integer> ids;
 	private int numGames;
 	
+	private Mode mode;
+	
 	private static final int RATING_THRESHOLD = 2100;
 	// For reference, there are 279K total games, and 5K where both players are rated > 2100. 
 	
@@ -32,12 +34,15 @@ public class DisconnectedGameData implements AbstractGameData {
 	 * @param toInclude A boolean indicating whether to include or disclude the given game Ids
 	 */
 	public DisconnectedGameData(int numGames, ArrayList<Integer> gameIds, boolean toInclude) {
-		this.numGames = numGames;
+		this.numGames = numGames + gameIds.size();
 		String gIds = getConCatIds(gameIds);
-		if (toInclude)
+		if (toInclude){
 			filteredGames = MyDB.executeQuery(String.format(includeQuery, RATING_THRESHOLD, RATING_THRESHOLD, gIds, gameIds.size() ));
-		else
+			mode = Mode.TRAIN;
+		} else {
 			filteredGames = MyDB.executeQuery(String.format(discludeQuery, RATING_THRESHOLD, RATING_THRESHOLD, gIds, numGames));
+			mode = Mode.TEST;
+		}
 		
 		try {
 			if (hasNextGame())
@@ -48,6 +53,15 @@ public class DisconnectedGameData implements AbstractGameData {
 	
 	public int getNumGames(){
 		return numGames;
+	}
+	
+	/** Close the ResultSet object that internally serves the game data. */
+	public void close(){
+		try {
+			filteredGames.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private String getConCatIds(ArrayList<Integer> gameIds) {
@@ -94,6 +108,6 @@ public class DisconnectedGameData implements AbstractGameData {
 	// TODO Implement "mode" for this class; this is so that results can be reported
 	// in HypothesisTest.java as "train" or "test" set results. 
 	public Mode getMode() {
-		return null;
+		return mode;
 	}
 }
