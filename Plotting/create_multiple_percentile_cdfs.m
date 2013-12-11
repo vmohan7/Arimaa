@@ -5,9 +5,9 @@
 % and create cdf plots.
 
 % TODO: change these parameters 
-csvName1 = 'nb_histcdf_percentiles.csv';
-csvName2 = 'nb_histcdf_percentiles.csv';
-modelName1 = 'Logistic Regression';
+csvName1 = 'arimaa_l2_500.csv';
+csvName2 = 'arimaa_svm_500.csv';
+modelName1 = 'L1 Logistic Regression';
 modelName2 = ' SVM';
 modelColors = ['b' 'r'];
 
@@ -29,28 +29,48 @@ grid off;
 [X2 Y2] = ecdf(M2);
 plot(X2,Y2,modelColors(2));
 
-X = [X1 X2];
-Y = [Y1 Y2];
+% X = [X1 X2]; % generates error due to mismatched dimensions
+% Y = [Y1 Y2];
+% 
+% % Draw dotted lines showing Y-value at X=10% for model 1
+% % Draw vertical dotted line
+% xVal = 0.10;
+% for i=1:size(X,2)
+%     vertLineX=[xVal,xVal];
+%     yData = Y(:,i);
+%     xData = X(:,i);
+%     yMax = yData(min(find(xData>xVal)))
+%     vertLineY=[0,yMax];
+%     plot(vertLineX,vertLineY,strcat('--', modelColors(i)));
+% 
+%     % Draw horizontal dotted line
+%     horizLineX=[0 xVal];
+%     horizLineY=[yMax yMax];
+%     plot(horizLineX, horizLineY, strcat('--', modelColors(i)));
+% 
+%     % Draw point where lines intersect
+%     plot(xVal, yMax, strcat('.', modelColors(i)));
+% end
 
-% Draw dotted lines showing Y-value at X=10% for model 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Draw dotted lines showing Y-value at X=10%
 % Draw vertical dotted line
 xVal = 0.10;
-for i=1:size(X,2)
-    vertLineX=[xVal,xVal];
-    yData = Y(:,i);
-    xData = X(:,i);
-    yMax = yData(min(find(xData>xVal)))
-    vertLineY=[0,yMax];
-    plot(vertLineX,vertLineY,strcat('--', modelColors(i)));
+vertLineX=[xVal,xVal];
+yMax = Y1(min(find(X1>xVal)))
+vertLineY=[0,yMax];
+plot(vertLineX,vertLineY,'--k');
 
-    % Draw horizontal dotted line
-    horizLineX=[0 xVal];
-    horizLineY=[yMax yMax];
-    plot(horizLineX, horizLineY, strcat('--', modelColors(i)));
+% Draw horizontal dotted line
+horizLineX=[0 xVal];
+horizLineY=[yMax yMax];
+plot(horizLineX, horizLineY, '--k');
 
-    % Draw point where lines intersect
-    plot(xVal, yMax, strcat('.', modelColors(i)));
-end
+% Draw point where lines intersect
+plot(xVal, yMax, '.k');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 title('Proportion of expert moves evaluated at top of ranking', 'FontSize', 20);
 xlabel('Top percent of move ranking', 'FontSize', 16);

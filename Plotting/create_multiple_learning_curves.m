@@ -4,15 +4,20 @@
 % curve plots. 
 
 % TODO: change these parameters 
-csvName1 = 'nb_learning_curve_percentiles.csv';
-csvName2 = 'nb_learning_curve_percentiles.csv';
+csvName1 = 'L2_learning.csv';
+csvName2 = 'SVM_learning.csv';
 modelName1 = 'Logistic Regression';
 modelName2 = ' SVM';
-xStartTick = 0;
-xEndTick = 160;
-xStep = 30;
-yMin = 75;
+xStartTick = 100;
+xEndTick = 500;
+xStep = 50;
+yMin = 85;
 yMax = 95;
+xAxisOffset = 30;
+color1 = [128  142  196] ./ 256;
+color2 = [115 251 118] ./ 256;
+colorScale = 0.5; % number by which to multiply color to generate lighter color
+
 
 % Column 1 of M1|M2 is number of examples in training set
 % Column 2 is training set percentile
@@ -24,11 +29,17 @@ M2 = csvread(csvName2);
 
 % Set figure color and position
 figure('Color',[1.0 1.0 1.0]);
+                           
 
-% Plot all learning curves
-plot(M1(:,1), M1(:,[2 3]), '--.');
 hold on;
-plot(M2(:,1), M2(:,[2 3]), '-x');
+
+
+plot(M1(:,1), M1(:,2), '-r');%, 'Color', color1 .* colorScale);
+plot(M1(:,1), M1(:,3), '--r');%, 'Color', color1);
+plot(M2(:,1), M2(:,2), '-b');%, 'Color', color2 .* colorScale);
+plot(M2(:,1), M2(:,3), '--b');%, 'Color', color2);
+
+
 
 % Draw dashed line showing convergence -- assuming that both learning
 % curves converge at around the same value! 
@@ -45,13 +56,13 @@ ylabel('Percentile of expert move among all ordered moves', 'FontSize', 16);
 
 % Configure axes ticks and range
 set(gca, 'XTick', xStartTick:xStep:xEndTick); % set the x-tick marks according to input parameters
-axis([0 xEndTick yMin yMax]) % gives x min/max and y min/max for axis scaling: [xmin xmax ymin ymax]
+axis([xStartTick-xAxisOffset xEndTick+xAxisOffset yMin yMax]) % gives x min/max and y min/max for axis scaling: [xmin xmax ymin ymax]
 
 % Configure legend
 myLegend = legend(strcat(modelName1, ' training set'), ...
                     strcat(modelName1, ' testing set'), ...
                     strcat(modelName2, ' training set'), ...
-                    strcat(modelName2, 'testing set'), ...
+                    strcat(modelName2, ' testing set'), ...
                     'Approximate convergence');
 set(myLegend,'Location','SouthEast');
 set(myLegend, 'Fontsize', 16);
