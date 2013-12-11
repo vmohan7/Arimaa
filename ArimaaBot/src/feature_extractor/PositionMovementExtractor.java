@@ -11,7 +11,7 @@ public class PositionMovementExtractor extends AbstractExtractor implements Feat
 	private static final int NUM_SRC_MVMT = 512;
 	private static final int DEFAULT_CAPTURE_LOCATION = 32;
 	
-	private GameState curr;
+	//private GameState curr;
 	private GameState prev;
 	private ArimaaMove current_move;
 	private BitSet featureVector;
@@ -19,7 +19,7 @@ public class PositionMovementExtractor extends AbstractExtractor implements Feat
 	
 	public PositionMovementExtractor(GameState prev, GameState curr, ArimaaMove current_move, byte[] piece_types) {
 
-		this.curr = curr;
+		//this.curr = curr;
 		this.prev = prev;
 		this.current_move = current_move;
 		featureVector = null;
