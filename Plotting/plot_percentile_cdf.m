@@ -5,14 +5,35 @@ function M = plot_percentile_cdf(csvname)
 
 % M is a column vector of percentiles of all expert moves evaluated
 M = csvread(csvname);
-
-M = 1.0 - M; % Since we want "proportion in top n percent"
-
 figure('Color',[1.0 1.0 1.0]);
 
-cdfplot(M);
+% COMMENTED OUT -- decided to use ecdf instead of cdfplot because ecdf
+% returns X,Y data from which we can calculate specific proportions. 
+% M = 1.0 - M; % Since we want "proportion in top n percent"
+% cdfplot(M);
 
+% Get X,Y data and plot cdf
+[X Y] = ecdf(M);
+plot(X,Y);
+
+hold on;
 grid off;
+
+% Draw dotted lines showing Y-value at X=10%
+
+% Draw vertical dotted line
+xVal = 0.10;
+vertLineX=[xVal,xVal];
+yMax = Y(min(find(X>xVal)))
+vertLineY=[0,yMax];
+plot(vertLineX,vertLineY,'--');
+
+% Draw horizontal dotted line
+horizLineX=[0 xVal];
+horizLineY=[yMax yMax];
+plot(horizLineX, horizLineY, '--');
+
+plot(xVal, yMax, '.');
 
 % TODO: come up with better title
 title('Proportion of expert moves in top n percent', 'FontSize', 20);
