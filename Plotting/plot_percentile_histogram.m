@@ -6,11 +6,12 @@ function h = plot_percentile_histogram(csvname, ymax)
 % M is a column vector of percentiles of all expert moves evaluated
 M = csvread(csvname);
 
-figure('Color',[1.0 1.0 1.0]);
-nBins = 100;
+figure('Color',[1.0 1.0 1.0]); % color the figure background white instead of gray
+nBins = 100; % the histogram has this many bars
 
 [n,x] = hist(M, nBins);
 bar(x, n./sum(n),1,'hist'); % normalize y axis to give proportions instead of counts
+
 h = gca; % get a handle to the current axis
 axis([0 1 0 ymax]) % gives x min/max and y min/max for axis scaling: [xmin xmax ymin ymax]
 
