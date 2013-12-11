@@ -108,9 +108,9 @@ public class MonteCarlo {
 			possibleMoves = engine.genRootMoves(gameBoard);
 			if (possibleMoves.size() == 0) break; //Game Over does not seem to capture this
 			
-			ArimaaState nextState = new ArimaaState(state.getCurr(), gameBoard, null);
+			ArimaaState nextState = new ArimaaState(state.getPrev(), state.getCurr(), gameBoard, state.getPrevMove(), state.getNextMove(), null);
 			move = agent.selectMove(nextState, possibleMoves);
-			nextState = new ArimaaState(state.getCurr(), gameBoard, move);
+			nextState = new ArimaaState(state.getPrev(), state.getCurr(), gameBoard, state.getPrevMove(), state.getNextMove(), move);
 			
 			Utilities.TDUpdate(state, nextState, 0, ETA, weights);
 			state = nextState;

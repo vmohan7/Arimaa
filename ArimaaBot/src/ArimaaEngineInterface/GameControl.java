@@ -89,6 +89,6 @@ public class GameControl {
 		LogFile.message(move.toString());
 		LogFile.message(next.toBoardString());
 		
-		state = new ArimaaState(state.getCurr(), next, null);
+		state = new ArimaaState(state.getPrev(), state.getCurr(), next, state.getPrevMove(), move, null);
 	}
 }

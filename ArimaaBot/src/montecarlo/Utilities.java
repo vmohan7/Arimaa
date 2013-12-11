@@ -30,7 +30,8 @@ public class Utilities {
 		GameState currState = new GameState();
 		currState.playFullClear(move, state.getCurr());
 		
-		FeatureExtractor fe = new FeatureExtractor( state.getCurr(), state.getPrev());
+		FeatureExtractor fe = new FeatureExtractor( state.getCurr(), state.getPrev(), state.getPrevPrev(),
+								state.getPrevMove(), state.getPrevPrevMove() );
 		BitSet bs = fe.extractFeatures(move, currState);
 		for (int i = bs.nextSetBit(0); i != -1; i = bs.nextSetBit(i+1))
 			features[i] = 1;
