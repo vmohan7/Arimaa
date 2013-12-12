@@ -8,6 +8,7 @@ import arimaa3.ArimaaEngine;
 import arimaa3.ArimaaMove;
 import arimaa3.MoveList;
 import feature_extractor.FeatureExtractor;
+import utilities.AbstractGameData.Mode;
 import utilities.helper_classes.ArimaaState;
 import utilities.helper_classes.GameInfo;
 import utilities.helper_classes.Utilities;
@@ -19,12 +20,14 @@ public class HypothesisTest {
     	private GameParser gp;
     	private AbstractHypothesis hyp;
     	private AggregateResults totalScore;
+    	private Mode mode;
     	
-    	public AggregateThread(GameInfo gi, int gameNum, AbstractHypothesis hyp, AggregateResults total_results){
+    	public AggregateThread(GameInfo gi, int gameNum, AbstractHypothesis hyp, AggregateResults total_results, Mode mode){
     		gp = new GameParser(gi);
     		gameNumber = gameNum;
     		this.hyp = hyp;
     		totalScore = total_results;
+    		this.mode = mode;
     	}
     	
 	    public void run() {
@@ -37,7 +40,7 @@ public class HypothesisTest {
 				
 				AggregateResults ar = new AggregateResults();
 				while (gp.hasNextGameState())
-					evaluateMoveOrdering(ar, hyp, gp.getNextGameState());
+					evaluateMoveOrdering(ar, hyp, gp.getNextGameState(), mode, gp.getMoveNumber());
 				
 				totalScore.addResult(ar); //this method is synchronized so threading does not affect this
 				//???? print ar moves for game????
@@ -78,7 +81,7 @@ public class HypothesisTest {
 			
 			AggregateResults ar = new AggregateResults();
 			while (gp.hasNextGameState())
-				evaluateMoveOrdering(ar, hyp, gp.getNextGameState());
+				evaluateMoveOrdering(ar, hyp, gp.getNextGameState(), gd.getMode(), gp.getMoveNumber());
 			
 			totalScore.addResult(ar);
 			//???? print ar moves for game????
@@ -105,7 +108,7 @@ public class HypothesisTest {
 	 * @param ar The result to update 
 	 * @param hyp The hypothesis
 	 * @param arimaaState The state containing the expert move */
-	private static void evaluateMoveOrdering(AggregateResults ar, AbstractHypothesis hyp, ArimaaState arimaaState){
+	private static void evaluateMoveOrdering(AggregateResults ar, AbstractHypothesis hyp, ArimaaState arimaaState, Mode mode, int moveNumber){
 		FeatureExtractor fe = new FeatureExtractor(arimaaState.getCurr(), arimaaState.getPrev(), arimaaState.getPrevPrev(), arimaaState.getPrevMove(), arimaaState.getPrevPrevMove());
 		ArimaaEngine ai = new ArimaaEngine(); //TODO see if this is stupidly slow
 		MoveList possibleMoves = ai.genRootMoves(arimaaState.getCurr());
@@ -125,7 +128,7 @@ public class HypothesisTest {
 			
 		}
 		
-		ar.addMove(numAbove, possibleMoves.size());
+		ar.addMove(numAbove, possibleMoves.size(), mode, moveNumber);
 	}
 	
 	/** This internal class maintains the aggregate 
@@ -146,14 +149,17 @@ public class HypothesisTest {
 			numExpertMoves += otherAr.getNumExpertMoves();
 		}
 
-		public void addMove(int numAbove, int totalMoves){
+		public void addMove(int numAbove, int totalMoves, Mode mode, int moveNumber){
 			numExpertMoves++;
 			double percentage = ( (double) numAbove ) / totalMoves;
 			sumPercent += percentage;
 			if ( percentage <= TOP5PERCENT){
 				numInTop5Percent++;
 			}
-			Utilities.printPercentile("PERCENTILE," + (1.0 - percentage)); 
+			
+			if (mode == Mode.TEST) {
+				Utilities.printPercentile(moveNumber + "," + (1.0 - percentage));
+			}
 		}
 		
 		public double getAvgEvaluation(){

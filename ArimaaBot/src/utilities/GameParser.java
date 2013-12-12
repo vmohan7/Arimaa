@@ -29,6 +29,10 @@ public class GameParser {
 		return count < moveList.length;
 	}
 	
+	public int getMoveNumber(){
+		return (count + 1) / 2;
+	}
+	
 	/**
 	 *  @return an <b>ArimaaState</b> or </i><b>null</b><i> if there are no 
 	 *  more game states (i.e. the game is over)</i>
