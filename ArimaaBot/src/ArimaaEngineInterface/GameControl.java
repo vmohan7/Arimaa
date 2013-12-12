@@ -76,6 +76,10 @@ public class GameControl {
 		GenTurn gt = new GenTurn();
 		String final_move = gt.getOfficialArimaaNotation(state.getCurr(), bestMove).replaceAll(" pass", "");
 		
+		if(bestMove == null){
+			LogFile.message("My move is null and the number of possible moves is " + moves.size() );
+		}
+		
 		long elapsed_time = System.currentTimeMillis() - start_time;
 		LogFile.message("Elapsed time: " + elapsed_time + " ms");
 
@@ -89,6 +93,7 @@ public class GameControl {
 		LogFile.message(move.toString());
 		LogFile.message(next.toBoardString());
 		
-		state = new ArimaaState(state.getPrev(), state.getCurr(), next, state.getPrevMove(), move, null);
+		state = new ArimaaState(state.getPrev(), state.getCurr(), next, 
+				state.getPrevMove(), move, null);
 	}
 }

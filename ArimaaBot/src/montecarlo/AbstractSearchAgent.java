@@ -21,6 +21,7 @@ public abstract class AbstractSearchAgent extends AbstractAgent{
 	protected abstract MoveList getMoves(ArimaaState state);
 	
 	//use ArimaaState such that the next move is filled in by this function
+	//we assume that the next move is null
 	public ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves){
 		ArimaaMove bestMove = trainRandomly( moves );
 		if (bestMove != null)
