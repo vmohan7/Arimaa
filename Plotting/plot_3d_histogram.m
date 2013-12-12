@@ -1,8 +1,12 @@
 
 csvName = 'nb_3dhist.csv';
+% csvName = 'svm_move_histogram.csv';
+% csvName = 'l1_move_histogram.csv';
+
+modelName = 'Naive Bayes';
 moveBucketSize = 10; % granularity of buckets for the moves
 percentBucketSize = .1; % granularity of buckets for the percentiles
-numMoveBuckets = 70 / moveBucketSize;
+numMoveBuckets = 70 / moveBucketSize; % dictates the move number at which to cut off
 numPercentBuckets = 1 / percentBucketSize;
 
 M = csvread(csvName);
@@ -43,7 +47,7 @@ titleFontSize = 24;
 axesFontSize = 18;
 tickFontSize = 14;
 
-title('Histogram of expert move ranking', 'FontSize', titleFontSize);
+title(strcat(modelName, ': histogram of expert move ranking'), 'FontSize', titleFontSize);
 xlabel('Move number within a game', 'FontSize', axesFontSize, 'Rotation', xAngle);
 ylabel(sprintf('Percentile (discretized) of expert \nmove among all ordered moves'), 'FontSize', axesFontSize, 'Rotation', yAngle);
 zlabel(sprintf('Proportion of expert moves, \nnormalized by move number'), 'FontSize', axesFontSize);
