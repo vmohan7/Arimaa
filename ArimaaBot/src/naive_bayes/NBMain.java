@@ -24,11 +24,11 @@ public class NBMain {
 	
 	/* If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
-	public static final boolean PARSEABLE_OUTPUT = false;
+	public static final boolean PARSEABLE_OUTPUT = true;
 
 	/* If set to true, then the percentile of each expert move evaluated will be printed
 	 * in a csv-importable format. */
-	public static final boolean PRINT_PERCENTILES = false;
+	public static final boolean PRINT_PERCENTILES = true;
 	
 	/* ===================================================== */
 	
@@ -57,9 +57,9 @@ public class NBMain {
 		myGameData.setMode(GameData.Mode.TEST);
 		HypothesisTest.test(myHypothesis, myGameData);
 		
-		Utilities.printInfo("\nTesting hypothesis on TRAIN set...");
-		myGameData.setMode(GameData.Mode.TRAIN);
-		HypothesisTest.test(myHypothesis, myGameData);
+//		Utilities.printInfo("\nTesting hypothesis on TRAIN set...");
+//		myGameData.setMode(GameData.Mode.TRAIN);
+//		HypothesisTest.test(myHypothesis, myGameData);
 		
 		final long endTime = System.currentTimeMillis();
 		Utilities.printInfo("Round execution time: " + Utilities.msToString(endTime - startTime));

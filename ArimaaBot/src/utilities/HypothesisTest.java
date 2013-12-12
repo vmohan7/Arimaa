@@ -158,7 +158,7 @@ public class HypothesisTest {
 			}
 			
 			if (mode == Mode.TEST) {
-				Utilities.printPercentile(moveNumber + "," + (1.0 - percentage));
+				Utilities.printPercentile("PERCENTILE," + moveNumber + "," + (1.0 - percentage));
 			}
 		}
 		

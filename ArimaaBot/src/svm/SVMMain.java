@@ -109,13 +109,13 @@ public class SVMMain {
 			e.printStackTrace();
 		}
 		
-		//DisconnectedGameData myGameData = new DisconnectedGameData(num_games, gIds, false);
-		//Utilities.printInfo("\nTesting hypothesis on " + num_games +" TEST games...");
-		//HypothesisTest.test(myHypothesis, myGameData);
-		
-		DisconnectedGameData myGameData = new DisconnectedGameData(num_games, gIds, true);
-		Utilities.printInfo("\nTesting hypothesis on TRAINING games...");
+		DisconnectedGameData myGameData = new DisconnectedGameData(num_games, gIds, false);
+		Utilities.printInfo("\nTesting hypothesis on " + num_games +" TEST games...");
 		HypothesisTest.test(myHypothesis, myGameData);
+		
+//		DisconnectedGameData myGameData = new DisconnectedGameData(num_games, gIds, true);
+//		Utilities.printInfo("\nTesting hypothesis on TRAINING games...");
+//		HypothesisTest.test(myHypothesis, myGameData);
 		myGameData.close();
 	}
 	
