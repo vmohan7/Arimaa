@@ -9,15 +9,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import naive_bayes.NBMain;
-
 import libsvm.svm;
 import libsvm.svm_model;
-
 import de.bwaldvogel.liblinear.Model;
-
 import utilities.AbstractHypothesis;
 import utilities.DisconnectedGameData;
 import utilities.HypothesisTest;
+import utilities.MyDB;
 import utilities.helper_classes.Utilities;
 
 
@@ -60,6 +58,7 @@ public class SVMMain {
 				printErrorMessage();
 			}
 		}
+		MyDB.close();
 	}
 	
 	private static void printErrorMessage(){
