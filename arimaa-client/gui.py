@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import sys, wx, math, os, socket, string
+import sys, wx, math, os
 from threading import Thread, Event
 from Queue import Queue, Empty
 
@@ -31,8 +31,23 @@ sys.path.append(aei_directory)
 from pyrimaa import board
 from pyrimaa.board import Position, Color, Piece
 
-from ConfigParser import SafeConfigParser, NoOptionError
-import roundrobin
+class ComThread(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.stop = Event()
+        # Setting a max queue size seems to prevent this thread from eating the 
+        # CPU when things go badly.
+        self.messages = Queue(1000)
+        self.setDaemon(True)
+
+    def send(self, msg):
+        sys.stdout.write(msg + "\n")
+        sys.stdout.flush()
+
+    def run(self):
+        while not self.stop.isSet():
+            msg = sys.stdin.readline()
+            self.messages.put(msg.strip())
 
 class ArimaaClient(wx.Frame):
     GOLD_COLOR   = wx.Colour(200, 175, 100)
@@ -45,7 +60,7 @@ class ArimaaClient(wx.Frame):
     
     #### Initialization methods ####
     
-    def __init__(self, proxiedBot=None):
+    def __init__(self):
         wx.Frame.__init__(self, None, -1, "Rabbits' Arimaa Client")
         icon = wx.Icon(ArimaaClient.RESOURCES + "icon.xpm", wx.BITMAP_TYPE_XPM)
         self.SetIcon(icon)
@@ -61,9 +76,10 @@ class ArimaaClient(wx.Frame):
         initialPieces = config.Read("pieces", "Gameroom")
         self.loadBoard(initialBoard)
         self.loadPieces(initialPieces)
-    
+
+
         gameMenu = wx.Menu()
-        # self.addMenuItem(gameMenu,"&Save\tCtrl-S","Save move list",self.OnSave)
+        self.addMenuItem(gameMenu,"&Save\tCtrl-S","Save move list",self.OnSave)
         self.addMenuItem(gameMenu,"&Quit\tCtrl-Q","Quit",self.OnQuit)
         
         boardMenu = wx.Menu()
@@ -86,26 +102,20 @@ class ArimaaClient(wx.Frame):
         menuBar.Append(piecesMenu, "&Pieces")
         self.SetMenuBar(menuBar)
         self.CreateStatusBar()
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.controlPanel(), 0.1, wx.ALL, 1)
-        sizer.Add(self.boardPanel(), 0, wx.ALL, 1)
-        sizer.Add(self.historyPanel(), 1, wx.ALL|wx.EXPAND, 1)
-        #sizer.Add(self.gamePanel(), 0, wx.EXPAND|wx.ALL, 1)
-        sizer.Add(self.chatBox(), 1, wx.EXPAND|wx.ALL, 1)
-        sizer.Add(self.chatLine(), 0, wx.EXPAND|wx.ALL, 1)
+        
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(self.controlPanel(), 0, wx.ALL, 0)
+        sizer.Add(self.boardPanel(), 0, wx.ALL, 0)
+        sizer.Add(self.historyPanel(), 0, wx.ALL, 0)
         self.SetSizer(sizer)
         sizer.SetSizeHints(self)
         
         self.setDefaultGuiValues()
-        self.botName = proxiedBot
-        self.proxiedEngine = None
-        if self.botName:
-            self.setupProxiedEngine()
         self.setupEngine()
         
         # On every event from this timer, we check for an AEI message.
         self.aeiTimer = wx.Timer(self)
-        self.aeiTimer.Start(200)
+        self.aeiTimer.Start(100)
         
         self.slideTimer = wx.Timer(self)
         self.slideDelay = 30
@@ -119,7 +129,6 @@ class ArimaaClient(wx.Frame):
     def setDefaultGuiValues(self):
         self.sendBtn.Enable(False)
         self.undoBtn.Enable(False)
-        self.chatBtn.Enable(True)
         self.selectedSquare = None
         self.glowingSquares = []
         self.stepsTaken = []
@@ -136,9 +145,7 @@ class ArimaaClient(wx.Frame):
         self.slideNextMove = True
         self.tcmove = 30
         self.greserve, self.sreserve = 0, 0
-        self.gstartTime, self.sstartTime = 0, 0
         self.isGold = "notset"
-        self.chat = []
         
     def setupEngine(self):
         try:
@@ -148,37 +155,9 @@ class ArimaaClient(wx.Frame):
         if header != "aei":
             raise Exception("Instead of AEI header, received (%s)" % header)
         self.controller.send("protocol-version 1")
-        if self.proxiedEngine:
-            self.controller.send("id name Arimaa Client as " + self.botName)
-        else:
-            self.controller.send("id name Arimaa Client")
+        self.controller.send("id name wxArimaa")
         self.controller.send("id author Rabbits")
         self.controller.send("aeiok")
-    
-    def setupProxiedEngine(self):
-        botConfig = SafeConfigParser()
-        botConfig.read("roundrobin.cfg")
-        globalOpts = []
-        for name, value in botConfig.items("global"):
-            if name.startswith("bot_"):
-                globalOpts.append((name[4:], value))
-        botConfigs = set(botConfig.sections())
-        botConfigs.remove('global')
-        bot = None
-        for botSection in botConfigs:
-            if self.botName.lower() == botSection.lower():
-                botOpts = []
-                for name, value in botConfig.items(botSection):
-                    if name.startswith("bot_"):
-                        botOpts.append((name[4:], value))
-                bot = {'name': botSection, 'options': botOpts}
-                break
-        if bot:
-            self.proxiedEngine = roundrobin.run_bot(bot, botConfig, globalOpts)
-            self.SetStatusText("Proxying bot: " + self.botName)
-        else:
-            self.SetStatusText("Proxy error: " + self.botName + \
-                    " not found in roundrobin.cfg")
     
     def loadBoard(self, board):
         directory = ArimaaClient.RESOURCES + "boards/" + board + "/"
@@ -224,37 +203,28 @@ class ArimaaClient(wx.Frame):
         self.Bind(wx.EVT_MENU, handler, id=menuId)
         return menuId
         
-    def gamePanel(self):
-        gp = wx.Panel(self)
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.controlPanel(), 0.1, wx.ALL, 1)
-        sizer.Add(self.boardPanel(), 0, wx.ALL, 1)
-        sizer.Add(self.historyPanel(), 1, wx.ALL|wx.EXPAND, 1)
-        gp.SetSizer(sizer)
-        sizer.SetSizeHints(gp)
-        return gp 
-
-    def chatBox(self):
-        self.chatB = wx.ListBox(self, size=(700,200))
-        return self.chatB
-
-    def chatLine(self):
-        self.chatL = wx.TextCtrl(self,-1)
-        return self.chatL
-
+    def boardPanel(self):
+        self.boardRim = wx.Panel(self)
+        self.boardRim.SetBackgroundColour(ArimaaClient.GOLD_COLOR)
+        self.boardP = wx.Panel(self.boardRim, size=(402, 402))
+        self.boardP.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.boardP.Bind(wx.EVT_LEFT_DOWN, self.OnClick)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self.boardP, 0, wx.ALL, ArimaaClient.RIM_SIZE)
+        self.boardRim.SetSizer(sizer)
+        sizer.SetSizeHints(self.boardRim)
+        return self.boardRim
+        
     def controlPanel(self):
         cp = wx.Panel(self)
         self.sendBtn = wx.Button(cp, -1, "Send")
         self.undoBtn = wx.Button(cp, -1, "Undo")
-        self.chatBtn = wx.Button(cp, -1, "Chat")
         self.sendBtn.SetFont(wx.Font(-1, -1, wx.NORMAL, wx.NORMAL))
         self.undoBtn.SetFont(wx.Font(-1, -1, wx.NORMAL, wx.NORMAL))
-        self.chatBtn.SetFont(wx.Font(-1, -1, wx.NORMAL, wx.NORMAL))
         self.stepsTxt  = wx.StaticText(cp, -1, "8")
         self.timeTxt   = wx.StaticText(cp, -1, "--")
         cp.Bind(wx.EVT_BUTTON, self.OnSendMove, self.sendBtn)
         cp.Bind(wx.EVT_BUTTON, self.OnUndoStep, self.undoBtn)
-        cp.Bind(wx.EVT_BUTTON, self.OnSendChat, self.chatBtn)
         sizer  = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.sendBtn,  0, wx.ALL, 4)
         sizer.Add(self.undoBtn,  0, wx.ALL, 4)
@@ -262,26 +232,11 @@ class ArimaaClient(wx.Frame):
         sizer.Add(self.stepsTxt, 0, wx.ALL, 4)
         sizer.Add(wx.StaticText(cp, -1, "Time left:"), 0, wx.ALL, 4)
         sizer.Add(self.timeTxt, 0, wx.ALL, 4)
-        sizer.Add(self.chatBtn,  0, wx.ALL, 4)
         cp.SetSizer(sizer)
         sizer.SetSizeHints(cp)
         return cp
         
-    def boardPanel(self):
-        self.boardRim = wx.Panel(self)
-        self.boardRim.SetBackgroundColour(ArimaaClient.GOLD_COLOR)
-        self.boardP = wx.Panel(self.boardRim, size=(402, 402))
-        self.boardP.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.boardP.Bind(wx.EVT_LEFT_DOWN, self.OnClick)
-        self.boardP.Bind(wx.EVT_MOTION, self.OnMotion)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.boardP, 0, wx.ALL, ArimaaClient.RIM_SIZE)
-        self.boardRim.SetSizer(sizer)
-        sizer.SetSizeHints(self.boardRim)
-        return self.boardRim
-        
     def historyPanel(self):
-        # should resize to the empty space
         self.historyP = wx.ListBox(self, size=(200,240))
         return self.historyP
     
@@ -296,8 +251,8 @@ class ArimaaClient(wx.Frame):
         self.controller.stop.set()
         self.Destroy()
     
-    #def OnSave(self, event):
-    #    self.SetStatusText("Saving is not implemented.") # Bocsi
+    def OnSave(self, event):
+        self.SetStatusText("Saving is not implemented.") # Bocsi
     
     def OnTimer(self, event):
         if event.GetTimer() == self.aeiTimer:     self.checkAEI()
@@ -332,7 +287,7 @@ class ArimaaClient(wx.Frame):
         self.selectedSquare = None
         self.glowingSquares = []
         self.stepsLeft += 1
-        self.stepsTxt.SetLabel(str(self.stepsLeft))
+        self.stepsTxt.SetLabel(self.stepsLeft.__str__())
         if self.insetup or self.position.inpush or len(self.pastPositions) == 0:
             self.sendBtn.Enable(False)
         else:
@@ -341,22 +296,15 @@ class ArimaaClient(wx.Frame):
             self.undoBtn.Enable(False)
         self.DoDrawing()
         
-    def OnSendChat(self, event):
-        chatline = self.chatL.GetValue()
-        if (len(chatline)>0):
-            self.controller.send("chat " + chatline)
-        self.chatL.SetValue("")
-        
     def OnClick(self, event):
-        row, col = self.coordinatesToIndices(event.GetX(), event.GetY())
-        self.SetStatusText("click at (%s,%s)->(%s,%s)" %(event.GetX(),event.GetY(),row,col))
+        row = (event.GetY()-5)/49
+        col = (event.GetX()-5)/49
         # Currently, clicks are ignored while pieces are sliding...
-        if row < 0 or row > 7 or col < 0 or col > 7:
-            self.SetStatusText("row %s or col %s out of range.", row, col)
+        if row < 0 or row > 7 or col < 0 or col > 7 \
+                or not self.going or self.slidingNow:
             return
-        elif not self.going or self.slidingNow:
-            self.SetStatusText("wait a moment.")
-            return
+        if self.isGold:
+            row = 7 - row
         if self.insetup:
             self.placeNextSetupPiece(row, col)
         elif self.pieceAt(row,col) != Piece.EMPTY:
@@ -367,20 +315,6 @@ class ArimaaClient(wx.Frame):
             self.selectedSquare = None
         self.refreshGlowingSquares()
         self.DoDrawing()
-    
-    def OnMotion(self, event):
-        if self.insetup or not self.going or self.slidingNow:
-            return
-        row, col = self.coordinatesToIndices(event.GetX(), event.GetY())
-        if row < 0 or row > 7 or col < 0 or col > 7:
-            return
-        if (row, col) == self.selectedSquare or \
-                (row, col) in self.glowingSquares:
-            return
-        elif self.pieceAt(row,col) != Piece.EMPTY:
-            self.selectedSquare = (row, col)
-            self.refreshGlowingSquares()
-            self.DoDrawing()
     
     def OnPaint(self, event):
         dc = wx.BufferedPaintDC(event.GetEventObject(), self.buffImage)
@@ -393,11 +327,13 @@ class ArimaaClient(wx.Frame):
             dc = wx.BufferedDC(wx.ClientDC(self.boardP), self.buffImage)
         dc.DrawBitmap(self.gameBoard, 0, 0, False)
         if self.selectedSquare != None:
-            x, y = self.indicesToCoordinates(self.selectedSquare)
-            dc.DrawBitmap(self.selectGlo, x, y, True)
+            row, col = self.selectedSquare
+            if self.isGold: row = 7-row
+            dc.DrawBitmap(self.selectGlo, 5+49*col, 5+49*row, True)
             for square in self.glowingSquares:
-                x, y = self.indicesToCoordinates(square)
-                dc.DrawBitmap(self.moveToGlo, x, y, True)
+                row, col = square
+                if self.isGold: row = 7-row
+                dc.DrawBitmap(self.moveToGlo, 5+49*col, 5+49*row, True)
         elif self.insetup and self.going and not self.slidingNow:
             self.drawNextSetupPiece(dc)
         for row in xrange(8):
@@ -405,10 +341,12 @@ class ArimaaClient(wx.Frame):
                 piece = self.pieceAt(row, col)
                 if (not self.slidingNow or (row,col) != self.slidingNow.at()) \
                         and piece != Piece.EMPTY:
-                    x, y = self.indicesToCoordinates((row, col))
-                    dc.DrawBitmap(ArimaaClient.images[piece], x, y, True)
+                    if self.isGold: r = (7-row)
+                    else:           r = row
+                    image = ArimaaClient.images[piece]
+                    dc.DrawBitmap(image, 5+col*49, 5+49*r, True)
         if self.slidingNow:
-            self.slidingNow.Draw(dc, self.slideCount, self)
+            self.slidingNow.Draw(dc, self.slideCount, self.isGold)
     
     def drawNextSetupPiece(self, dc):
         if self.stepsLeft != 0:
@@ -419,12 +357,14 @@ class ArimaaClient(wx.Frame):
         if self.stepsLeft == 0:
             self.SetStatusText("Click the Send button to submit your move.")
             return
-        elif (self.position.color == Color.GOLD and row > 1) or \
-                (self.position.color == Color.SILVER and row < 6):
-            self.SetStatusText("Setup in the bottom two rows.")
+        elif self.position.color == Color.GOLD and row > 1:
+            self.SetStatusText("Gold must setup in the bottom two rows.")
+            return
+        elif self.position.color == Color.SILVER and row < 6:
+            self.SetStatusText("Silver must setup in the top two rows.")
             return
         elif self.pieceAt(row, col) != Piece.EMPTY:
-            self.SetStatusText("That spot is already taken.")
+            self.SetStatusText("That spot is already taken")
             return
         piece = self.nextSetupPiece()
         self.stepsLeft -= 1
@@ -444,7 +384,7 @@ class ArimaaClient(wx.Frame):
             self.sendBtn.Enable(True)
         self.SetStatusText("")
         self.undoBtn.Enable(True)
-        self.stepsTxt.SetLabel(str(self.stepsLeft))
+        self.stepsTxt.SetLabel(self.stepsLeft.__str__())
     
     def nextSetupPiece(self):
         piece = ArimaaClient.SETUP_PIECES[8-self.stepsLeft]
@@ -467,7 +407,7 @@ class ArimaaClient(wx.Frame):
         if self.position.inpush: self.sendBtn.Enable(False)
         else:                    self.sendBtn.Enable(True)
         self.stepsLeft -= 1
-        self.stepsTxt.SetLabel(str(self.stepsLeft))
+        self.stepsTxt.SetLabel(self.stepsLeft.__str__())
         if self.pieceAt(row, col) != Piece.EMPTY:
             self.selectedSquare = (row, col)
             if not ((fromRow == 2 or fromRow == 5) and 
@@ -493,7 +433,7 @@ class ArimaaClient(wx.Frame):
             row, col = int(step[2])-1, ord(step[1])-97
             if len(step) < 4: direction = 'p' # 'p' for placement
             else:             direction = step[3]
-            # A hack to prevent a visual glitch:
+            # A hack of a patch to prevent a visual glitch:
             if direction == 'x':
                 self.pendingSlides[-1].position = \
                     self.pendingSlides[-1].position.place_piece(piece,8*row+col)
@@ -525,16 +465,6 @@ class ArimaaClient(wx.Frame):
     def pieceAt(self, row, col):
         return self.position.piece_at(1 << (8*row+col))
     
-    def coordinatesToIndices(self, x, y):
-        row, col = (y - 5) / 49, (x - 5) / 49
-        if self.isGold: row = 7 - row
-        else:           col = 7 - col
-        return (row, col)
-    
-    def indicesToCoordinates(self, (row, col)):
-        if self.isGold: return 5+49*col, 5+49*(7-row)
-        else:           return 5+49*(7-col), 5+49*row
-    
     def refreshGlowingSquares(self):
         self.glowingSquares = []
         if self.selectedSquare == None or self.stepsLeft == 0:
@@ -559,10 +489,11 @@ class ArimaaClient(wx.Frame):
     
     def updateTime(self):
         self.timeLeft -= 1
-        self.timeTxt.SetLabel(str(self.timeLeft))
+        self.timeTxt.SetLabel(self.timeLeft.__str__())
         self.timeTimer.Restart(1000)
         if self.timeLeft == 10:
             self.timeTxt.SetForegroundColour('red')
+            # Why is this not asynchronous?
             ArimaaClient.lowTimeSound.Play()
     
     def resetTime(self):
@@ -570,7 +501,7 @@ class ArimaaClient(wx.Frame):
             self.timeLeft = self.tcmove + self.greserve
         else:
             self.timeLeft = self.tcmove + self.sreserve
-        self.timeTxt.SetLabel(str(self.timeLeft))
+        self.timeTxt.SetLabel(self.timeLeft.__str__())
         self.timeTimer.Restart(1000)
         self.timeTxt.SetForegroundColour('black')
     
@@ -583,13 +514,12 @@ class ArimaaClient(wx.Frame):
     #### AEI engine methods ####
 
     def newgame(self):
-        if self.proxiedEngine: self.proxiedEngine.newgame()
         self.turnPosition = Position(Color.GOLD, 4, board.BLANK_BOARD)
         self.position = self.turnPosition
         self.insetup = True
         self.isGold = "notset"
         self.stepsLeft = 8
-        self.stepsTxt.SetLabel(str(self.stepsLeft))
+        self.stepsTxt.SetLabel(self.stepsLeft.__str__())
         self.setBorderColor()
         ArimaaClient.newGameSound.Play()
         self.DoDrawing()
@@ -597,13 +527,11 @@ class ArimaaClient(wx.Frame):
     def setposition(self, side_str, pos_str):
         side = "gswb".find(side_str) % 2
         self.position = board.parse_short_pos(side, 4, pos_str)
-        if self.proxiedEngine: self.proxiedEngine.setposition(self.position)
         self.insetup = False
         self.setBoarderColor()
         self.DoDrawing()
 
     def setoption(self, name, value):
-        if self.proxiedEngine: self.proxiedEngine.setoption(name, value)
         if   name == "tcmove":   self.tcmove   = int(value)
         elif name == "greserve": self.greserve = int(value)
         elif name == "sreserve": self.sreserve = int(value)
@@ -616,7 +544,7 @@ class ArimaaClient(wx.Frame):
             self.log("Warning: Received unrecognized option %s" % (name))
     
     def makemove(self, move_str):
-        move_number = str(1 + (len(self.gameHistory) / 2))
+        move_number = (1 + (len(self.gameHistory) / 2)).__str__()
         if self.turnPosition.color == Color.GOLD: move_number += "g "
         else:                                     move_number += "s "
         self.gameHistory.append(move_number + move_str)
@@ -633,7 +561,7 @@ class ArimaaClient(wx.Frame):
         else:            self.stepsLeft = 4
         if self.isGold == "notset":
             self.isGold = False
-        self.stepsTxt.SetLabel(str(self.stepsLeft))
+        self.stepsTxt.SetLabel(self.stepsLeft.__str__())
         self.setBorderColor()
         if self.slideNextMove:
             self.applyAEISlidingMove(move_str)
@@ -641,17 +569,12 @@ class ArimaaClient(wx.Frame):
             self.slideNextMove = self.slidePieces
             self.position = self.turnPosition
         self.DoDrawing()
-        if self.proxiedEngine: self.proxiedEngine.makemove(move_str)
 
     def go(self):
         if self.isGold == "notset": # Uhg.
             self.isGold = True
-        if self.proxiedEngine:
-            self.proxiedEngine.go()
-        else:
-            self.going = True
-            if self.insetup: self.SetStatusText("Click to place your pieces.")
-            else:            self.SetStatusText("Your turn.")
+        self.going = True
+        self.SetStatusText("Your turn")
         self.resetTime()
         self.DoDrawing()
 
@@ -660,39 +583,17 @@ class ArimaaClient(wx.Frame):
 
     def bestmove(self, move_str):
         self.going = False
+        self.slideNextMove = False
         self.controller.send("bestmove " + move_str)
-        if not self.proxiedEngine:
-            self.slideNextMove = False
-        self.SetStatusText("Move sent.")
+        self.SetStatusText("Move sent")
         self.timeTimer.Stop()
 
     def checkAEI(self):
-        # Don't communicate while sliding.
-        if self.slidingNow:
-            return
-        ctl = self.controller
-        if self.proxiedEngine:
-            try:
-                resp = self.proxiedEngine.engine.readline(timeout=0.1)
-                resp = string.strip(resp, "\n")
-                if resp == "":
-                    raise socket.timeout()
-                if resp.startswith("bestmove"):
-                    self.timeTimer.Stop()
-                self.SetStatusText(self.botName + ": " + resp)
-                ctl.send(resp)
-            except socket.timeout:
-                pass
-                
+	ctl = self.controller
         if not ctl.stop.isSet() and not ctl.messages.empty():
             msg = ctl.messages.get()
             if msg == "isready":
-                if self.proxiedEngine: self.proxiedEngine.isready()
                 ctl.send("readyok")
-            elif msg.startswith("chat"):
-                self.chat.append(msg.split(None, 1)[1])
-            	self.chatB.Set(self.chat)
-            	self.chatB.Select(len(self.chat)-1)
             elif msg == "newgame":
                 self.newgame()
             elif msg.startswith("setposition"):
@@ -712,14 +613,11 @@ class ArimaaClient(wx.Frame):
                 move_str = msg.split(None, 1)[1]
                 self.makemove(move_str)
             elif msg.startswith("go"):
-                # Right now, proxied bots don't get to ponder
                 if len(msg.split()) == 1:
                     self.go()
             elif msg == "stop":
-                if self.proxiedEngine: self.proxiedEngine.stop()
                 pass
             elif msg == "quit":
-                if self.proxiedEngine: self.proxiedEngine.quit()
                 self.SetStatusText("Game over.")
                 endState = self.turnPosition.is_end_state()
                 if (not self.isGold and endState == -1) or \
@@ -773,54 +671,28 @@ class Slide():
     def playSound(self):
         if self.sound: self.sound.Play()
     
-    def Draw(self, dc, count, frame):
+    def Draw(self, dc, count, isGold):
         if self.angle == 0:
             pieceImage = self.image
         else:
             img = self.image.ConvertToImage()
             img = img.Rotate(self.angle*(self.startCount-count), (24, 24))
             pieceImage = img.ConvertToBitmap()
-        x, y = frame.indicesToCoordinates((self.torow, self.tocol))
-        if frame.isGold:
-            y += count*self.up
-            x -= count*self.right
-        else:
-            y -= count*self.up
-            x += count*self.right
-        dc.DrawBitmap(pieceImage, x, y, True)
-
-class ComThread(Thread):
-    def __init__(self):
-        Thread.__init__(self)
-        self.stop = Event()
-        # Setting a max queue size seems to prevent this thread from eating the 
-        # CPU when things go badly.
-        self.messages = Queue(1000)
-        self.setDaemon(True)
-
-    def send(self, msg):
-        sys.stdout.write(msg + "\n")
-        sys.stdout.flush()
-
-    def run(self):
-        while not self.stop.isSet():
-            msg = sys.stdin.readline()
-            self.messages.put(msg.strip())
-
+        xcoor = 5+49*self.tocol - count*self.right
+        if isGold: ycoor = 5+49*(7-self.torow) + count*self.up
+        else:      ycoor = 5+49*self.torow     - count*self.up
+        dc.DrawBitmap(pieceImage, xcoor, ycoor, True)
+        
 class ArimaaApp(wx.App):
     def OnInit(self):
-        argv = sys.argv[1:]
-        proxyBotName = None
-        if len(argv) > 0 and (argv[0] == "-p" or argv[0] == "--proxy"):
-            proxyBotName = argv[1]
         self.SetAppName("rabbits-arimaa-client")
         self.SetVendorName("rabbits")
-        self.frame = ArimaaClient(proxyBotName)
+        self.frame = ArimaaClient()
         self.frame.Show(True)
         self.SetTopWindow(self.frame)
         return True
 
 if __name__ == "__main__":
-    app = ArimaaApp(redirect=False)
+    app = ArimaaApp(False)
     app.MainLoop()
 
