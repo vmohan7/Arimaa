@@ -5,9 +5,38 @@
 ;;; Components
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  (role gold)
-  (role silver)
+  ( role gold )
+  ( role silver )
+
+  (<= (base (cell ?m ?n ?g)) (index ?m) (index ?n) (gPiece ?g))
+  (<= (base (cell ?m ?n ?s)) (index ?m) (index ?n) (sPiece ?s))
+  (<= (base (cell ?m ?n b)) (index ?m) (index ?n))
   
+  ( base(control(gold)) )
+  ( base(control(silver)) )  
+
+  (index 1)
+  (index 2)
+  (index 3)
+  (index 4)
+  (index 5)
+  (index 6)
+  (index 7)
+  (index 8)
+
+  (gPiece R)
+  (gPiece D)
+  (gPiece C)
+  (gPiece H)
+  (gPiece M)
+  (gPiece E)
+  
+  (sPiece r)
+  (sPiece d)
+  (sPiece c)
+  (sPiece h)
+  (sPiece m)
+  (sPiece e)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init
