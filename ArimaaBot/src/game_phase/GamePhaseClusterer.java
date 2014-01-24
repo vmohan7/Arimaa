@@ -1,6 +1,7 @@
 package game_phase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import utilities.GameData;
 import utilities.GameParser;
@@ -9,7 +10,7 @@ import utilities.helper_classes.Utilities;
 
 public class GamePhaseClusterer {
 	
-	public static final int NUM_GAMES = 5;
+	public static final int NUM_GAMES = 1000;
 	public static final int CLUSTERS = 3;
 	public static final int ITERATIONS = 100;
 
@@ -42,7 +43,7 @@ public class GamePhaseClusterer {
 		for(int j = 0; j < centers[0].length; j++){
 			System.out.print(j + "\t");
 			for(int i = 0; i < centers.length; i++){
-				System.out.print(i + " " );
+				System.out.print(String.format("%.4f",centers[i][j]) + "\t" );
 			}
 			System.out.println("");
 		}
