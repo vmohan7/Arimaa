@@ -31,7 +31,15 @@ public class GamePhaseClusterer {
 		}
 		
 		double[][] matrix = trainMatrix.toArray(new double[1][1]);
-		//k-means...
+		KMeansWrapper kmeans = new KMeansWrapper(3, 1000, matrix);
+		kmeans.cluster();
+		double[][] centers = kmeans.centroids();
+		
+		for(int i = 0; i < centers.length; i++){
+			for(int j = 0; j < centers[i].length; j++){
+				//Print out centroids
+			}
+		}
 	}
 
 }
