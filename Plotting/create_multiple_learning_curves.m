@@ -4,8 +4,8 @@
 % curve plots. 
 
 % TODO: change these parameters 
-csvName1 = 'L2_learning.csv';
-csvName2 = 'SVM_learning.csv';
+csvName1 = 'learning_curves/L2_learning.csv';
+csvName2 = 'learning_curves/SVM_learning.csv';
 modelName1 = 'Logistic Regression';
 modelName2 = ' SVM';
 xStartTick = 100;
@@ -32,7 +32,7 @@ figure('Color',[1.0 1.0 1.0]);
                            
 
 hold on;
-
+box on;
 
 plot(M1(:,1), M1(:,2), '-r');%, 'Color', color1 .* colorScale);
 plot(M1(:,1), M1(:,3), '--r');%, 'Color', color1);
