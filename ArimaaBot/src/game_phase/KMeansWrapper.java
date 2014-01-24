@@ -61,7 +61,10 @@ public class KMeansWrapper {
 		hasClustered = true; //information for centroids calculation
 	}
 	
-	
+	/**
+	 * Returns the centroids (REQUIRES HAVING CALLED .cluster()).
+	 * @return The resulting double[][] will look like <br><b>centroids[whichCentroid][whichCoordinate]</b>
+	 */
 	public double[][] centroids() {
 		if (!hasClustered) {
 			throw new IllegalStateException("Cluster must be called before asking for centroids");
