@@ -72,11 +72,12 @@ public class KMeansWrapper {
 		if (centroids != null) return doubleArrayCopy(centroids);
 		
 		// ------------------ number of clusters ; dimension of the feature
-		centroids = new double[clusterArr.length][designMatrix[0].length];
+		centroids = new double[clusterArr.length][];
 		for (int centroid = 0; centroid < centroids.length; centroid++) {
 			int numFeaturesForCentroid = clusterArr[centroid].length;
 			
 			//sum up all features in the centroid
+			centroids[centroid] = new double[designMatrix[0].length];
 			for (int feature = 0; feature < numFeaturesForCentroid; feature++) {
 				addArrays(centroids[centroid], clusterArr[centroid][feature]);
 			}
