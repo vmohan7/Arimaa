@@ -8,9 +8,13 @@ import utilities.helper_classes.GameInfo;
 import utilities.helper_classes.Utilities;
 
 public class GamePhaseClusterer {
+	
+	public static final int NUM_GAMES = 5;
+	public static final int CLUSTERS = 3;
+	public static final int ITERATIONS = 100;
 
 	public static void main(String args[]){
-		GameData myGameData = new GameData(1000, 1.0);
+		GameData myGameData = new GameData(NUM_GAMES, 0.99);
 		Utilities.printInfo("Finished fetching game data");
 		ArrayList<double[]> trainMatrix = new ArrayList<double[]>();
 		
@@ -31,7 +35,17 @@ public class GamePhaseClusterer {
 		}
 		
 		double[][] matrix = trainMatrix.toArray(new double[1][1]);
-		//k-means...
+		KMeansWrapper kmeans = new KMeansWrapper(CLUSTERS, ITERATIONS, matrix);
+		kmeans.cluster();
+		double[][] centers = kmeans.centroids();
+		
+		for(int j = 0; j < centers[0].length; j++){
+			System.out.print(j + "\t");
+			for(int i = 0; i < centers.length; i++){
+				System.out.print(i + " " );
+			}
+			System.out.println("");
+		}
 	}
 
 }
