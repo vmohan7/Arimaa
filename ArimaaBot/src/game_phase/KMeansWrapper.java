@@ -16,6 +16,9 @@ public class KMeansWrapper {
 	int numClusters, numIterations;
 	double[][] designMatrix;
 	
+	double[][] centroids;
+	boolean hasClustered = false;
+	
 	/** 
 	 * Constructor!
 	 * @param clusters number of clusters
@@ -26,6 +29,7 @@ public class KMeansWrapper {
 		designMatrix = features;
 		numClusters = clusters;
 		numIterations = iterations;
+		centroids = null; //centroids need to be populated -- they will
 	}
 	
 	/** 
@@ -37,9 +41,6 @@ public class KMeansWrapper {
 	 *  of the last datapoint clustered with the first centroid (0+1).
 	 */
 	public void cluster(){
-		// Iterate across designMatrix and create DenseInstances
-		// Put those in a DataSet
-		// Call 'cluster'
 		Dataset dataset = new DefaultDataset();
 		for (int i = 0; i < designMatrix.length; i++){
 			Instance datapoint = new DenseInstance(designMatrix[i]);
@@ -56,11 +57,37 @@ public class KMeansWrapper {
 		//System.out.println("Score (where 0.0 is the best): " + score);
 		
 		clusterArr = dataSetToDoubleArrays(dataSetClusters);
+		hasClustered = true; //information for centroids calculation
 	}
 	
 	
+	public double[][] centroids() {
+		if (!hasClustered) {
+			throw new IllegalStateException("Cluster must be called before asking for centroids");
+	 	}
+		if (centroids != null) return doubleArrayCopy(centroids);
+		
+		centroids = new double[clusterArr.length][];
+		
+		return centroids;
+	}
 
 	
+	private double[][] doubleArrayCopy(double[][] arr) {
+		if (arr == null) return null;
+		
+		double[][] copy = new double[arr.length][];
+		for (int i = 0; i < copy.length; i++) {
+			if (arr[i] == null) {
+				copy[i] = null;
+				continue;
+			}
+			copy[i] = Arrays.copyOf(arr[i], arr[i].length);
+		}
+		
+		return copy;
+	}
+
 	/** 
 	 * Parse the dataset array into clusters (of the format returned above).
 	 * Each Instance seems to be internally represented as a 
