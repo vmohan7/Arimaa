@@ -12,12 +12,13 @@ import net.sf.javaml.core.Instance;
 
 public class KMeansWrapper {
 	
-	double[][][] clusterArr;
-	int numClusters, numIterations;
-	double[][] designMatrix;
+	private double[][][] clusterArr;
+	private int numClusters, numIterations;
+	private double[][] designMatrix;
 	
-	double[][] centroids;
-	boolean hasClustered = false;
+	private double[][] centroids;
+	private boolean hasClustered = false;
+	
 	
 	/** 
 	 * Constructor!
@@ -26,10 +27,10 @@ public class KMeansWrapper {
 	 * @param features each double array is a coordinate (a feature)
 	 */
 	public KMeansWrapper(int clusters, int iterations, double[][] features) {
-		designMatrix = features;
+		designMatrix = doubleArrayCopy(features); //don't trust the client--ever
 		numClusters = clusters;
 		numIterations = iterations;
-		centroids = null; //centroids need to be populated -- they will
+		centroids = null; //centroids need to be populated after clustering -- null used as sentinel
 	}
 	
 	/** 
@@ -67,12 +68,44 @@ public class KMeansWrapper {
 	 	}
 		if (centroids != null) return doubleArrayCopy(centroids);
 		
-		centroids = new double[clusterArr.length][];
+		// ------------------ number of clusters ; dimension of the feature
+		centroids = new double[clusterArr.length][designMatrix[0].length];
+		for (int centroid = 0; centroid < centroids.length; centroid++) {
+			int numFeaturesForCentroid = clusterArr[centroid].length;
+			
+			//sum up all features in the centroid
+			for (int feature = 0; feature < numFeaturesForCentroid; feature++) {
+				addArrays(centroids[centroid], clusterArr[centroid][feature]);
+			}
+			
+			//average all centroids
+			divide(centroids[centroid], numFeaturesForCentroid);
+		}
 		
-		return centroids;
+		return centroids(); //use the method expecting centroids to be not null
+	}
+	
+	/** Vector addition--result in dest */
+	private void addArrays(double[] dest, double[] toAdd) {
+		if (dest == null || toAdd == null)
+			throw new IllegalArgumentException("need non-null arrays to do calculations");
+		if (dest.length != toAdd.length)
+			throw new ArrayIndexOutOfBoundsException("two arrays have different lengths--cannot add");
+		
+		for (int i = 0; i < dest.length; i++)
+			dest[i] += toAdd[i];
 	}
 
+	/** Element-wise division of dividend by divisor */
+	private void divide(double[] dividend, double divisor) {
+		if (dividend == null)
+			throw new IllegalArgumentException("need non-null arrays to do calculations");
+		
+		for (int i = 0; i < dividend.length; i++)
+			dividend[i] /= divisor;
+	}
 	
+	/** Returns a deep copy of the double[][] arr */
 	private double[][] doubleArrayCopy(double[][] arr) {
 		if (arr == null) return null;
 		
@@ -114,16 +147,19 @@ public class KMeansWrapper {
 	}
 	
 	
-	
+	/** BASIC TEST CODE */
 	public static void main(String[] args) {
 		//very basic test code -- to see output
 		double[][] designMatrix = { {0, 1, 2}, {1, 0, 2}, {0, -1, -2}, {-1, 0, -2} };
-		int numClusters = 4;
+		int numClusters = 2;
 		int numIterations = 100;
 		
 		KMeansWrapper kmw = new KMeansWrapper(numClusters, numIterations, designMatrix);
 		kmw.cluster();
-		System.out.println(Arrays.deepToString(kmw.clusterArr));
+		kmw.centroids();
+		
+		System.out.println("The clusters: " + Arrays.deepToString(kmw.clusterArr));
+		System.out.println("Centroids: " + Arrays.deepToString(kmw.centroids()));
 	}	
 }
 
