@@ -10,7 +10,7 @@ import utilities.helper_classes.Utilities;
 
 public class GamePhaseClusterer {
 	
-	public static final int NUM_GAMES = 1000;
+	public static final int NUM_GAMES = 100;
 	public static final int CLUSTERS = 3;
 	public static final int ITERATIONS = 100;
 
