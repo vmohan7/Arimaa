@@ -1,0 +1,49 @@
+; knightstour.kif
+
+; One player in the game
+(role player)
+
+; Board has 5 rows and 6 columns
+(row 1)
+(row 2)
+(row 3)
+(row 4)
+(row 5)
+
+(col 1)
+(col 2)
+(col 3)
+(col 4)
+(col 5)
+(col 6)
+
+; Cells can be a hole, a blank cell, or an occupied cell
+(<= (base (cell ?M ?N hole)) (and (row ?M) (col ?N)))
+(<= (base (cell ?M ?N blank)) (and (row ?M) (col ?N)))
+(<= (base (cell ?M ?N occupied)) (and (row ?M) (col ?N)))
+
+(next_row 1 2)
+(next_row 2 3)
+(next_row 3 4)
+(next_row 4 5)
+(next_col a b)
+(next_col b c)
+(next_col c d)
+(next_col d e)
+(next_col e f)
+
+; loc1 and loc2 are rows or columns [1-5|a-f]
+(<= (adjacent ?loc1 ?loc2)
+	(next_row ?loc1 ?loc2)
+	(next_row ?loc2 ?loc1)
+	(next_col ?loc1 ?loc2)
+	(next_col ?loc2 ?loc1)
+)
+
+(<= (adjacent_two ?loc1 ?loc2)
+	(and 
+		(adjacent ?loc1 ?mid)
+		(adjacent ?mid ?loc2)
+		(distinct ?loc1 ?loc2)
+	)
+)
