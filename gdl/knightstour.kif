@@ -10,17 +10,55 @@
 (row 4)
 (row 5)
 
-(col 1)
-(col 2)
-(col 3)
-(col 4)
-(col 5)
-(col 6)
+(col a)
+(col b)
+(col c)
+(col d)
+(col e)
+(col f)
+   
+; 1-> true 0->false
+(boolean 1)
+(boolean 0)
 
 ; Cells can be a hole, a blank cell, or an occupied cell
 (<= (base (cell ?M ?N hole)) (and (row ?M) (col ?N)))
 (<= (base (cell ?M ?N blank)) (and (row ?M) (col ?N)))
 (<= (base (cell ?M ?N occupied)) (and (row ?M) (col ?N)))
+(<= (base (isFirstMove ?bool)) (boolean ?bool))
+
+(init (isFirstMove 1))
+(init (cell 1 a blank))
+(init (cell 1 b blank))
+(init (cell 1 c blank))
+(init (cell 1 d blank))
+(init (cell 1 e blank))
+(init (cell 1 f blank))
+(init (cell 2 a blank))
+(init (cell 2 b blank))
+(init (cell 2 c blank))
+(init (cell 2 d blank))
+(init (cell 2 e blank))
+(init (cell 2 f blank))
+(init (cell 3 a blank))
+(init (cell 3 b blank))
+(init (cell 3 c blank))
+(init (cell 3 d blank))
+(init (cell 3 e blank))
+(init (cell 3 f blank))
+(init (cell 4 a blank))
+(init (cell 4 b blank))
+(init (cell 4 c blank))
+(init (cell 4 d blank))
+(init (cell 4 e blank))
+(init (cell 4 f blank))
+(init (cell 5 a blank))
+(init (cell 5 b blank))
+(init (cell 5 c blank))
+(init (cell 5 d blank))
+(init (cell 5 e blank))
+(init (cell 5 f blank))
+
 
 (next_row 1 2)
 (next_row 2 3)
@@ -34,10 +72,12 @@
 
 ; loc1 and loc2 are rows or columns [1-5|a-f]
 (<= (adjacent ?loc1 ?loc2)
-	(next_row ?loc1 ?loc2)
-	(next_row ?loc2 ?loc1)
-	(next_col ?loc1 ?loc2)
-	(next_col ?loc2 ?loc1)
+    (or 
+    	(next_row ?loc1 ?loc2)
+    	(next_row ?loc2 ?loc1)
+    	(next_col ?loc1 ?loc2)
+    	(next_col ?loc2 ?loc1)
+    )
 )
 
 (<= (adjacent_two ?loc1 ?loc2)
@@ -47,3 +87,97 @@
 		(distinct ?loc1 ?loc2)
 	)
 )
+
+; define all possible actions 'hop'
+(<= (input ?R (hop ?M ?N))
+    (and 
+        (row ?M) 
+        (col ?N)
+    )
+)
+
+; on the first move, hop (place the knight) anywhere
+(<= (legal ?R (hop ?M ?N)) 
+    (true (isFirstMove 1))
+)
+
+; on all other moves, hop only to valid squares
+(<= (legal ?R (hop ?M ?N))
+    (legal_move ?M ?N)   
+)
+
+(<= (legal_move ?M ?N)
+    (and 
+        (true (cell ?M ?N blank))     ; destination is blank
+        (and 
+            (true (cell ?J ?K occupied))  ; the source is occupied...
+            (knights_move ?J ?M ?K ?N)    ; ...and the knight can move from the occupied square to the destination
+        )
+    )
+)
+
+
+
+; the characteristic L-shape of the knight movement
+(<= (knights_move ?r1 ?r2 ?c1 ?c2)
+    (or
+        (and
+            (adjacent ?r1 ?r2)
+            (adjacent_two ?c1 ?c2)
+        )
+        (and
+            (adjacent_two ?r1 ?r2)
+            (adjacent ?c1 ?c2)
+        )
+    )
+)
+    
+
+; handles first move
+(<= (next (isFirstMove 0)) 
+    (true (isFirstMove 1))
+)
+
+; occupies destination cell
+(<= (next (cell ?M ?N occupied)) 
+    (does ?R (hop ?M ?N))
+)
+
+; dig out (make a hole of) source cell
+(<= (next (cell ?J ?K hole))
+    (true (cell ?J ?K occupied))
+)
+
+; untouched blank and hole cells stay the same
+(<= (next (cell ?M ?N ?W))
+    (and
+        (true (cell ?M ?N ?W))
+        (distinct ?W occupied)
+        (not (does player (hop ?M ?N)))
+    )
+)
+    
+
+
+; If no cells are blank, then the player has won (i.e. visited all cells)
+; Question: does this line need parentheses around 'all_occupied'?
+(<= all_visited 
+    (true (not (cell ?M ?N blank)))
+)
+
+; No legal moves remaining (knight is stuck, but have not won)
+(<= stalemate
+    (and 
+        (not (legal_move ?M ?N))
+        (not all_visited)
+    )
+)
+        
+
+(<= (goal player 100) all_visited)
+(<= (goal player 0) stalemate)
+
+(<= terminal all_visited)
+(<= terminal stalemate)
+
+
