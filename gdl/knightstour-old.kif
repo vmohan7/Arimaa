@@ -1,22 +1,7 @@
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Knights Tour
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Components
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; knightstour.kif
 
 ; One player in the game
 (role player)
-
-; define all possible actions 'hop'
-(<= (input ?R (hop ?M ?N))
-    (and 
-        (row ?M) 
-        (col ?N)
-    )
-)
 
 ; Board has 5 rows and 6 columns
 (row 1)
@@ -42,12 +27,8 @@
 (<= (base (cell ?M ?N occupied)) (and (row ?M) (col ?N)))
 (<= (base (isFirstMove ?bool)) (boolean ?bool))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; init
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (init (isFirstMove 1))
-(init (cell 1 a blank)) 
+(init (cell 1 a blank))
 (init (cell 1 b blank))
 (init (cell 1 c blank))
 (init (cell 1 d blank))
@@ -78,6 +59,7 @@
 (init (cell 5 e blank))
 (init (cell 5 f blank))
 
+
 (next_row 1 2)
 (next_row 2 3)
 (next_row 3 4)
@@ -101,11 +83,17 @@
 (<= (adjacent_two ?loc1 ?loc2)
 	(and 
 		(adjacent ?loc1 ?mid)
-		(and
-		    (adjacent ?mid ?loc2)
-		    (distinct ?loc1 ?loc2)
-		)
+		(adjacent ?mid ?loc2)
+		(distinct ?loc1 ?loc2)
 	)
+)
+
+; define all possible actions 'hop'
+(<= (input ?R (hop ?M ?N))
+    (and 
+        (row ?M) 
+        (col ?N)
+    )
 )
 
 ; on the first move, hop (place the knight) anywhere
@@ -121,7 +109,7 @@
 (<= (legal_move ?M ?N)
     (and 
         (true (cell ?M ?N blank))     ; destination is blank
-        (and
+        (and 
             (true (cell ?J ?K occupied))  ; the source is occupied...
             (knights_move ?J ?M ?K ?N)    ; ...and the knight can move from the occupied square to the destination
         )
@@ -164,16 +152,8 @@
 (<= (next (cell ?M ?N ?W))
     (and
         (true (cell ?M ?N ?W))
-        (and 
-            (distinct ?W occupied)
-            (and
-                (does player (hop ?J ?K))
-                (and
-                    (distinct ?M ?J)
-                    (distinct ?N ?K)
-                )
-            )
-        )
+        (distinct ?W occupied)
+        (not (does player (hop ?M ?N)))
     )
 )
     
@@ -182,7 +162,7 @@
 ; If no cells are blank, then the player has won (i.e. visited all cells)
 ; Question: does this line need parentheses around 'all_occupied'?
 (<= all_visited 
-    (not (true (cell ?M ?N blank)))
+    (true (not (cell ?M ?N blank)))
 )
 
 ; No legal moves remaining (knight is stuck, but have not won)
@@ -199,3 +179,5 @@
 
 (<= terminal all_visited)
 (<= terminal stalemate)
+
+
