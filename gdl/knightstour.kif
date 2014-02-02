@@ -1,21 +1,14 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Knights Tour
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Components
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; knightstour.kif
 
 ; One player in the game
 (role player)
 
 ; define all possible actions 'hop'
 (<= (input ?R (hop ?M ?N))
-    (and 
-        (row ?M) 
-        (col ?N)
-    )
+    (row ?M) 
+    (col ?N)
+    (role ?R)
 )
 
 ; Board has 5 rows and 6 columns
@@ -37,17 +30,13 @@
 (boolean 0)
 
 ; Cells can be a hole, a blank cell, or an occupied cell
-(<= (base (cell ?M ?N hole)) (and (row ?M) (col ?N)))
-(<= (base (cell ?M ?N blank)) (and (row ?M) (col ?N)))
-(<= (base (cell ?M ?N occupied)) (and (row ?M) (col ?N)))
+(<= (base (cell ?M ?N hole)) (row ?M) (col ?N))
+(<= (base (cell ?M ?N blank)) (row ?M) (col ?N))
+(<= (base (cell ?M ?N occupied)) (row ?M) (col ?N))
 (<= (base (isFirstMove ?bool)) (boolean ?bool))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; init
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (init (isFirstMove 1))
-(init (cell 1 a blank)) 
+(init (cell 1 a blank))
 (init (cell 1 b blank))
 (init (cell 1 c blank))
 (init (cell 1 d blank))
@@ -78,6 +67,7 @@
 (init (cell 5 e blank))
 (init (cell 5 f blank))
 
+
 (next_row 1 2)
 (next_row 2 3)
 (next_row 3 4)
@@ -89,59 +79,47 @@
 (next_col e f)
 
 ; loc1 and loc2 are rows or columns [1-5|a-f]
-(<= (adjacent ?loc1 ?loc2)
-    (or 
-    	(next_row ?loc1 ?loc2)
-    	(next_row ?loc2 ?loc1)
-    	(next_col ?loc1 ?loc2)
-    	(next_col ?loc2 ?loc1)
-    )
-)
+(<= (adjacent ?loc1 ?loc2) (next_row ?loc1 ?loc2))
+(<= (adjacent ?loc1 ?loc2) (next_row ?loc2 ?loc1))
+(<= (adjacent ?loc1 ?loc2) (next_col ?loc1 ?loc2))
+(<= (adjacent ?loc1 ?loc2) (next_col ?loc2 ?loc1))
 
 (<= (adjacent_two ?loc1 ?loc2)
-	(and 
-		(adjacent ?loc1 ?mid)
-		(and
-		    (adjacent ?mid ?loc2)
-		    (distinct ?loc1 ?loc2)
-		)
-	)
+    (adjacent ?loc1 ?mid)
+    (adjacent ?mid ?loc2)
+    (distinct ?loc1 ?loc2)
 )
 
 ; on the first move, hop (place the knight) anywhere
-(<= (legal ?R (hop ?M ?N)) 
+(<= (legal ?R (hop ?M ?N))
+    (role ?R)
+    (cell ?M ?N blank)
     (true (isFirstMove 1))
 )
 
 ; on all other moves, hop only to valid squares
 (<= (legal ?R (hop ?M ?N))
-    (legal_move ?M ?N)   
+    (legal_move ?M ?N)
+    (role ?R)
 )
 
 (<= (legal_move ?M ?N)
-    (and 
-        (true (cell ?M ?N blank))     ; destination is blank
-        (and
-            (true (cell ?J ?K occupied))  ; the source is occupied...
-            (knights_move ?J ?M ?K ?N)    ; ...and the knight can move from the occupied square to the destination
-        )
-    )
+    (true (cell ?M ?N blank))     ; destination is blank
+    (true (cell ?J ?K occupied))  ; the source is occupied...
+    (knights_move ?J ?M ?K ?N)    ; ...and the knight can move from the occupied square to the destination
 )
 
 
 
 ; the characteristic L-shape of the knight movement
 (<= (knights_move ?r1 ?r2 ?c1 ?c2)
-    (or
-        (and
-            (adjacent ?r1 ?r2)
-            (adjacent_two ?c1 ?c2)
-        )
-        (and
-            (adjacent_two ?r1 ?r2)
-            (adjacent ?c1 ?c2)
-        )
-    )
+    (adjacent ?r1 ?r2)
+    (adjacent_two ?c1 ?c2)
+)
+
+(<= (knights_move ?r1 ?r2 ?c1 ?c2)
+    (adjacent_two ?r1 ?r2)
+    (adjacent ?c1 ?c2)
 )
     
 
@@ -162,21 +140,13 @@
 
 ; untouched blank and hole cells stay the same
 (<= (next (cell ?M ?N ?W))
-    (and
-        (true (cell ?M ?N ?W))
-        (and 
-            (distinct ?W occupied)
-            (and
-                (does player (hop ?J ?K))
-                (and
-                    (distinct ?M ?J)
-                    (distinct ?N ?K)
-                )
-            )
-        )
-    )
+    (true (cell ?M ?N ?W))
+    (distinct ?W occupied)
+    (does player (hop ?J ?K))
+    (distinct ?M ?J)
+    (distinct ?N ?K)
 )
-    
+
 
 
 ; If no cells are blank, then the player has won (i.e. visited all cells)
@@ -187,10 +157,8 @@
 
 ; No legal moves remaining (knight is stuck, but have not won)
 (<= stalemate
-    (and 
-        (not (legal_move ?M ?N))
-        (not all_visited)
-    )
+    (not (legal_move ?M ?N))
+    (not all_visited)
 )
         
 
