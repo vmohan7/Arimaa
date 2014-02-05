@@ -4,20 +4,25 @@ public class GameInfo {
 	
 	private String whiteStartState, blackStartState;
 	private String moveList;
+	private int gameID;
 	
-	/** Constructs a GameInfo from the three parameters:
+	/** Constructs a GameInfo from the four parameters:
 	 * @param whiteSS The string representing white's starting state
 	 * @param blackSS The string representing blacks's starting state
-	 * @param moveL The (single) string representing the game's move list */
-	public GameInfo(String whiteSS, String blackSS, String moveL) {
+	 * @param moveL The (single) string representing the game's move list
+	 * @param gID The game id of this game (id of row in SQL table) 
+	 **/
+	public GameInfo(String whiteSS, String blackSS, String moveL, int gID) {
 		whiteStartState = whiteSS;
 		blackStartState = blackSS;
 		moveList = moveL;
+		gameID = gID;
 	}
 	
 	public String getWhiteStartState() { return whiteStartState; }
 	public String getBlackStartState() { return blackStartState; }
 	public String getMoveList() { return moveList; }
+	public int getGameID() { return gameID; }
 	
 	@Override
 	public int hashCode() {

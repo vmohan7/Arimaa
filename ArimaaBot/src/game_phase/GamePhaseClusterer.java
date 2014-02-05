@@ -84,6 +84,7 @@ public class GamePhaseClusterer {
 			GameInfo trainGameInfo = myGameData.getNextGame();
 			GameParser myParser = new GameParser(trainGameInfo);
 			
+			csv.appendValue(Integer.toString(trainGameInfo.getGameID()));
 			while (myParser.hasNextGameState()){
 				csv.appendValue(Integer.toString(
 						kmeans.assignCluster(

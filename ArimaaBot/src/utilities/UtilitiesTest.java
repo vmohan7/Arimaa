@@ -88,7 +88,7 @@ public class UtilitiesTest {
 		String moveW2 = "\n3w Re5e";
 		String emptyMove = "\n3b";
 		
-		GameInfo gi = new GameInfo(whiteSS, blackSS, moveW1 + moveB1 + moveW2 + emptyMove);
+		GameInfo gi = new GameInfo(whiteSS, blackSS, moveW1 + moveB1 + moveW2 + emptyMove, -1);
 		GameParser gp = new GameParser(gi);
 		
 		assertTrue(gp.hasNextGameState());

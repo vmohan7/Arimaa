@@ -14,15 +14,26 @@ public class GameData implements AbstractGameData {
 	private static final int RATING_THRESHOLD = 2100;
 	// For reference, there are 279K total games, and 5K where both players are rated > 2100. 
 	
-	private static String myQuery = "SELECT w_state, b_state, movelist FROM " +
+	private static final String EXPERT_QUERY = "SELECT games.id, w_state, b_state, movelist FROM " +
 			"(SELECT id FROM games WHERE white_rating >= %d " +
 			"AND black_rating >= %d ORDER BY RAND() LIMIT %d ) g_ids " +
 			"INNER JOIN games ON games.id = g_ids.id"; 
 	
+	private static final String ANY_QUERY = "SELECT games.id, w_state, b_state, movelist FROM " +
+			"(SELECT id FROM games ORDER BY RAND() LIMIT %d ) g_ids " +
+			"INNER JOIN games ON games.id = g_ids.id";
+	
+	private static final String myQuery = ANY_QUERY;
+	
 	public GameData(int numGames, double trainFraction){
 		this.numGames = numGames;
 		this.firstTestGame = (int) (trainFraction * numGames) + 1;
-		filteredGames = MyDB.executeQuery(String.format(myQuery, RATING_THRESHOLD, RATING_THRESHOLD, numGames));
+		
+		if (myQuery == EXPERT_QUERY)
+			filteredGames = MyDB.executeQuery(String.format(myQuery, RATING_THRESHOLD, RATING_THRESHOLD, numGames));
+		else if (myQuery == ANY_QUERY)
+			filteredGames = MyDB.executeQuery(String.format(myQuery, numGames));
+		
 		setMode(Mode.TRAIN);
 	}
 	
@@ -62,7 +73,8 @@ public class GameData implements AbstractGameData {
 			
 			GameInfo ret = new GameInfo(filteredGames.getString("w_state"),
 					filteredGames.getString("b_state"),
-					filteredGames.getString("movelist"));
+					filteredGames.getString("movelist"),
+					filteredGames.getInt("id"));
 			
 			filteredGames.next();
 			return ret;
