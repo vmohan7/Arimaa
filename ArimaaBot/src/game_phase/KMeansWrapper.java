@@ -150,7 +150,41 @@ public class KMeansWrapper {
 		return clusters;
 	}
 	
+	/** Finds and returns the integer corresponding to the closest cluster (L2-Norm) */
+	public int assignCluster(double[] extractFeatures) {
+		if (!hasClustered) {
+			throw new IllegalStateException("Centroids must exist (call cluster) before assigning.");
+	 	}
+		
+		double minDistance = Double.MAX_VALUE;
+		int closestCentroid = -1;
+		for (int centroid = 0; centroid < centroids.length; centroid++) {
+			double distToCentroid = vectorDistance(centroids[centroid], extractFeatures);
+			
+			if (distToCentroid < minDistance) {
+				closestCentroid = centroid;
+				minDistance = distToCentroid;
+			}
+		}
+		
+		assert(closestCentroid != -1);
+		return closestCentroid;
+	}
 	
+	
+	private double vectorDistance(double[] vec1, double[] vec2) {
+		if (vec1 == null || vec2 == null)
+			throw new IllegalArgumentException("need non-null arrays to do calculations");
+		if (vec1.length != vec2.length)
+			throw new ArrayIndexOutOfBoundsException("two arrays have different lengths--cannot add");
+		
+		double distance = 0;
+		for (int i = 0; i < vec1.length; i++)
+			distance += Math.pow(vec1[i] - vec2[i], 2);
+		
+		return distance;
+	}
+
 	/** BASIC TEST CODE */
 	public static void main(String[] args) {
 		//very basic test code -- to see output
@@ -164,6 +198,10 @@ public class KMeansWrapper {
 		
 		System.out.println("The clusters: " + Arrays.deepToString(kmw.clusterArr));
 		System.out.println("Centroids: " + Arrays.deepToString(kmw.centroids()));
+		System.out.println("");
+		for (int vec = 0; vec < designMatrix.length; vec++) {
+			System.out.println(Arrays.toString(designMatrix[vec]) + " assigned to cluster " + kmw.assignCluster(designMatrix[vec]));
+		}
 	}	
 }
 

@@ -5,18 +5,51 @@ import java.util.Arrays;
 
 import utilities.GameData;
 import utilities.GameParser;
+import utilities.helper_classes.CSVDataFormatter;
 import utilities.helper_classes.GameInfo;
 import utilities.helper_classes.Utilities;
 
 public class GamePhaseClusterer {
 	
-	public static final int NUM_GAMES = 100;
-	public static final int CLUSTERS = 3;
-	public static final int ITERATIONS = 100;
-
+	private static final int NUM_GAMES = 100;
+	private static final int CLUSTERS = 3;
+	private static final int ITERATIONS = 100;
+	private static final String PATH_PREFIX = "../Plotting/"; //optional
+	private static final String FILE_NAME = PATH_PREFIX + "kmeans_" + CLUSTERS + ".csv";
+	
 	public static void main(String args[]){
-		GameData myGameData = new GameData(NUM_GAMES, 0.99);
+		Utilities.printInfo(String.format("<< Running with %d games, %d clusters, and %d iterations >>", NUM_GAMES, CLUSTERS, ITERATIONS));
+		GameData myGameData = new GameData(NUM_GAMES, 0.75);
 		Utilities.printInfo("Finished fetching game data");
+		
+		double[][] trainMatrix = train(myGameData);
+		
+		Utilities.printInfo("\nBeginning clustering...");
+		KMeansWrapper kmeans = new KMeansWrapper(CLUSTERS, ITERATIONS, trainMatrix);
+		kmeans.cluster();
+		double[][] centers = kmeans.centroids();
+		printCentroids(centers);
+		
+		myGameData.setMode(GameData.Mode.TEST);
+		
+		Utilities.printInfo("\nTesting and printing to CSV...");
+		testAndOutputCSV(myGameData, kmeans);
+	}
+
+	/** Formatted print of centroids */
+	private static void printCentroids(double[][] centers) {
+		for(int j = 0; j < centers[0].length; j++){
+			Utilities.printInfoInline(j + "\t");
+			for(int i = 0; i < centers.length; i++){
+				Utilities.printInfoInline(String.format("%.4f",centers[i][j]) + "\t" );
+			}
+			Utilities.printInfo("");
+		}
+	}
+
+
+	/** Generates the 2D matrix of real-valued features (to be clustered) */
+	private static double[][] train(GameData myGameData) {
 		ArrayList<double[]> trainMatrix = new ArrayList<double[]>();
 		
 		int count = 0;
@@ -35,18 +68,37 @@ public class GamePhaseClusterer {
 			Utilities.printInfo("training took " + Utilities.msToString(endTime - startTime));
 		}
 		
-		double[][] matrix = trainMatrix.toArray(new double[1][1]);
-		KMeansWrapper kmeans = new KMeansWrapper(CLUSTERS, ITERATIONS, matrix);
-		kmeans.cluster();
-		double[][] centers = kmeans.centroids();
-		
-		for(int j = 0; j < centers[0].length; j++){
-			System.out.print(j + "\t");
-			for(int i = 0; i < centers.length; i++){
-				System.out.print(String.format("%.4f",centers[i][j]) + "\t" );
-			}
-			System.out.println("");
-		}
+		return trainMatrix.toArray(new double[0][0]);
 	}
 
+	
+	/** Uses the test games to assign each GameState to a cluster. Results output to CSV. */
+	private static void testAndOutputCSV(GameData myGameData, KMeansWrapper kmeans) {
+		CSVDataFormatter csv = new CSVDataFormatter();
+		int count = 0;
+		
+		while (myGameData.hasNextGame()){
+			final long startTime = System.currentTimeMillis();
+			
+			Utilities.printInfoInline("Testing on game # " + ++count + "..."); //time will be appended in-line
+			GameInfo trainGameInfo = myGameData.getNextGame();
+			GameParser myParser = new GameParser(trainGameInfo);
+			
+			csv.appendValue(Integer.toString(trainGameInfo.getGameID()));
+			while (myParser.hasNextGameState()){
+				csv.appendValue(Integer.toString(
+						kmeans.assignCluster(
+								FeatureExtractor.extractFeatures( myParser.getNextGameState().getCurr() )
+						)
+				));
+			}
+			
+			csv.nextLine();
+			
+			final long endTime = System.currentTimeMillis();
+			Utilities.printInfo("testing took " + Utilities.msToString(endTime - startTime));
+		}
+		
+		csv.finalizeFile(FILE_NAME);
+	}
 }

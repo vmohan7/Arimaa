@@ -88,7 +88,8 @@ public class DisconnectedGameData implements AbstractGameData {
 		try {
 			GameInfo ret = new GameInfo(filteredGames.getString("w_state"),
 					filteredGames.getString("b_state"),
-					filteredGames.getString("movelist"));
+					filteredGames.getString("movelist"),
+					filteredGames.getInt("id"));
 			
 			ids.add(filteredGames.getInt("id"));
 			filteredGames.next();
