@@ -8,9 +8,20 @@ public class FeatureExtractor implements Constants {
 
 	public static final int NUM_PIECES_FEATURES = 2;
 	public static final int NUM_RANKS = 8;
-	public static final int NUM_PIECE_RANK = 12*NUM_RANKS;
+	public static final int NUM_PIECE_RANK_FEATURES = 12*NUM_RANKS;
 	public static final int NUM_TRAPS = 4; 
-	public static final int NUM_FEATURES = NUM_PIECES_FEATURES + NUM_PIECE_RANK + 2*NUM_TRAPS;
+	public static final int NUM_TRAP_DOMINANCE_FEATURES = NUM_TRAPS * 2;
+	public static final int NUM_FEATURES = NUM_PIECES_FEATURES + NUM_PIECE_RANK_FEATURES + 2*NUM_TRAPS;
+	
+	
+	/* Maximum values for each feature class, used for normalizing feature ranges */
+	// Calculation for MAX_TRAP_DOMINANCE_SCORE: 
+	// 9 + 8 + 7 + 7 + 5/2 + 5/2 + 4/2 + 4/2 + 3/2 + 3/2 + 3/2 + 3/2 + 3/2 + 3 * 3/3
+	public static final double MAX_TRAP_DOMINANCE_SCORE = 50.5 * NUM_TRAP_DOMINANCE_FEATURES;
+	
+	public static final double MAX_RANKS = NUM_RANKS * NUM_PIECE_RANK_FEATURES;
+	
+	public static final double MAX_NUM_PIECES = 16.0 * NUM_PIECES_FEATURES;
 
 
 	//PL_WHITE and PL_BLACK are constants that refer to the index into the features array
@@ -28,8 +39,8 @@ public class FeatureExtractor implements Constants {
 	}
 	
 	private static void extractNumPieces(GameState state, double[] features){
-		features[PL_WHITE] = Util.PopCnt( state.colour_bb[PL_WHITE] );
-		features[PL_BLACK] = Util.PopCnt( state.colour_bb[PL_BLACK] );
+		features[PL_WHITE] = Util.PopCnt( state.colour_bb[PL_WHITE] ) / MAX_NUM_PIECES;
+		features[PL_BLACK] = Util.PopCnt( state.colour_bb[PL_BLACK] ) / MAX_NUM_PIECES;
 	}
 	
 	private static void extractRank(GameState state, double[] features){
@@ -37,7 +48,7 @@ public class FeatureExtractor implements Constants {
 			for(int rank = 0; rank < NUM_RANKS; rank++){
 				long curr_rank = RANK_1 << (rank*NUM_RANKS); //the current rank
 				features[NUM_PIECES_FEATURES + piece_type*NUM_RANKS +rank] = 
-						Util.PopCnt( state.piece_bb[piece_type] & curr_rank);
+						Util.PopCnt( state.piece_bb[piece_type] & curr_rank) / MAX_RANKS;
 			}
 		}
 	}
@@ -84,7 +95,7 @@ public class FeatureExtractor implements Constants {
 				}
 				
 				int trapFeatureID= (j % 2)*TRAP.length + i; //assigns a unique index for each (player, trap square) tuple
-				features[NUM_PIECES_FEATURES + NUM_PIECE_RANK + trapFeatureID] += score;
+				features[NUM_PIECES_FEATURES + NUM_PIECE_RANK_FEATURES + trapFeatureID] += (score / MAX_TRAP_DOMINANCE_SCORE);
 			}
 			
 
