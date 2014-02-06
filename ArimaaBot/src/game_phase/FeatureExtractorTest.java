@@ -43,6 +43,24 @@ public class FeatureExtractorTest implements Constants {
 	    }
 
 	}
+	
+	@Test
+	public void testTrapDetect() {
+		
+		// data from first game in "games" relation
+	    String white = "1w Ec3 Mc2"; 
+	    String black = "1b eg6";
+	    GameState startState = new GameState(white,black);
+
+	    double[] features = FeatureExtractor.extractFeatures(startState);
+	    
+	    System.out.println(startState.toBoardString());
+	    
+	    for(int i = 98; i < features.length; i++){
+	    	System.out.println(i + " : " + features[i]);
+	    }
+
+	}
 
 	
 }

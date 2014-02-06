@@ -47,32 +47,35 @@ public class FeatureExtractor implements Constants {
 		int col = cell % 8;
 		
 		if (trapID == 0){
-			return (rank - 2) + (col - 2);
+			return Math.abs( rank - 2 ) + Math.abs( col - 2 );
 		}
 		else if (trapID == 1){
-			return (rank - 5) + (col - 2);
+			return Math.abs(rank - 5) + Math.abs(col - 2);
 		}
 		else if (trapID == 2){
-			return (rank - 2) + (col - 5);
+			return Math.abs(rank - 2) + Math.abs(col - 5);
 		}
 		else {
-			return (rank - 5) + (col - 5);
+			return Math.abs(rank - 5) + Math.abs(col - 5);
 		}
 		
 	}
 	
 	private static void extractTrapDominance(GameState state, double[] features){
-		int[] weights = { 9, 9, 7, 7, 5, 5, 3, 3, 2, 2, 1, 1 };
+		int[] weights = { 9, 8, 7, 5, 4, 1, 2, 3 };
 		byte[] pieceRanks = Utilities.calculatePieceTypes(state);
 		for(int i = 0; i < TRAP.length; i++){
 			for(int j = 0; j < state.piece_bb.length; j++){
 				double score = 0;
 
 				for (int cell = 0; cell < 64; cell++){
-					if ((state.piece_bb[j] & (1L << cell)) == 1){
+					if ((state.piece_bb[j] & (1L << cell)) > 0){
 						int distance = getDistance(cell, i);
+						
 						if (distance > 4){
 							continue; //dont consider pieces that are greater than 4 away
+						} else if (distance == 0){
+							distance = 2; //assume that distance of a piece on trap is equivalent to 2 hops away
 						}
 						
 						score += (1.0/distance)*weights[pieceRanks[j]];
