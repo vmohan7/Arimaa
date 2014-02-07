@@ -2,6 +2,7 @@ package game_phase;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.BitSet;
 
@@ -59,6 +60,25 @@ public class FeatureExtractorTest implements Constants {
 	    for(int i = 98; i < features.length; i++){
 	    	System.out.println(i + " : " + features[i]);
 	    }
+
+	}
+	
+	@Test
+	public void testReducedFeatureSet() {
+		System.out.println("\n\n==== BEGIN TESTING REDUCED FEATURE SET ====");
+	    String white = "1w Ee5 Md2 Ha2 Hh2 Db4 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
+	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
+	    GameState startState = new GameState(white,black);
+	    System.out.println(startState.toBoardString());
+
+	    double[] reducedFeatures = FeatureExtractor.extractReducedFeatures(startState);
+	   
+	    for(int i = 0; i < reducedFeatures.length; i++){
+	    	System.out.println(i + " : " + reducedFeatures[i]);
+	    }
+	    
+		System.out.println("\n\n==== END TESTING REDUCED FEATURE SET ====");
+
 
 	}
 

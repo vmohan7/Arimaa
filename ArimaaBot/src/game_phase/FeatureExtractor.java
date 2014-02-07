@@ -24,8 +24,12 @@ public class FeatureExtractor implements Constants {
 	public static final double MAX_RANKS = NUM_RANKS * NUM_PIECE_RANK_FEATURES;
 	public static final double MAX_NUM_PIECES = 16.0 * NUM_PIECES_FEATURES;
 	
+	
 	/* Constants for reduced feature set alternative */
-	public static final int NUM_REDUCED_FEATURES = 1;
+	private static final int NUM_REDUCED_FEATURES = 2;
+	
+	private static final long RANKS_FOUR_THRU_EIGHT = RANK_4 | RANK_5 | RANK_6 | RANK_7 | RANK_8;
+	private static final long RANKS_ONE_THRU_FIVE = RANK_1 | RANK_2 | RANK_3 | RANK_4 | RANK_5;
 
 
 	//PL_WHITE and PL_BLACK are constants that refer to the index into the features array
@@ -42,17 +46,44 @@ public class FeatureExtractor implements Constants {
 		return features;
 	}
 	
+	/**
+	 * Extract features to be used in GamePhaseHeuristicDiscriminator
+	 */
 	public static double[] extractReducedFeatures(GameState state){
 		double[] features = new double[NUM_REDUCED_FEATURES];
-		extractMinNumPieces(state, features, 0);
+		features[0] = extractMinNumPieces(state);
+		features[1] = extractMaxNumDisplaced(state);
 		return features;
 	}
 	
 	/**
-	 * @return The smaller of the number of gold or silver pieces on the board
+	 * @return the smaller of the number of gold or silver pieces on the board
 	 */
-	private static void extractMinNumPieces(GameState state, double[] features, int index){
-		features[index] = Math.min(Util.PopCnt( state.colour_bb[PL_WHITE]), Util.PopCnt( state.colour_bb[PL_BLACK]));
+	private static int extractMinNumPieces(GameState state){
+		return Math.min(Util.PopCnt(state.colour_bb[PL_WHITE]), Util.PopCnt(state.colour_bb[PL_BLACK]));
+	}
+	
+	/**
+	 * @return the higher value of 'numDisplaced' for gold and silver, where 'numDisplaced' is the 
+	 * number of non-elephant pieces advanced beyond one's own trap squares. 
+	 */
+	private static int extractMaxNumDisplaced(GameState state){
+		long[] piece_bb = state.piece_bb;
+		int whiteScore = 0;
+		int blackScore = 0;
+		
+		// Count all pieces except for elephants
+		for (int pieceType = PT_WHITE_RABBIT; pieceType < PT_WHITE_ELEPHANT; pieceType++){
+			
+			if (pieceType % 2 == PL_WHITE) // White pieces
+				whiteScore += Util.PopCnt(piece_bb[pieceType] & RANKS_FOUR_THRU_EIGHT);
+			
+			else // Black pieces
+				blackScore += Util.PopCnt(piece_bb[pieceType] & RANKS_ONE_THRU_FIVE);
+		}
+		
+		return Math.max(whiteScore, blackScore);
+
 	}
 	
 	private static void extractNumPiecesPerPlayer(GameState state, double[] features){
