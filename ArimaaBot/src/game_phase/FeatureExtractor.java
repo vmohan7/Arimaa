@@ -6,39 +6,56 @@ import arimaa3.*;
 
 public class FeatureExtractor implements Constants {
 
-	public static final int NUM_PIECES_FEATURES = 2;
+	/* General constants */ 
 	public static final int NUM_RANKS = 8;
-	public static final int NUM_PIECE_RANK_FEATURES = 12*NUM_RANKS;
 	public static final int NUM_TRAPS = 4; 
+	
+	/* Feature count constants */
+	public static final int NUM_PIECES_FEATURES = 2;
+	public static final int NUM_PIECE_RANK_FEATURES = 12*NUM_RANKS;
 	public static final int NUM_TRAP_DOMINANCE_FEATURES = NUM_TRAPS * 2;
 	public static final int NUM_FEATURES = NUM_PIECES_FEATURES + NUM_PIECE_RANK_FEATURES + 2*NUM_TRAPS;
 	
+	/* Maximum total value for all features in each feature class, used for normalizing feature ranges */
 	
-	/* Maximum values for each feature class, used for normalizing feature ranges */
 	// Calculation for MAX_TRAP_DOMINANCE_SCORE: 
 	// 9 + 8 + 7 + 7 + 5/2 + 5/2 + 4/2 + 4/2 + 3/2 + 3/2 + 3/2 + 3/2 + 3/2 + 3 * 3/3
 	public static final double MAX_TRAP_DOMINANCE_SCORE = 50.5 * NUM_TRAP_DOMINANCE_FEATURES;
-	
 	public static final double MAX_RANKS = NUM_RANKS * NUM_PIECE_RANK_FEATURES;
-	
 	public static final double MAX_NUM_PIECES = 16.0 * NUM_PIECES_FEATURES;
+	
+	/* Constants for reduced feature set alternative */
+	public static final int NUM_REDUCED_FEATURES = 1;
 
 
 	//PL_WHITE and PL_BLACK are constants that refer to the index into the features array
 	
-	/*
+	/**
 	 * Extracts features for the resulting board after playing a possible legal move.
 	 * current_board is the resulting board after playing current_move on prev game state.
 	 */
 	public static double[] extractFeatures(GameState state) {
 		double[] features = new double[NUM_FEATURES];
-		extractNumPieces(state, features);
+		extractNumPiecesPerPlayer(state, features);
 		extractRank(state, features);
 		extractTrapDominance(state, features);
 		return features;
 	}
 	
-	private static void extractNumPieces(GameState state, double[] features){
+	public static double[] extractReducedFeatures(GameState state){
+		double[] features = new double[NUM_REDUCED_FEATURES];
+		extractMinNumPieces(state, features, 0);
+		return features;
+	}
+	
+	/**
+	 * @return The smaller of the number of gold or silver pieces on the board
+	 */
+	private static void extractMinNumPieces(GameState state, double[] features, int index){
+		features[index] = Math.min(Util.PopCnt( state.colour_bb[PL_WHITE]), Util.PopCnt( state.colour_bb[PL_BLACK]));
+	}
+	
+	private static void extractNumPiecesPerPlayer(GameState state, double[] features){
 		features[PL_WHITE] = Util.PopCnt( state.colour_bb[PL_WHITE] ) / MAX_NUM_PIECES;
 		features[PL_BLACK] = Util.PopCnt( state.colour_bb[PL_BLACK] ) / MAX_NUM_PIECES;
 	}
@@ -97,9 +114,6 @@ public class FeatureExtractor implements Constants {
 				int trapFeatureID= (j % 2)*TRAP.length + i; //assigns a unique index for each (player, trap square) tuple
 				features[NUM_PIECES_FEATURES + NUM_PIECE_RANK_FEATURES + trapFeatureID] += (score / MAX_TRAP_DOMINANCE_SCORE);
 			}
-			
-
-			
 		}
 		
 
