@@ -83,7 +83,12 @@ public class FeatureExtractor implements Constants {
 		}
 		
 		return Math.max(whiteScore, blackScore);
-
+	}
+	
+	private static int extractImminentGoalFeature(GameState state){
+		//TODO: implement
+		
+		return 0;
 	}
 	
 	private static void extractNumPiecesPerPlayer(GameState state, double[] features){
