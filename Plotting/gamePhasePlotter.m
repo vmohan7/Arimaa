@@ -1,6 +1,6 @@
-% fid = fopen('kmeans_3.csv');
+fid = fopen('kmeans_3.csv');
 
-fid = fopen('kmeans_heuristic.csv');
+% fid = fopen('kmeans_heuristic.csv');
 
 % ignore the first this many columns in the csv (perhaps if the first
 % column is the game id)
