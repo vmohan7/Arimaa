@@ -13,7 +13,7 @@ public class GamePhaseHeuristicDiscriminator {
 	private static final int NUM_GAMES = 10;
 	private static final String PATH_PREFIX = "../Plotting/game_phase/"; //optional
 	private static final String FILE_NAME = PATH_PREFIX + "kmeans_heuristic_probabilities.csv";
-	private static final double[] WEIGHTS = {1.0, -0.5};
+	private static final double[] WEIGHTS = {1.0, -0.5, -10.0};
 	
 	// Probability distributions: http://commons.apache.org/proper/commons-math/userguide/distribution.html
 	// Normal distribution: http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/distribution/NormalDistribution.html
@@ -21,7 +21,7 @@ public class GamePhaseHeuristicDiscriminator {
 	
 	private static NormalDistribution BeginningDistr = new NormalDistribution(16.0, 2);
 	private static NormalDistribution MiddleDistr = new NormalDistribution(12.0, 2);
-	private static NormalDistribution EndDistr = new NormalDistribution(9.0, 2);
+	private static NormalDistribution EndDistr = new NormalDistribution(6.0, 2);
 	
 	
 	public enum GamePhase {

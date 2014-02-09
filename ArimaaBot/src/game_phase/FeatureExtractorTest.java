@@ -66,12 +66,16 @@ public class FeatureExtractorTest implements Constants {
 	@Test
 	public void testReducedFeatureSet() {
 		System.out.println("\n\n==== BEGIN TESTING REDUCED FEATURE SET ====");
-	    String white = "1w Ee5 Md2 Ha2 Hh2 Db4 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
-	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
-	    GameState startState = new GameState(white,black);
-	    System.out.println(startState.toBoardString());
+	    String gold = "1w Ee3 Md2 Ha4 Hh2 Db4 Dg2 Cf2 Cc1 Re6 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
+	    String silver = "1b ec5 md7 ch8 ca8 dc7 hb7 hg7 df5 ra7 rh7 ra2 rc8 rd8 rf8 rg8";
+	    GameState state = new GameState(gold,silver);
+	    System.out.println(state.toBoardString());
+	    
+	    String player = state.player == 0 ? "gold" : "silver";
+		System.out.println(player + "'s turn");
 
-	    double[] reducedFeatures = FeatureExtractor.extractReducedFeatures(startState);
+		
+	    double[] reducedFeatures = FeatureExtractor.extractReducedFeatures(state);
 	   
 	    for(int i = 0; i < reducedFeatures.length; i++){
 	    	System.out.println(i + " : " + reducedFeatures[i]);
