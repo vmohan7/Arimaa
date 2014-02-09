@@ -70,4 +70,5 @@ It shows which features (from David Wu's paper) correspond to which bits of our 
 | Capture Threats | 1776 - 2479 |
 | Previous Moves | 2480 - 2607 |
 
-Location of jar file for kmeans: http://www.java2s.com/Code/Jar/j/Downloadjavaml016jar.htm
+Get jar file for kmeans: http://www.java2s.com/Code/Jar/j/Downloadjavaml016jar.htm
+Get jar file for probability distributions: http://mvnrepository.com/artifact/org.apache.commons/commons-math3/3.0
