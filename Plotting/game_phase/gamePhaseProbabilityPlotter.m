@@ -1,3 +1,7 @@
+% Expects the format of the csv to look like this: 
+% <game-id (optional)>,<prob-beginning (move 1)>,<prob-middle (move 1)>, \
+% <prob-end (move 1)>,<prob-beginning (move 2)>,...
+
 % fid = fopen('kmeans_3_probabilities.csv');
 
 fid = fopen('kmeans_heuristic_probabilities.csv');
@@ -12,11 +16,19 @@ numPhases = 3;
 
 while ischar(tline)
     
-    probs = str2num(tline);
+    probsVector = str2num(tline);
+    probsVector = probsVector(1+columnOffset:end);
     
-    for i=2:numPhases
-       tline = fgetl(fid);
-       probs = [probs ; str2num(tline)];
+    probsLength = length(probsVector);
+    assert(mod(probsLength, numPhases) == 0);
+
+    probsMatrix = zeros(numPhases, probsLength / 3);
+    
+    
+    for i=1:probsLength
+       column = 1 + floor(i / numPhases);
+       row = 1 + mod(i, numPhases);
+       probsMatrix(row, column) = probsVector(i);
     end
     
     titleAddition = '';
@@ -25,7 +37,7 @@ while ischar(tline)
         titleAddition = num2str(vec(1:columnOffset));
     end;
     
-    plotGamePhase(probs(:,(1+columnOffset:end)), titleAddition, '');
+    plotGamePhase(probsMatrix, titleAddition, '');
     
     tline = fgetl(fid);
 end
