@@ -1,0 +1,37 @@
+% fid = fopen('kmeans_3.csv');
+
+fid = fopen('kmeans_heuristic_probabilities.csv');
+
+% ignore the first this many columns in the csv (perhaps if the first
+% column is the game id)
+columnOffset = 1;
+
+tline = fgetl(fid);
+colors = ['k', 'b', 'g', 'r'];
+color = 1;
+numPhases = 3;
+
+
+while ischar(tline)
+    
+    probs = str2num(tline);
+    
+    for i=1:numPhases
+       tline = fgetl(fid);
+       probs = [probs ; str2num(tline)];
+    end
+    
+    titleAddition = '';
+    
+    if (columnOffset ~= 0)
+        titleAddition = num2str(vec(1:columnOffset));
+    end;
+    
+   tline = fgetl(fid);
+
+    plotGamePhase(probs(:,(1+columnOffset:end)), titleAddition, colors(color));
+    color = mod(color, numel(colors)) + 1;
+end
+
+fclose(fid);
+disp('Type close all to programatically close all figures');

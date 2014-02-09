@@ -9,7 +9,7 @@ import utilities.helper_classes.Utilities;
 public class GamePhaseHeuristicDiscriminator {
 
 	private static final int NUM_GAMES = 10;
-	private static final String PATH_PREFIX = "../Plotting/"; //optional
+	private static final String PATH_PREFIX = "../Plotting/game_phase/"; //optional
 	private static final String FILE_NAME = PATH_PREFIX + "kmeans_heuristic.csv";
 	private static final double[] WEIGHTS = {1.0, -0.5};
 	

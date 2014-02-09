@@ -14,7 +14,7 @@ public class GamePhaseClusterer {
 	private static final int NUM_GAMES = 100;
 	private static final int CLUSTERS = 3;
 	private static final int ITERATIONS = 100;
-	private static final String PATH_PREFIX = "../Plotting/"; //optional
+	private static final String PATH_PREFIX = "../Plotting/game_phase/"; //optional
 	private static final String FILE_NAME = PATH_PREFIX + "kmeans_" + CLUSTERS + ".csv";
 	
 	public static void main(String args[]){
