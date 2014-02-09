@@ -1,5 +1,7 @@
 package game_phase;
 
+import org.apache.commons.math3.distribution.NormalDistribution;
+
 import utilities.GameData;
 import utilities.GameParser;
 import utilities.helper_classes.CSVDataFormatter;
@@ -12,6 +14,14 @@ public class GamePhaseHeuristicDiscriminator {
 	private static final String PATH_PREFIX = "../Plotting/game_phase/"; //optional
 	private static final String FILE_NAME = PATH_PREFIX + "kmeans_heuristic_probabilities.csv";
 	private static final double[] WEIGHTS = {1.0, -0.5};
+	
+	// Probability distributions: http://commons.apache.org/proper/commons-math/userguide/distribution.html
+	// Normal distribution: http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/distribution/NormalDistribution.html
+	// Find jar here: http://mvnrepository.com/artifact/org.apache.commons/commons-math3/3.0
+	
+	private static NormalDistribution BeginningDistr = new NormalDistribution(16.0, 2);
+	private static NormalDistribution MiddleDistr = new NormalDistribution(12.0, 2);
+	private static NormalDistribution EndDistr = new NormalDistribution(9.0, 2);
 	
 	
 	public enum GamePhase {
@@ -34,6 +44,7 @@ public class GamePhaseHeuristicDiscriminator {
 		
 		Utilities.printInfo("\nTesting and printing to CSV...");
 		testAndOutputCSV(myGameData);
+		
 	}
 	
 	private static double dotProduct(double[] vector1, double[] vector2){
@@ -50,15 +61,24 @@ public class GamePhaseHeuristicDiscriminator {
 	
 	private static double[] assignCluster(double[] features){
 		// TODO: deal with end game in an entirely different way (i.e. with at dedicated set of features)
+		// That is, build decision tree
+		// TODO: tune probability distributions and weights
 		
 		double score = dotProduct(features, WEIGHTS);
 		
-		if (score > 14)
-			return new double[]{1.0, 0.0, 0.0};
-		else if (score > 11)
-			return new double[]{0.0, 1.0, 0.0};
-		else
-			return new double[]{0.0, 0.0, 1.0};
+		double beginningProb = BeginningDistr.density(score);
+		double middleProb = MiddleDistr.density(score);
+		double endProb = EndDistr.density(score);
+		double totalProb = beginningProb + middleProb + endProb;
+		
+		return new double[]{beginningProb / totalProb, middleProb / totalProb, endProb / totalProb};
+		
+//		if (score > 14)
+//			return new double[]{1.0, 0.0, 0.0};
+//		else if (score > 11)
+//			return new double[]{0.0, 1.0, 0.0};
+//		else
+//			return new double[]{0.0, 0.0, 1.0};
 	}
 
 	/** Uses the test games to assign each GameState to a cluster. Results output to CSV. */

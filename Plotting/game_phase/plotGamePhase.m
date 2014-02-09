@@ -12,7 +12,8 @@ function plotGamePhase(gamePhaseVector, titleAddition, color)
     % If gamePhaseVector is a matrix, use different colors and a legend
     if (size(gamePhaseVector, 1) > 1)
         plot(moveNums, gamePhaseVector);
-        ylim([min(min(gamePhaseVector))-.5 max(max(gamePhaseVector))+.5]);
+        ylim([0 1]);
+        % ylim([min(min(gamePhaseVector))-.5 max(max(gamePhaseVector))+.5]);
         legend('Beginning game', 'Middle game', 'End game');
     else
         plot(moveNums, gamePhaseVector, color);
