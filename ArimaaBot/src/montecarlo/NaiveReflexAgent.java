@@ -5,7 +5,14 @@ import utilities.helper_classes.ArimaaState;
 import arimaa3.ArimaaMove;
 import arimaa3.MoveList;
 
-public class NaiveReflexAgent extends AbstractNAVVSearch {
+/**
+ * Combines Naive Bayes move ordering + pruning to X% and searches for
+ * the best move one ply deep.
+ * It uses the evaluation function learned from MCS.
+ * @author vasanth
+ *
+ */
+public class NaiveReflexAgent extends MoveOrderingPruning {
 	public NaiveReflexAgent(double[] weights, boolean training, NBHypothesis hyp) {
 		super(weights, training, 0, hyp); //ignore the depth
 	}

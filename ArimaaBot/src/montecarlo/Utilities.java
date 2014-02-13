@@ -42,7 +42,6 @@ public class Utilities {
 	}
 
 	/**
-	 * @param fe - The feature extrator that already contains the prev, and curr states
 	 * @param move - The move that we want to evaluate
 	 * @param weights - The weights used by logisitic regression
 	 * @return Our evaluation score based on the sigmoid function
@@ -82,9 +81,9 @@ public class Utilities {
 	}
 	
 	private static final int YCOUNT = 2;
-	public static NBHypothesis getNBPredictor(String fqtbl){
+	public static NBHypothesis getNBPredictor(String freqTable){
 		try {
-			Scanner reader = new Scanner( (new File(fqtbl)).getAbsoluteFile() );
+			Scanner reader = new Scanner( (new File(freqTable)).getAbsoluteFile() );
 			long numNeg = reader.nextLong();
 			long numPos = reader.nextLong();
 			reader.nextLine(); //read the end of the line
