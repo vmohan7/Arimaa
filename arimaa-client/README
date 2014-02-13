@@ -1,0 +1,53 @@
+...               +------------------------------------------+
+                  |          RABBITS' ARIMAA CLIENT          |
+                  |   +----------------------------------+   |
+                  | 8 |                                  |   |
+                  |   |                                  |   |
+                  | 7 |                                  |   |
+                  |   |         ___          ___.-.      |   |
+                  | 6 |        |   |        |  / /__     |   |
+                  |   |        |___|        |_/ //  \    |   |
+                  | 5 |                      / // /\/    |   |
+                  |   |                    .'  - (       |   |
+                  | 4 |                   /       \      |   |
+                  |   |         ___      /  Ö-  ?  \     |   |
+                  | 3 |        |   |    >T<         l    |   |
+                  |   |        |___|     `-.-'       l   |   |
+                  | 2 |                    /  ,"  _   l  |   |
+                  |   |                   /  / ,-      \ |   |
+                  | 1 |                  (_/( /     .   \|   |
+                  |   |                    , `     /     l-. |
+                  |   +--------------------l       |     | -)|
+                  |      A   B   C   D   E _\      _\    /-' |
+                  +-----------------------(____,- ( ____/----+
+
+==Welcome==
+
+Rabbits' Arimaa Client allows developers to play Arimaa against bots on a local
+computer through AEI (Arimaa Engine Interface).
+
+==Requirements==
+
+ * Python
+ * WxPython
+ * AEI
+
+This should do the trick:
+
+    sudo aptitude install python python-wxgtk2.8 bzr
+    
+    bzr branch lp:aei
+
+==Setup==
+
+Use this GUI like any AEI bot by adding it to roundrobin.cfg.
+Example:
+
+    [Human]
+    cmdline = python ../arimaa-client/gui.py
+
+==Improvements==
+
+Send bug reports and feature requests to Greg Clark <gjc3@calvin.edu>.
+
+
