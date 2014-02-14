@@ -1,15 +1,130 @@
 package montecarlo;
 
+import java.util.Arrays;
+
+import feature_extractor.FeatureConstants;
+import ai_util.Util;
+import arimaa3.Constants;
 import arimaa3.GameState;
 
 
 
+
 public class FairyEvaluation {
+
+	private static final int MAX_NUMBER_MOVES = 100;
 	
-	private class FairyBoard {
+	// constants used for the board
+	
+	private static final int EMPTY_SQUARE = 0x0;
+	private static final int EMPTY = 0x0;
+	private static final int OFF_BOARD_SQUARE = 0x9F; 
+	private static final int OFF_BOARD = 0x18;
+	private static final int GOLD = 0x10;
+	private static final int SILVER = 0x8;
+	private static final int OFF_BOARD_PIECE = 0x7;
+	private static final int ELEPHANT_PIECE = 0x6;
+	private static final int CAMEL_PIECE = 0x5;
+	private static final int HORSE_PIECE = 0x4;
+	private static final int DOG_PIECE = 0x3;
+	private static final int CAT_PIECE = 0x2;
+	private static final int RABBIT_PIECE = 0x1;
+	private static final int EMPTY_PIECE = 0x0;
+	private static final int PIECE_MASK = 0x7;
+	private static final int OWNER_MASK = 0x18;
+	private static final int FLIP_SIDE = GOLD^SILVER;
+	private static final int TRUE = 1;
+	private static final int FALSE = 0;
+	private static final int NORTH = -10;
+	private static final int SOUTH = 10;
+	private static final int EAST = 1;
+	private static final int WEST = -1;
+	
+	
+	// constants defining the various squares of the board
+	
+	private static final int A1 = 81;
+	private static final int A2 = 71;
+	private static final int A3 = 61;
+	private static final int A4 = 51;
+	private static final int A5 = 41;
+	private static final int A6 = 31;
+	private static final int A7 = 21;
+	private static final int A8 = 11;
+	private static final int B1 = 82;
+	private static final int B2 = 72;
+	private static final int B3 = 62;
+	private static final int B4 = 52;
+	private static final int B5 = 42;
+	private static final int B6 = 32;
+	private static final int B7 = 22;
+	private static final int B8 = 12;
+	private static final int C1 = 83;
+	private static final int C2 = 73;
+	private static final int C3 = 63;
+	private static final int C4 = 53;
+	private static final int C5 = 43;
+	private static final int C6 = 33;
+	private static final int C7 = 23;
+	private static final int C8 = 13;
+	private static final int D1 = 84;
+	private static final int D2 = 74;
+	private static final int D3 = 64;
+	private static final int D4 = 54;
+	private static final int D5 = 44;
+	private static final int D6 = 34;
+	private static final int D7 = 24;
+	private static final int D8 = 14;
+	private static final int E1 = 85;
+	private static final int E2 = 75;
+	private static final int E3 = 65;
+	private static final int E4 = 55;
+	private static final int E5 = 45;
+	private static final int E6 = 35;
+	private static final int E7 = 25;
+	private static final int E8 = 15;
+	private static final int F1 = 86;
+	private static final int F2 = 76;
+	private static final int F3 = 66;
+	private static final int F4 = 56;
+	private static final int F5 = 46;
+	private static final int F6 = 36;
+	private static final int F7 = 26;
+	private static final int F8 = 16;
+	private static final int G1 = 87;
+	private static final int G2 = 77;
+	private static final int G3 = 67;
+	private static final int G4 = 57;
+	private static final int G5 = 47;
+	private static final int G6 = 37;
+	private static final int G7 = 27;
+	private static final int G8 = 17;
+	private static final int H1 = 88;
+	private static final int H2 = 78;
+	private static final int H3 = 68;
+	private static final int H4 = 58;
+	private static final int H5 = 48;
+	private static final int H6 = 38;
+	private static final int H7 = 28;
+	private static final int H8 = 18;
+	
+	// macros for board manipulation
+	
+//	private int OWNER(int square) { return (bp->board[square] & OWNER_MASK); } // who owns a (piece on a) square?
+//	private int PIECE(int square) { return (bp->board[square] & PIECE_MASK); } // what piece is on a square?
+//	private int BOARD(int square) { return (bp->board[square]); } // What is on a square?  Returns the owner | piece combination.
+//	private int ROW(int square) { return (9-square/10); } // what row is a square in?  1 = bottom, 8 = top
+//	private int COL(int square) { return (square%10); } // what column is a square in?  1 = left (a), 8 = right (h)
+//	private int PRINT_SQUARE(int square) { return sprintf(message,"%c%c",COL(square)-1+'a',ROW(square)-1+'1'); BOARD_Message(); } //
+	
+	public class FairyBoard implements FeatureConstants {
 		
 		//private state variables;
-		private char[] bp; 
+		private char[] bp;
+		char at_move; // Who is at move? // character mask for GOLD or SILVER?
+		char steps; // How many steps have the side at move done so far?
+		int move; // How many moves have been done in the game so far?  0 at start, 2 after setup... even means gold is at move, odd means silver is at move.  Divide by 2 and add 1 to get official move number.
+		long hashkey; // 64-bit hashkey, used for index into hash table, and for collision / repetition detection
 		
 		/**
 		 * Converts a GameState to the Fairy board representation.
@@ -19,13 +134,22 @@ public class FairyEvaluation {
 			bp = new char[100];
 			convertBoard(state);
 			
-			//private state variables?
+			at_move = (char) ((state.getSideToMove() == PL_WHITE) ? GOLD : SILVER);
+			steps = (char) (NUM_STEPS_IN_MOVE - state.getStepsRemaining()); // assumes 4 steps per move
+			move = state.getTurnNumber() * 2; // assumes 4 steps per move (sadly...)
+			hashkey = state.getPositionHash();
 		}
 		
 		private void convertBoard(GameState state){
-			// TODO: fill this in
 			initializeEmptyBoard();
-			// for ()
+			for (int pieceType = PT_WHITE_RABBIT; pieceType <= PT_BLACK_ELEPHANT; pieceType++) {
+				long bitboard = state.piece_bb[pieceType];
+				while (bitboard != 0L){
+					int index64 = Util.FirstOne(bitboard);
+					updateBoardWithPiece(index64, pieceType);
+					bitboard ^= (1L << index64);
+				}
+			}
 		}
 		
 		private void initializeEmptyBoard(){
@@ -67,12 +191,81 @@ public class FairyEvaluation {
 			bp[index] |= pieceType; // update with pieceType bits
 		}
 
+		/**
+		 * @return the bp
+		 */
+		public char[] getBp() {
+			return Arrays.copyOf(bp, bp.length);
+		}
+
+		/**
+		 * @return the at_move
+		 */
+		public char getAtMove() {
+			return at_move;
+		}
+
+		/**
+		 * @return the steps
+		 */
+		public char getSteps() {
+			return steps;
+		}
+
+		/**
+		 * @return the move
+		 */
+		public int getMove() {
+			return move;
+		}
+
+		/**
+		 * @return the hashkey
+		 */
+		public long getHashkey() {
+			return hashkey;
+		}
 		
-		//getters
+		private char getPieceText(int bpIndex) {
+			// TODO: implement for reals
+			return 'a';
+		}
+
+		public String toBoardString() {
+			// TODO Fix move number and TS
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(getMove());
+			sb.append(getAtMove() == GOLD ? 'w' : 'b');
+			
+		    // display the board
+		    sb.append(" \n +-----------------+\n");
+		    
+		    // loop over board, initialize board state info and find where all the pieces are.
+		    for (int row = 1; row <= 8; row++) {
+		    	sb.append((8+1) - row); sb.append("|");
+		    			    	
+		    	for (int col = 1; col <= 8; col++) {
+		    		int index = row * 10 + col;
+			        sb.append(" "); sb.append(getPieceText(index));
+
+		    	}
+		    	sb.append(" |\n");
+
+		    }
+
+		    sb.append(" +-----------------+\n");
+		    sb.append("   a b c d e f g h\n");
+
+		    sb.append("TS: "); sb.append(getMove() * 8 /*total_steps*/); sb.append("\n");
+			
+			return sb.toString();
+		}
+
 	}
 
 	public static double evaluate(GameState state){
-		
+		return 0.0;
 	}
 	
 }
@@ -83,110 +276,7 @@ public class FairyEvaluation {
 //
 //// private static final int TESTING = ;// define this to get a version suitable to run automatic tests with.
 //
-//private static final int MAX_NUMBER_MOVES = 100;
-//
-//// constants used for the board
-//
-//private static final int EMPTY_SQUARE = 0x0;
-//private static final int EMPTY = 0x0;
-//private static final int OFF_BOARD_SQUARE = 0x9F; 
-//private static final int OFF_BOARD = 0x18;
-//private static final int GOLD = 0x10;
-//private static final int SILVER = 0x8;
-//private static final int OFF_BOARD_PIECE = 0x7;
-//private static final int ELEPHANT_PIECE = 0x6;
-//private static final int CAMEL_PIECE = 0x5;
-//private static final int HORSE_PIECE = 0x4;
-//private static final int DOG_PIECE = 0x3;
-//private static final int CAT_PIECE = 0x2;
-//private static final int RABBIT_PIECE = 0x1;
-//private static final int EMPTY_PIECE = 0x0;
-//private static final int PIECE_MASK = 0x7;
-//private static final int OWNER_MASK = 0x18;
-//private static final int FLIP_SIDE = GOLD^SILVER;
-//private static final int TRUE = 1;
-//private static final int FALSE = 0;
-//private static final int NORTH = -10;
-//private static final int SOUTH = 10;
-//private static final int EAST = 1;
-//private static final int WEST = -1;
-//
-//
-//// constants defining the various squares of the board
-//
-//private static final int A1 = 81;
-//private static final int A2 = 71;
-//private static final int A3 = 61;
-//private static final int A4 = 51;
-//private static final int A5 = 41;
-//private static final int A6 = 31;
-//private static final int A7 = 21;
-//private static final int A8 = 11;
-//private static final int B1 = 82;
-//private static final int B2 = 72;
-//private static final int B3 = 62;
-//private static final int B4 = 52;
-//private static final int B5 = 42;
-//private static final int B6 = 32;
-//private static final int B7 = 22;
-//private static final int B8 = 12;
-//private static final int C1 = 83;
-//private static final int C2 = 73;
-//private static final int C3 = 63;
-//private static final int C4 = 53;
-//private static final int C5 = 43;
-//private static final int C6 = 33;
-//private static final int C7 = 23;
-//private static final int C8 = 13;
-//private static final int D1 = 84;
-//private static final int D2 = 74;
-//private static final int D3 = 64;
-//private static final int D4 = 54;
-//private static final int D5 = 44;
-//private static final int D6 = 34;
-//private static final int D7 = 24;
-//private static final int D8 = 14;
-//private static final int E1 = 85;
-//private static final int E2 = 75;
-//private static final int E3 = 65;
-//private static final int E4 = 55;
-//private static final int E5 = 45;
-//private static final int E6 = 35;
-//private static final int E7 = 25;
-//private static final int E8 = 15;
-//private static final int F1 = 86;
-//private static final int F2 = 76;
-//private static final int F3 = 66;
-//private static final int F4 = 56;
-//private static final int F5 = 46;
-//private static final int F6 = 36;
-//private static final int F7 = 26;
-//private static final int F8 = 16;
-//private static final int G1 = 87;
-//private static final int G2 = 77;
-//private static final int G3 = 67;
-//private static final int G4 = 57;
-//private static final int G5 = 47;
-//private static final int G6 = 37;
-//private static final int G7 = 27;
-//private static final int G8 = 17;
-//private static final int H1 = 88;
-//private static final int H2 = 78;
-//private static final int H3 = 68;
-//private static final int H4 = 58;
-//private static final int H5 = 48;
-//private static final int H6 = 38;
-//private static final int H7 = 28;
-//private static final int H8 = 18;
-//
-//// macros for board manipulation
-//
-//private int OWNER(int square) { return (bp->board[square] & OWNER_MASK); } // who owns a (piece on a) square?
-//private int PIECE(int square) { return (bp->board[square] & PIECE_MASK); } // what piece is on a square?
-//private int BOARD(int square) { return (bp->board[square]); } // What is on a square?  Returns the owner | piece combination.
-//private int ROW(int square) { return (9-square/10); } // what row is a square in?  1 = bottom, 8 = top
-//private int COL(int square) { return (square%10); } // what column is a square in?  1 = left (a), 8 = right (h)
-//private int PRINT_SQUARE(int square) { return sprintf(message,"%c%c",COL(square)-1+'a',ROW(square)-1+'1'); BOARD_Message(); } //
+
 //
 //typedef struct
 //{
