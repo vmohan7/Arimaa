@@ -38,6 +38,8 @@ public class MonteCarloTest {
 		
 		System.out.println(fb.toBoardString());
 		
+		assertTrue(fb.isEqualToGS(state));
+		
 	}
 
 }
