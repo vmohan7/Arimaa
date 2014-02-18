@@ -1,4 +1,4 @@
 #!/bin/bash
 
 J_PATH="../ArimaaBot"
-java -Xmx700M -classpath $J_PATH/bin:$J_PATH/ ArimaaEngineInterface.ArimaaEngineInterface
+java -Xmx1000M -classpath $J_PATH/bin:$J_PATH/ ArimaaEngineInterface.ArimaaEngineInterface

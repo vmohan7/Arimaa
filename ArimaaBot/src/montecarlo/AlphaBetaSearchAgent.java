@@ -9,7 +9,7 @@ import arimaa3.MoveList;
 public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 
 	protected ArimaaEngine engine;
-	private int maxDepth;
+	protected int maxDepth;
 	public AlphaBetaSearchAgent(double[] weights, boolean training, int depth) {
 		super(weights, training);
 		engine = new ArimaaEngine();
@@ -42,35 +42,40 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 		return bestMove;
 	}
 	
-	private double AlphaBeta(ArimaaState state, int depth, double alpha, double beta, boolean myTurn){
-		if (state.getCurr().isGameOver()){
-			return getGameOverScore();
-		} else if (depth == 0){
-			return evaluation(state);
-		}
-
-		MoveList moves = getMoves(state);
+	private double AlphaBeta(final ArimaaState state, int depth, double alpha, double beta, boolean isMaxPlayer){
 		GameState next = new GameState();
 		next.playFullClear(state.getNextMove(), state.getCurr());
-		if (myTurn){
+		
+		int sign = (maxDepth - depth) % 2 == 0 ? 1 : -1;
+		
+		ArimaaState nextState = new ArimaaState(state.getPrev(), state.getCurr(), next, 
+				state.getPrevMove(), state.getNextMove(), null);
+		
+		if (next.isGameOver()){
+			double score =  sign*(-next.getGameResult());
+			return score;
+		} else if (depth == 0){
+			double score =  sign*evaluation(nextState);
+			return score; //TODO determine if we should put a negative here 
+		}
+
+		MoveList moves = getMoves(nextState);  //Changed getMoves for just a GameState and called it on next as oppsed to curr
+		
+		if (isMaxPlayer){
 			for(ArimaaMove move: moves){
 				alpha = Math.max(alpha, AlphaBeta(new ArimaaState(state.getPrev(), state.getCurr(), next,
-						state.getPrevMove(), state.getNextMove(), move), depth - 1, alpha, beta, !myTurn) );
+						state.getPrevMove(), state.getNextMove(), move), depth - 1, alpha, beta, false) );
 				if (beta <= alpha)
 					break; // beta cut off
 			}
-			
 			return alpha;
 		} else {
 			for(ArimaaMove move: moves){
-				GameState gs = new GameState();
-				gs.playFullClear(move, state.getCurr());
 				beta = Math.min(beta, AlphaBeta(new ArimaaState(state.getPrev(), state.getCurr(), next,
-						state.getPrevMove(), state.getNextMove(), move), depth - 1, alpha, beta, !myTurn) );
+						state.getPrevMove(), state.getNextMove(), move), depth - 1, alpha, beta, true) );
 				if (beta <= alpha)
 					break; // alpha cut off
 			}
-			
 			return beta;
 		}
 	}
