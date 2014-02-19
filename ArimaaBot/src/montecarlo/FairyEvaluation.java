@@ -1,5 +1,9 @@
 package montecarlo;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Arrays;
 
 import feature_extractor.FeatureConstants;
@@ -176,6 +180,213 @@ public class FairyEvaluation {
 			
 			hashkey = state.getPositionHash();
 		}
+		
+		/**
+		 * A constructor to create a FairyBoard from a textfile.
+		 * This is mainly for testing our translated evaluation against botFairy's C evaluation.
+		 * @param filename The path to the textfile containing an ASCII board layout. 
+		 * 				   (This file should be formatted as for botFairy.)
+		 * @throws IOException thrown if the file at <b>filename</b> is not found or if readLine() fails
+		 */
+		public FairyBoard(String filename) throws IOException {
+			BufferedReader rd;
+			//char line[100];
+		    //int error_code=0; //unused -- exception thrown instead
+		    int move=0;
+		    //char side; //unused
+		    int i, j;
+			
+			try {
+				rd = new BufferedReader(new FileReader(filename));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				throw e;
+			}
+			
+			try {
+				String line = rd.readLine(); // line with move number and side to move
+				for (i=0; line.charAt(i)>='0' && line.charAt(i)<='9'; i++)
+		        {
+		            move=move*10+line.charAt(i)-'0';
+		        }
+		        
+				this.move = 2*move-2;
+		        if (line.charAt(i)=='w')
+		        {
+		            this.at_move=GOLD;
+		        } else 
+		        {
+		            this.at_move=SILVER;
+		            this.move++;
+		        }
+		        
+		        line = rd.readLine(); // line with top border of board
+		        for (i=1; i<9; i++) // do this for each of the 8 lines of the board
+		        {
+		            line = rd.readLine();
+		            for (j=1; j<9; j++)
+		            {
+		                switch(line.charAt(2*j+1))
+		                {
+		                    case 'E' :
+		                        board[i*10+j]=(GOLD | ELEPHANT_PIECE);
+		                        break;
+		                    case 'M' :
+		                        board[i*10+j]=(GOLD | CAMEL_PIECE);
+		                        break;
+		                    case 'H' :
+		                        board[i*10+j]=(GOLD | HORSE_PIECE);
+		                        break;
+		                    case 'D' :
+		                        board[i*10+j]=(GOLD | DOG_PIECE);
+		                        break;
+		                    case 'C' :
+		                        board[i*10+j]=(GOLD | CAT_PIECE);
+		                        break;
+		                    case 'R' :
+		                        board[i*10+j]=(GOLD | RABBIT_PIECE);
+		                        break;
+		                    case 'e' :
+		                        board[i*10+j]=(SILVER | ELEPHANT_PIECE);
+		                        break;
+		                    case 'm' :
+		                        board[i*10+j]=(SILVER | CAMEL_PIECE);
+		                        break;
+		                    case 'h' :
+		                        board[i*10+j]=(SILVER | HORSE_PIECE);
+		                        break;
+		                    case 'd' :
+		                        board[i*10+j]=(SILVER | DOG_PIECE);
+		                        break;
+		                    case 'c' :
+		                        board[i*10+j]=(SILVER | CAT_PIECE);
+		                        break;
+		                    case 'r' :
+		                        board[i*10+j]=(SILVER | RABBIT_PIECE);
+		                        break;
+		                    case ' ' : case 'X' :
+		                        board[i*10+j]=EMPTY_SQUARE;
+		                        break;
+		                    default :
+//		                        sprintf(message,"Unknown character encountered while reading board.\n");
+//		                        BOARD_Message();
+		                    	System.err.println("Unknown character encountered while reading board.");
+//		                        error_code=1;
+		                        break;
+		                }
+		            }
+		        }
+		        rd.close();
+		        //TODO: Calculate hashkey?
+		        // this.hashkey =  
+//		        if (!error_code)
+//			    {
+//			        BOARD_Calculate_Hashkey(bp);
+//			    }
+//			    return error_code;
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw e;
+			} 		
+					
+		}
+		
+		// ****** Collapsed C code, translated into the Java constructor above. ******
+		/*
+		 * int BOARD_Read_Position(board_t *bp, char *file_name) // returns 0 if file opened and read successfully
+			{
+			    FILE *filep;
+			    char line[100];
+			    int error_code=0;
+			    int move=0;
+			    char side;
+			    int i, j;
+			    
+			    filep=fopen(file_name,"r");
+			    if (filep==NULL)
+			    {
+			        error_code=1;
+			    }
+			    if (!error_code)
+			    {
+			        fgets(line,100,filep); // line with move number and side to move
+			        for (i=0; line[i]>='0' && line[i]<='9'; i++)
+			        {
+			            move=move*10+line[i]-'0';
+			        }
+			        bp->move=2*move-2;
+			        if (line[i]=='w')
+			        {
+			            bp->at_move=GOLD;
+			        } else 
+			        {
+			            bp->at_move=SILVER;
+			            bp->move++;
+			        }
+			        fgets(line,100,filep); // line with top border of board
+			        for (i=1; i<9; i++) // do this for each of the 8 lines of the board
+			        {
+			            fgets(line,100,filep);
+			            for (j=1; j<9; j++)
+			            {
+			                switch(line[2*j+1])
+			                {
+			                    case 'E' :
+			                        BOARD(i*10+j)=(GOLD | ELEPHANT_PIECE);
+			                        break;
+			                    case 'M' :
+			                        BOARD(i*10+j)=(GOLD | CAMEL_PIECE);
+			                        break;
+			                    case 'H' :
+			                        BOARD(i*10+j)=(GOLD | HORSE_PIECE);
+			                        break;
+			                    case 'D' :
+			                        BOARD(i*10+j)=(GOLD | DOG_PIECE);
+			                        break;
+			                    case 'C' :
+			                        BOARD(i*10+j)=(GOLD | CAT_PIECE);
+			                        break;
+			                    case 'R' :
+			                        BOARD(i*10+j)=(GOLD | RABBIT_PIECE);
+			                        break;
+			                    case 'e' :
+			                        BOARD(i*10+j)=(SILVER | ELEPHANT_PIECE);
+			                        break;
+			                    case 'm' :
+			                        BOARD(i*10+j)=(SILVER | CAMEL_PIECE);
+			                        break;
+			                    case 'h' :
+			                        BOARD(i*10+j)=(SILVER | HORSE_PIECE);
+			                        break;
+			                    case 'd' :
+			                        BOARD(i*10+j)=(SILVER | DOG_PIECE);
+			                        break;
+			                    case 'c' :
+			                        BOARD(i*10+j)=(SILVER | CAT_PIECE);
+			                        break;
+			                    case 'r' :
+			                        BOARD(i*10+j)=(SILVER | RABBIT_PIECE);
+			                        break;
+			                    case ' ' : case 'X' :
+			                        BOARD(i*10+j)=EMPTY_SQUARE;
+			                        break;
+			                    default :
+			                        sprintf(message,"Unknown character encountered while reading board.\n");
+			                        BOARD_Message();
+			                        error_code=1;
+			                        break;
+			                }
+			            }
+			        }
+			    }
+			    fclose(filep);
+			    if (!error_code)
+			    {
+			        BOARD_Calculate_Hashkey(bp);
+			    }
+			    return error_code;
+			}
+		 */
 		
 		/** Helper method to populate the board char array with GameState's board information */
 		private void convertBoard(GameState state){
