@@ -4,48 +4,25 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 import feature_extractor.FeatureConstants;
 import ai_util.Util;
-import arimaa3.Constants;
 import arimaa3.GameState;
 
 
-
-
+/**
+ * This class translated botFairy's evaluation function from C to Java.
+ * Additionally, this provides basic integration with Jeff Bacher's code.
+ * Sorry, it's pretty long... and hard to make pretty :P We tried.
+ * @author Neema, Vivek
+ */
 public class FairyEvaluation {
-
-	private static final int MAX_NUMBER_MOVES = 100;
-	
-	// constants used for the board
-	
-	private static final int EMPTY_SQUARE = 0x0;
-	private static final int EMPTY = 0x0;
-	private static final int OFF_BOARD_SQUARE = 0x9F; 
-	private static final int OFF_BOARD = 0x18;
-	private static final int GOLD = 0x10;
-	private static final int SILVER = 0x8;
-	private static final int OFF_BOARD_PIECE = 0x7;
-	private static final int ELEPHANT_PIECE = 0x6;
-	private static final int CAMEL_PIECE = 0x5;
-	private static final int HORSE_PIECE = 0x4;
-	private static final int DOG_PIECE = 0x3;
-	private static final int CAT_PIECE = 0x2;
-	private static final int RABBIT_PIECE = 0x1;
-	private static final int EMPTY_PIECE = 0x0;
-	private static final int PIECE_MASK = 0x7;
-	private static final int OWNER_MASK = 0x18;
-	private static final int FLIP_SIDE = GOLD^SILVER;
-	private static final int TRUE = 1;
-	private static final int FALSE = 0;
-	private static final int NORTH = -10;
-	private static final int SOUTH = 10;
-	private static final int EAST = 1;
-	private static final int WEST = -1;
-	
-	
-	// constants defining the various squares of the board
+		
+/*
+	// unused constants -- I recommend folding them with Eclipse
+ 	// constants defining the various squares of the board
 	
 	private static final int A1 = 81;
 	private static final int A2 = 71;
@@ -111,6 +88,39 @@ public class FairyEvaluation {
 	private static final int H6 = 38;
 	private static final int H7 = 28;
 	private static final int H8 = 18;
+	
+	private static final int MAX_NUMBER_MOVES = 100;
+	
+	private static final int OFF_BOARD = 0x18;
+	
+	private static final int FLIP_SIDE = GOLD^SILVER;
+	private static final int TRUE = 1;
+	private static final int FALSE = 0;
+ */
+
+	// constants used for the board
+	
+	private static final int EMPTY_SQUARE = 0x0;
+	private static final int EMPTY = 0x0;
+	private static final int OFF_BOARD_SQUARE = 0x9F; 
+	
+	private static final int GOLD = 0x10;
+	private static final int SILVER = 0x8;
+	private static final int OFF_BOARD_PIECE = 0x7;
+	private static final int ELEPHANT_PIECE = 0x6;
+	private static final int CAMEL_PIECE = 0x5;
+	private static final int HORSE_PIECE = 0x4;
+	private static final int DOG_PIECE = 0x3;
+	private static final int CAT_PIECE = 0x2;
+	private static final int RABBIT_PIECE = 0x1;
+	private static final int EMPTY_PIECE = 0x0;
+	private static final int PIECE_MASK = 0x7;
+	private static final int OWNER_MASK = 0x18;
+
+	private static final int NORTH = -10;
+	private static final int SOUTH = 10;
+	private static final int EAST = 1;
+	private static final int WEST = -1;
 
 	private static final int ELEPHANT_VALUE = 20000;
 	private static final int CAMEL_VALUE = 5000;
@@ -154,6 +164,11 @@ public class FairyEvaluation {
 	                                      0,0,0,0,0,0,0,0,0};        
 
 	
+	/** 
+	 * This subclass mimics botFairy's C-struct representation of the board.
+	 * In addition, it has some functionality absent in C to support testing.
+	 * See the bottom of this page for an exact copy of the C-struct (and comments).
+	 */
 	public class FairyBoard implements FeatureConstants {
 		
 		private char[] board;
@@ -181,14 +196,35 @@ public class FairyEvaluation {
 			hashkey = state.getPositionHash();
 		}
 		
+		
 		/**
 		 * A constructor to create a FairyBoard from a textfile.
 		 * This is mainly for testing our translated evaluation against botFairy's C evaluation.
 		 * @param filename The path to the textfile containing an ASCII board layout. 
 		 * 				   (This file should be formatted as for botFairy.)
+		 * 					e.g. (<b><i>You should look at the actual comment for formatting...
+		 * 								JavaDocs butchers it</b></i>) <br>
+									86w
+									 +-----------------+
+									8| r r r     r r r |
+									7| R   r     d     |
+									6|       e         |
+									5|       E         |
+									4|             C d |
+									3|   H           R |
+									2|     M     C     |
+									1| R R R       R R |
+									 +-----------------+
+									   a b c d e f g h
 		 * @throws IOException thrown if the file at <b>filename</b> is not found or if readLine() fails
 		 */
 		public FairyBoard(String filename) throws IOException {
+			board = new char[100];
+			initializeEmptyBoard(); // in C, this is done to the struct before being passed in for reading from file
+			this.steps = 0; // this is how the board is constructed when reading from file in the C code
+			
+			// -------------------- now for the transcribed stuff...
+			
 			BufferedReader rd;
 			//char line[100];
 		    //int error_code=0; //unused -- exception thrown instead
@@ -268,125 +304,21 @@ public class FairyEvaluation {
 		                        board[i*10+j]=EMPTY_SQUARE;
 		                        break;
 		                    default :
-//		                        sprintf(message,"Unknown character encountered while reading board.\n");
-//		                        BOARD_Message();
 		                    	System.err.println("Unknown character encountered while reading board.");
-//		                        error_code=1;
 		                        break;
 		                }
 		            }
 		        }
 		        rd.close();
-		        //TODO: Calculate hashkey?
-		        // this.hashkey =  
-//		        if (!error_code)
-//			    {
-//			        BOARD_Calculate_Hashkey(bp);
-//			    }
-//			    return error_code;
+		        this.hashkey = 0L;  
+		        
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw e;
 			} 		
 					
 		}
-		
-		// ****** Collapsed C code, translated into the Java constructor above. ******
-		/*
-		 * int BOARD_Read_Position(board_t *bp, char *file_name) // returns 0 if file opened and read successfully
-			{
-			    FILE *filep;
-			    char line[100];
-			    int error_code=0;
-			    int move=0;
-			    char side;
-			    int i, j;
-			    
-			    filep=fopen(file_name,"r");
-			    if (filep==NULL)
-			    {
-			        error_code=1;
-			    }
-			    if (!error_code)
-			    {
-			        fgets(line,100,filep); // line with move number and side to move
-			        for (i=0; line[i]>='0' && line[i]<='9'; i++)
-			        {
-			            move=move*10+line[i]-'0';
-			        }
-			        bp->move=2*move-2;
-			        if (line[i]=='w')
-			        {
-			            bp->at_move=GOLD;
-			        } else 
-			        {
-			            bp->at_move=SILVER;
-			            bp->move++;
-			        }
-			        fgets(line,100,filep); // line with top border of board
-			        for (i=1; i<9; i++) // do this for each of the 8 lines of the board
-			        {
-			            fgets(line,100,filep);
-			            for (j=1; j<9; j++)
-			            {
-			                switch(line[2*j+1])
-			                {
-			                    case 'E' :
-			                        BOARD(i*10+j)=(GOLD | ELEPHANT_PIECE);
-			                        break;
-			                    case 'M' :
-			                        BOARD(i*10+j)=(GOLD | CAMEL_PIECE);
-			                        break;
-			                    case 'H' :
-			                        BOARD(i*10+j)=(GOLD | HORSE_PIECE);
-			                        break;
-			                    case 'D' :
-			                        BOARD(i*10+j)=(GOLD | DOG_PIECE);
-			                        break;
-			                    case 'C' :
-			                        BOARD(i*10+j)=(GOLD | CAT_PIECE);
-			                        break;
-			                    case 'R' :
-			                        BOARD(i*10+j)=(GOLD | RABBIT_PIECE);
-			                        break;
-			                    case 'e' :
-			                        BOARD(i*10+j)=(SILVER | ELEPHANT_PIECE);
-			                        break;
-			                    case 'm' :
-			                        BOARD(i*10+j)=(SILVER | CAMEL_PIECE);
-			                        break;
-			                    case 'h' :
-			                        BOARD(i*10+j)=(SILVER | HORSE_PIECE);
-			                        break;
-			                    case 'd' :
-			                        BOARD(i*10+j)=(SILVER | DOG_PIECE);
-			                        break;
-			                    case 'c' :
-			                        BOARD(i*10+j)=(SILVER | CAT_PIECE);
-			                        break;
-			                    case 'r' :
-			                        BOARD(i*10+j)=(SILVER | RABBIT_PIECE);
-			                        break;
-			                    case ' ' : case 'X' :
-			                        BOARD(i*10+j)=EMPTY_SQUARE;
-			                        break;
-			                    default :
-			                        sprintf(message,"Unknown character encountered while reading board.\n");
-			                        BOARD_Message();
-			                        error_code=1;
-			                        break;
-			                }
-			            }
-			        }
-			    }
-			    fclose(filep);
-			    if (!error_code)
-			    {
-			        BOARD_Calculate_Hashkey(bp);
-			    }
-			    return error_code;
-			}
-		 */
+
 		
 		/** Helper method to populate the board char array with GameState's board information */
 		private void convertBoard(GameState state){
@@ -521,7 +453,6 @@ public class FairyEvaluation {
 			return (bpIndex%10); 
 		} 
 		
-		// public int PRINT_bpIndex(int bpIndex) { return sprintf(message,"%c%c",COL(bpIndex)-1+'a',ROW(bpIndex)-1+'1'); BOARD_Message(); } //
 
 		/** 
 		 * The string representation of the fairy board, tailored to look almost 
@@ -576,22 +507,84 @@ public class FairyEvaluation {
 	}
 	
 	
+/* ------------------------------------ FOR TESTING ONLY ------------------------------------ */ 
+	private static final String TESTS_EXTENSION = "C:/Users/Neema/Desktop/Downloaded Bots/faerie/botFairy/Fairy_full/";
+	private static final String TESTS_DOCUMENT = "tests.txt";
+	private static final String OUTPUT = "test_results_navv_Java.txt";
+	
 	/** 
-	 * Evaluates a GameState according to Fairy's eval.c!
-	 * DISCLAIMER: This code has been transposed from C (from bot_Fairy) -- it is not ours. 
-	 * */
+	 * Reads Fairy's test boards and outputs scores for each one. Ideally,
+	 * these will match the tests from the evaluation function in C.
+	 * I have written code in C that outputs in this exact format.
+	 * Currently, that C code is only local. I have included it at the bottom of this file.
+	 * See FairyBoard's constructor for "limitations" on the ASCII board.
+	 * @author Neema
+	 */
+	public static void main(String args[]) {
+		// Currently, I've overloaded EVAL_Eval to take a FairyBoard,
+		// so that EVAL_Eval can be tested directly from ASCII files
+		try {
+			FairyEvaluation fe = new FairyEvaluation(); // for the eval method
+			BufferedReader testsRd = new BufferedReader(new FileReader(TESTS_EXTENSION + TESTS_DOCUMENT));
+			PrintWriter testsWr = new PrintWriter(TESTS_EXTENSION + OUTPUT);
+			
+			int nTestCases = Integer.parseInt(readLineIgnoreComments(testsRd));
+			for (int test = 0; test < nTestCases; test++) {
+				String filename = readLineIgnoreComments(testsRd);
+				assert(filename != null);
+				
+				int score = fe.EVAL_Eval(fe.new FairyBoard(TESTS_EXTENSION + filename), 1);
+				testsWr.printf("File %s: %d\n", filename, score);
+				
+				
+				String toSkip = readLineIgnoreComments(testsRd);
+				assert(toSkip != null);
+			}
+			
+			testsRd.close();
+			testsWr.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Exiting...");
+			return;
+		}
+		
+	}
+	
+	private static String readLineIgnoreComments(BufferedReader rd) throws IOException {
+		while (true) {
+			String line = rd.readLine();
+			if (line == null) return null;
+			if (line.isEmpty()) return "";
+			if (line.charAt(0) == '#') continue;
+			return line;
+		}
+	}
+/* ----------------------------------[END] FOR TESTING ONLY ---------------------------------- */
+	
+	
+	/** Evaluates a GameState according to Fairy's eval.c! */
 	public static double evaluate(GameState state){
 		FairyEvaluation fe = new FairyEvaluation();
 		return (double)fe.EVAL_Eval(state, 0);
 	}
 	
-	/** The real evaluation is done here */
+	/** The real evaluation is done here... well, sort of... */
 	private int EVAL_Eval(GameState evalState, int verbose)
-	
-	// Evaluation is done from gold's perspective.  At the end of the evaluation, it's adjusted to be seen from current player's perspective.
-	
 	{
 		FairyBoard bp = new FairyBoard(evalState);
+		return EVAL_Eval(bp, verbose);
+	}
+	
+	/** 
+	 * Overloaded for our testing purposes. (See main in this file.)
+	 * DISCLAIMER: This code has been transposed from C (from bot_Fairy) -- it is not ours.
+	 * 
+	 * Evaluation is done from gold's perspective.  At the end of the evaluation, 
+	 * it's adjusted to be seen from current player's perspective.
+	 */
+	private int EVAL_Eval(FairyBoard bp, int verboseUnused) {
 		
 	    // evaluation constants
 	    int[] piece_value = {0,RABBIT_VALUE,CAT_VALUE,DOG_VALUE,HORSE_VALUE,CAMEL_VALUE,ELEPHANT_VALUE};
@@ -1191,50 +1184,155 @@ public class FairyEvaluation {
 }
 
 
-//  ** REFERENCE -- FairyBoard is our Java equivalent of this struct **
-//
-//typedef struct
-//{
-//    unsigned char board[100]; 
-//        /*****
-//        11 - 88 = actual board, edges around for easier move generation and evaluation
-//        
-//        11 12 ... 17 18    a8 b8 ... g8 h8
-//        21 22 ... 27 28    a7 b7 ... g7 h7
-//        ............... == ...............
-//        71 72 ... 77 78    a2 b2 ... g2 h2
-//        81 82 ... 87 88    a1 b1 ... g1 h1
-//                
-//        directions:
-//            -10 : North (up, towards silver)
-//            +10 : South (down, towards gold)
-//            +1 : East (right from gold's view, left from silver's view)
-//            -1 : West (left from gold's view, right from silver's view)
-//            
-//        highest bit - is square off the board?
-//            (board[x]&0x80U)==0 : square is on board.
-//            (board[x]&0x80U)==0x80U : square is off the board.
-//        second, third bit - currently unused.
-//        fourth, fifth bit - who owns the piece?
-//            (board[x] & OWNER_MASK)==OFF_BOARD : square is off the board - both bits are set
-//            (board[x] & OWNER_MASK)==GOLD : gold piece - first bit is set
-//            (board[x] & OWNER_MASK)==SILVER : silver piece - second bit is set
-//            (board[x] & OWNER_MASK)==EMPTY : empty square - none of the bits are set
-//        remaining three bits - which kind of piece is it?
-//            (board[x]&0x7U) gives which piece it is.
-//                (board[x] & PIECE_MASK)==6 : Elephant
-//                (board[x] & PIECE_MASK)==5 : Camel
-//                (board[x] & PIECE_MASK)==4 : Horse
-//                (board[x] & PIECE_MASK)==3 : Dog
-//                (board[x] & PIECE_MASK)==2 : Cat
-//                (board[x] & PIECE_MASK)==1 : Rabbit
-//            Special cases:
-//                (board[x] & PIECE_MASK)==0 : Empty
-//                (board[x] & PIECE_MASK)==7 : Off the board
-//        *****/
-//    unsigned char at_move; // Who is at move?
-//    unsigned char steps; // How many steps have the side at move done so far?
-//    int move; // How many moves have been done in the game so far?  0 at start, 2 after setup... even means gold is at move, odd means silver is at move.  Divide by 2 and add 1 to get official move number.
-//    unsigned long long int hashkey; // 64-bit hashkey, used for index into hash table, and for collision / repetition detection
-//} board_t;
 
+
+
+/** REFERENCE 1 -- FairyBoard is our Java equivalent of this struct **
+
+typedef struct
+{
+    unsigned char board[100]; 
+        *****
+        11 - 88 = actual board, edges around for easier move generation and evaluation
+        
+        11 12 ... 17 18    a8 b8 ... g8 h8
+        21 22 ... 27 28    a7 b7 ... g7 h7
+        ............... == ...............
+        71 72 ... 77 78    a2 b2 ... g2 h2
+        81 82 ... 87 88    a1 b1 ... g1 h1
+                
+        directions:
+            -10 : North (up, towards silver)
+            +10 : South (down, towards gold)
+            +1 : East (right from gold's view, left from silver's view)
+            -1 : West (left from gold's view, right from silver's view)
+            
+        highest bit - is square off the board?
+            (board[x]&0x80U)==0 : square is on board.
+            (board[x]&0x80U)==0x80U : square is off the board.
+        second, third bit - currently unused.
+        fourth, fifth bit - who owns the piece?
+            (board[x] & OWNER_MASK)==OFF_BOARD : square is off the board - both bits are set
+            (board[x] & OWNER_MASK)==GOLD : gold piece - first bit is set
+            (board[x] & OWNER_MASK)==SILVER : silver piece - second bit is set
+            (board[x] & OWNER_MASK)==EMPTY : empty square - none of the bits are set
+        remaining three bits - which kind of piece is it?
+            (board[x]&0x7U) gives which piece it is.
+                (board[x] & PIECE_MASK)==6 : Elephant
+                (board[x] & PIECE_MASK)==5 : Camel
+                (board[x] & PIECE_MASK)==4 : Horse
+                (board[x] & PIECE_MASK)==3 : Dog
+                (board[x] & PIECE_MASK)==2 : Cat
+                (board[x] & PIECE_MASK)==1 : Rabbit
+            Special cases:
+                (board[x] & PIECE_MASK)==0 : Empty
+                (board[x] & PIECE_MASK)==7 : Off the board
+        *****
+    unsigned char at_move; // Who is at move?
+    unsigned char steps; // How many steps have the side at move done so far?
+    int move; // How many moves have been done in the game so far?  0 at start, 2 after setup... even means gold is at move, odd means silver is at move.  Divide by 2 and add 1 to get official move number.
+    unsigned long long int hashkey; // 64-bit hashkey, used for index into hash table, and for collision / repetition detection
+} board_t;
+
+*/
+
+
+/** REFERENCE 2 -- The C code which runs the C evaluation function and outputs scores **
+  *  			-- I have commented the code to the extent it made sense to make sense
+  *  			   of botFairy's code
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#include "board.h"
+#include "search.h"
+#include "hash.h"
+#include "eval.h"
+
+
+static const char *TESTS_DOCUMENT = "tests.txt";
+static const char *OUTPUT_DOCUMENT = "test_results_navv_C.txt";
+
+// copied over and modified runtest.c's main function
+int main() // returns 1 if an error occurs, 0 otherwise
+{
+	int error_code = 0;
+	board_t position;
+	move_t moves[4];
+	int i, j;
+	int steps = 0;
+	FILE *fp, *outputFP;
+	char line[100];
+	int number_of_tests = 0;
+
+	BOARD_Message_Init();
+	{
+		BOARD_Init(&position);
+		
+		fp = fopen(TESTS_DOCUMENT, "r");
+		outputFP = fopen(OUTPUT_DOCUMENT, "w");
+		if (fp == NULL || outputFP == NULL) {
+			error_code = 1;
+		}
+		else {
+			fgets(line, 100, fp);
+			while (line[0] == '#') {
+				fgets(line, 100, fp);
+			}
+
+			// at this point, the line buffer contains the number of tests to expect in the file (first line of file)
+			// note that each test is its own text file--an ASCII board
+
+			// hand-rolled reading of an integer... why not strtoul?
+			for (i = 0; line[i] >= '0' && line[i] <= '9'; i++) {
+				number_of_tests = number_of_tests * 10 + line[i] - '0';
+			}
+
+			// looping over each board/text file
+			for (i = 0; !error_code && i<number_of_tests; i++)
+			{
+				fgets(line, 100, fp);
+				while (line[0] == '#')
+				{
+					fgets(line, 100, fp);
+				}
+
+				// now, line contains the name of the file, terminated by a newline (\n)
+
+				for (j = 0; line[j] != '\n'; j++)
+				{
+				}
+				line[j] = '\0';
+				sprintf(message, "Reading position \"%s\" from file.\n", line);
+				BOARD_Message();
+
+				// populate the board from the ASCII representation at the given filename...
+				if (BOARD_Read_Position(&position, line))
+				{
+					sprintf(message, "Couldn't read position from file.\n");
+					BOARD_Message();
+					error_code = 1;
+				}
+				else
+				{
+					position.steps = 0;
+					fprintf(outputFP, "File %s: %d\n", line, EVAL_Eval(&position, TRUE));
+
+					// read a line of the tests.txt file we're not using (some limit for the search)
+					// in addition to any comments. NOTE this is done after fprintf so filename is preserved
+					fgets(line, 100, fp);
+					while (line[0] == '#')
+					{
+						fgets(line, 100, fp);
+					}
+				}
+			}
+			fclose(fp);
+			fclose(outputFP);
+		}
+	}
+	BOARD_Message_Exit();
+	return 0;
+}
+*/
