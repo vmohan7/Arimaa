@@ -16,6 +16,13 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 		maxDepth = depth;
 	}
 
+
+	/**
+	 * Should be evaluated from the current player's (from the game state) perspective
+	 * If the current player wins, then it returns a positive score
+	 * Otherwise, it should return a negative score
+	 * @return
+	 */
 	protected abstract double getGameOverScore(GameState gs);
 	protected abstract double evaluation(ArimaaState state);
 	protected abstract MoveList getMoves(ArimaaState state);
@@ -52,7 +59,7 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 				state.getPrevMove(), state.getNextMove(), null);
 		
 		if (next.isGameOver()){
-			double score =  sign*(-next.getGameResult());
+			double score =  sign*(this.getGameOverScore(next)); 
 			return score;
 		} else if (depth == 0){
 			double score =  sign*evaluation(nextState);
