@@ -4,6 +4,12 @@ import utilities.helper_classes.ArimaaState;
 import arimaa3.ArimaaMove;
 import arimaa3.MoveList;
 
+/**
+ * Searches for the best move one ply deep.
+ * It uses the evaluation function learned from MCS.
+ * @author vasanth
+ *
+ */
 public class ReflexAgent extends AbstractAgent {
 
 	public ReflexAgent(double[] weights, boolean training) {

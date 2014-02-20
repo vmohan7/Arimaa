@@ -9,10 +9,10 @@ import utilities.helper_classes.ArimaaState;
 import arimaa3.ArimaaMove;
 import arimaa3.MoveList;
 
-public abstract class AbstractNAVVSearch extends AbstractSearchAgent {
+public abstract class MoveOrderingPruning extends AlphaBetaSearchAgent {
 
 	private NBHypothesis hyp;
-	public AbstractNAVVSearch(double[] weights, boolean training, int depth, NBHypothesis hyp) {
+	public MoveOrderingPruning(double[] weights, boolean training, int depth, NBHypothesis hyp) {
 		super(weights, training, depth);
 		this.hyp = hyp;
 	}

@@ -7,7 +7,13 @@ import arimaa3.ArimaaMove;
 import arimaa3.Constants;
 import arimaa3.MoveList;
 
-public class NAVVClueless extends AbstractNAVVSearch implements Constants {
+/**
+ * Combines Alpha-Beta search with Naive Bayes move ordering + pruning to X%
+ * and uses Jeff Bacher's evaluation function.
+ * @author vasanth
+ *
+ */
+public class NAVVClueless extends MoveOrderingPruning implements Constants {
 
 	private boolean firstMove;
 	private ArimaaEvaluate2 eval;
