@@ -21,7 +21,11 @@ public class FairyAgent extends AlphaBetaSearchAgent {
 		return GAME_OVER_SCORE - gs.total_steps;
 	}
 
+
 	@Override
+	/**
+	 * @return Evaluation score with respect to the current player
+	 */
 	protected double evaluation(ArimaaState state) {
 		return FairyEvaluation.evaluate(state.getCurr());
 	}

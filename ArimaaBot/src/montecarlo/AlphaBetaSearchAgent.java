@@ -59,7 +59,8 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 				state.getPrevMove(), state.getNextMove(), null);
 		
 		if (next.isGameOver()){
-			double score =  sign*(this.getGameOverScore(next)); 
+			//flip the sign of next.gameResult to make it from the current player's perspective
+			double score =  sign*(next.getGameResult() < 0 ? 1 : -1)*(this.getGameOverScore(next)); 
 			return score;
 		} else if (depth == 0){
 			double score =  sign*evaluation(nextState);
