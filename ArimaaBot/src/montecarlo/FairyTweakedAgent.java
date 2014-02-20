@@ -1,6 +1,7 @@
 package montecarlo;
 
 import utilities.helper_classes.ArimaaState;
+import arimaa3.GameState;
 import arimaa3.MoveList;
 
 public class FairyTweakedAgent extends AlphaBetaSearchAgent {
@@ -14,7 +15,7 @@ public class FairyTweakedAgent extends AlphaBetaSearchAgent {
 	}
 
 	@Override
-	protected double getGameOverScore() {
+	protected double getGameOverScore(GameState unused) {
 		//TODO put the actual game over score
 		return 0;
 	}

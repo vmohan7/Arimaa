@@ -16,7 +16,7 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 		maxDepth = depth;
 	}
 
-	protected abstract double getGameOverScore();
+	protected abstract double getGameOverScore(GameState gs);
 	protected abstract double evaluation(ArimaaState state);
 	protected abstract MoveList getMoves(ArimaaState state);
 	

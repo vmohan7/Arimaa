@@ -1,9 +1,6 @@
 package montecarlo;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.junit.Test;
 
@@ -33,7 +30,7 @@ public class AlphaBetaTest {
 		}
 
 		@Override
-		protected double getGameOverScore() { return Constants.SCORE_MATE; }
+		protected double getGameOverScore(GameState unused) { return Constants.SCORE_MATE; }
 
 		private double getRank(long bb){
 			if ( (bb & Constants.RANK_1) > 0){

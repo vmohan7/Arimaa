@@ -3,6 +3,7 @@ package montecarlo;
 import naive_bayes.NBHypothesis;
 import utilities.helper_classes.ArimaaState;
 import arimaa3.ArimaaMove;
+import arimaa3.GameState;
 import arimaa3.MoveList;
 
 /**
@@ -42,7 +43,7 @@ public class NaiveReflexAgent extends MoveOrderingPruning {
 	//Dummy overrides to make compiler happy
 	
 	@Override
-	protected double getGameOverScore() { return 0; }
+	protected double getGameOverScore(GameState unused) { return 0; }
 
 	@Override
 	protected double evaluation(ArimaaState state) { return 0; }

@@ -1,5 +1,6 @@
 package montecarlo;
 
+import arimaa3.GameState;
 import naive_bayes.NBHypothesis;
 import utilities.helper_classes.ArimaaState;
 
@@ -16,7 +17,7 @@ public class NAVVCarlo extends MoveOrderingPruning {
 	}
 
 	@Override
-	protected double getGameOverScore() {
+	protected double getGameOverScore(GameState unused) {
 		return 1.0; //max value for the sigmoid function
 	}
 

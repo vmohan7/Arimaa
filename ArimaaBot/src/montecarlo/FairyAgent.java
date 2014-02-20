@@ -1,10 +1,12 @@
 package montecarlo;
 
 import utilities.helper_classes.ArimaaState;
+import arimaa3.GameState;
 import arimaa3.MoveList;
 
 public class FairyAgent extends AlphaBetaSearchAgent {
-
+	
+	private static final int GAME_OVER_SCORE = 500000;
 	
 	/**
 	 * @param depth for AlphaBeta Search
@@ -14,15 +16,14 @@ public class FairyAgent extends AlphaBetaSearchAgent {
 	}
 
 	@Override
-	protected double getGameOverScore() {
-		//TODO put the actual game over score
-		return 0;
+	protected double getGameOverScore(GameState gs) {
+		// subtract total steps to slightly favor shorter wins
+		return GAME_OVER_SCORE - gs.total_steps;
 	}
 
 	@Override
 	protected double evaluation(ArimaaState state) {
-		// TODO fill in evaluation function for Fairy given the Game State
-		return 0;
+		return FairyEvaluation.evaluate(state.getCurr());
 	}
 
 	@Override

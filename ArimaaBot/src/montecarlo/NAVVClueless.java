@@ -5,6 +5,7 @@ import utilities.helper_classes.ArimaaState;
 import arimaa3.ArimaaEvaluate2;
 import arimaa3.ArimaaMove;
 import arimaa3.Constants;
+import arimaa3.GameState;
 import arimaa3.MoveList;
 
 /**
@@ -24,7 +25,7 @@ public class NAVVClueless extends MoveOrderingPruning implements Constants {
 	}
 
 	@Override
-	protected double getGameOverScore() {
+	protected double getGameOverScore(GameState unused) {
 		return Constants.SCORE_MATE;
 	}
 	
