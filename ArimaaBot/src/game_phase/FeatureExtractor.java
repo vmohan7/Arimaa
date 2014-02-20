@@ -1,5 +1,7 @@
 package game_phase;
 
+import feature_extractor.FeatureConstants;
+import utilities.GoalTestWrapper;
 import utilities.helper_classes.Utilities;
 import ai_util.Util;
 import arimaa3.*;
@@ -26,10 +28,12 @@ public class FeatureExtractor implements Constants {
 	
 	
 	/* Constants for reduced feature set alternative */
-	private static final int NUM_REDUCED_FEATURES = 2;
+	private static final int NUM_REDUCED_FEATURES = 3;
 	
 	private static final long RANKS_FOUR_THRU_EIGHT = RANK_4 | RANK_5 | RANK_6 | RANK_7 | RANK_8;
 	private static final long RANKS_ONE_THRU_FIVE = RANK_1 | RANK_2 | RANK_3 | RANK_4 | RANK_5;
+	
+	private static GoalTestWrapper GOAL_TEST_WRAPPER = new GoalTestWrapper();
 
 
 	//PL_WHITE and PL_BLACK are constants that refer to the index into the features array
@@ -53,6 +57,7 @@ public class FeatureExtractor implements Constants {
 		double[] features = new double[NUM_REDUCED_FEATURES];
 		features[0] = extractMinNumPieces(state);
 		features[1] = extractMaxNumDisplaced(state);
+		features[2] = extractImminentGoalFeature(state);
 		return features;
 	}
 	
@@ -85,8 +90,19 @@ public class FeatureExtractor implements Constants {
 		return Math.max(whiteScore, blackScore);
 	}
 	
+	/**
+	 * @return 1 if a rabbit can reach the goal on the next move; else 0
+	 */
 	private static int extractImminentGoalFeature(GameState state){
-		//TODO: implement
+		// Check if current player can win on next turn
+		if (GOAL_TEST_WRAPPER.winInNumSteps(state, FeatureConstants.NUM_STEPS_IN_MOVE))
+			return 1;
+		
+		// Check if opponent can win on next turn
+		GameState opponentState = new GameState();
+		opponentState.playPASS(state);
+		if (GOAL_TEST_WRAPPER.winInNumSteps(opponentState, FeatureConstants.NUM_STEPS_IN_MOVE))
+			return 1;
 		
 		return 0;
 	}
