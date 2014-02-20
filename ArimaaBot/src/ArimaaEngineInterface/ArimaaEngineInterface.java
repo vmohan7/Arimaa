@@ -6,7 +6,7 @@ import java.util.*;
 import naive_bayes.NBHypothesis;
 
 import montecarlo.*;
-import ai_util.*;
+import ai_util.LogFile;
 
 
 public class ArimaaEngineInterface {
@@ -95,6 +95,8 @@ public class ArimaaEngineInterface {
 				else if (AEIcommand.command.equals("makemove")) {
 					String move_text = AEIcommand.getRestOfCommand();
 					gc.getMove(move_text);
+					
+					LogMoveFile.write(move_text);
 				}
 				else if (AEIcommand.command.equals("setoption")) {
 					//TODO check if weights is given for agents
