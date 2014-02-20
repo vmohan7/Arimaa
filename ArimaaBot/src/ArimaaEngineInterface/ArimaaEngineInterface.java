@@ -82,6 +82,8 @@ public class ArimaaEngineInterface {
 				else if (AEIcommand.command.equals("newgame")) {
 					send_message("log starting new game using bot " + bot_type);
 					
+					LogMoveFile.write("\n-------------------------------------------------------------\n");
+					
 					gc.reset();
 					if (bot_type == 1)
 						gc.setAgent( new ReflexAgent(weights, false) ); 
@@ -91,6 +93,8 @@ public class ArimaaEngineInterface {
 						gc.setAgent(new NAVVCarlo(weights, false, 2, hyp));
 					else if (bot_type == 4)
 						gc.setAgent(new NAVVClueless(null, false, 2, hyp));
+					else if (bot_type == 5)
+						gc.setAgent( new FairyAgent(1) );
 				}
 				else if (AEIcommand.command.equals("makemove")) {
 					String move_text = AEIcommand.getRestOfCommand();
