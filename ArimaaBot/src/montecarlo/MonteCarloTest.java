@@ -6,10 +6,12 @@ import java.util.PriorityQueue;
 
 import montecarlo.MoveOrderingPruning.MoveOrder;
 import arimaa3.GameState;
-import montecarlo.FairyEvaluation.FairyBoard;
 
 import org.junit.Ignore;
 import org.junit.Test;
+
+import fairy_agents.FairyEvaluation;
+import fairy_agents.FairyEvaluation.FairyBoard;
 
 public class MonteCarloTest {
 	private static String tests[] = {

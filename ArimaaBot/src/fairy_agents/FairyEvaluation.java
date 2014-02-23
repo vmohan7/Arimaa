@@ -1,4 +1,4 @@
-package montecarlo;
+package fairy_agents;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
+import montecarlo.AbstractCombiner;
 import feature_extractor.FeatureConstants;
 import game_phase.GamePhase;
 import ai_util.Util;

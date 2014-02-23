@@ -3,8 +3,8 @@ package ArimaaEngineInterface;
 import java.io.*;
 import java.util.*;
 
+import fairy_agents.FairyAgent;
 import naive_bayes.NBHypothesis;
-
 import montecarlo.*;
 import ai_util.LogFile;
 

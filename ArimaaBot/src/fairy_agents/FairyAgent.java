@@ -1,5 +1,7 @@
-package montecarlo;
+package fairy_agents;
 
+import montecarlo.AbstractCombiner;
+import montecarlo.AlphaBetaSearchAgent;
 import game_phase.GamePhase;
 import game_phase.GamePhaseHeuristicDiscriminator;
 import utilities.helper_classes.ArimaaState;
