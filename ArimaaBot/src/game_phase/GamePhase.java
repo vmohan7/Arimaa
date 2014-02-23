@@ -5,8 +5,9 @@ public enum GamePhase {
     private int value;
 
     private GamePhase(int value) {
-            this.value = value;
+    	this.value = value;
     }
+    
     public int getValue() {
         return value;
     }
