@@ -86,7 +86,7 @@ public class GamePhaseHeuristicDiscriminator {
 
 		if (score > 14)
 			return 0;
-		else if (score > 11)
+		else if (score > 9)
 			return 1;
 		else
 			return 2;		
