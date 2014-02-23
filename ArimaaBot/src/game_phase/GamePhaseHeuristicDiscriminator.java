@@ -12,7 +12,7 @@ public class GamePhaseHeuristicDiscriminator {
 
 	private static final int NUM_GAMES = 10;
 	private static final String PATH_PREFIX = "../Plotting/game_phase/"; //optional
-	private static final String FILE_NAME = PATH_PREFIX + "kmeans_heuristic_probabilities.csv";
+	private static final String FILE_NAME = PATH_PREFIX + "kmeans_heuristic_ternary.csv";
 	private static final double[] WEIGHTS = {1.0, -0.5, -10.0};
 	
 	// Probability distributions: http://commons.apache.org/proper/commons-math/userguide/distribution.html
@@ -59,7 +59,7 @@ public class GamePhaseHeuristicDiscriminator {
 	}
 	
 	
-	private static double[] assignCluster(double[] features){
+	private static double[] assignClusterProbs(double[] features){
 		// TODO: deal with end game in an entirely different way (i.e. with at dedicated set of features)
 		// That is, build decision tree
 		// TODO: tune probability distributions and weights
@@ -73,12 +73,23 @@ public class GamePhaseHeuristicDiscriminator {
 		
 		return new double[]{beginningProb / totalProb, middleProb / totalProb, endProb / totalProb};
 		
-//		if (score > 14)
-//			return new double[]{1.0, 0.0, 0.0};
-//		else if (score > 11)
-//			return new double[]{0.0, 1.0, 0.0};
-//		else
-//			return new double[]{0.0, 0.0, 1.0};
+
+	}
+	
+	/**
+	 * 
+	 * @param features
+	 * @return 0 for beginning, 1 for middle, 2 for end
+	 */
+	private static int assignCluster(double[] features){
+		double score = dotProduct(features, WEIGHTS);
+
+		if (score > 14)
+			return 0;
+		else if (score > 11)
+			return 1;
+		else
+			return 2;		
 	}
 
 	/** Uses the test games to assign each GameState to a cluster. Results output to CSV. */
@@ -95,12 +106,15 @@ public class GamePhaseHeuristicDiscriminator {
 			
 			csv.appendValue(Integer.toString(trainGameInfo.getGameID()));
 			while (myParser.hasNextGameState()){
-				double[] currProbabilities = assignCluster(FeatureExtractor.extractReducedFeatures( myParser.getNextGameState().getCurr()));
+//				double[] currProbabilities = assignClusterProbs(FeatureExtractor.extractReducedFeatures( myParser.getNextGameState().getCurr()));
+//				
+//				for (int i = 0; i < currProbabilities.length; i++){
+//					csv.appendValue(Double.toString(currProbabilities[i]));
+//				}
 				
-				for (int i = 0; i < currProbabilities.length; i++){
-					csv.appendValue(Double.toString(currProbabilities[i]));
-				}
-
+				// Assign ternary phases and print to csv for plotting
+				int currPhase = assignCluster(FeatureExtractor.extractReducedFeatures( myParser.getNextGameState().getCurr()));
+				csv.appendValue(Integer.toString(currPhase));
 			}
 			
 			csv.nextLine();

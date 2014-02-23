@@ -1,4 +1,4 @@
-fid = fopen('kmeans_3.csv');
+fid = fopen('kmeans_heuristic_ternary.csv');
 
 % fid = fopen('kmeans_heuristic.csv');
 
