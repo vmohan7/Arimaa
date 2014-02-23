@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import fairy_agents.FairyAgent;
+import fairy_agents.FairyAgentHeuristicHardcoded;
 import naive_bayes.NBHypothesis;
 import montecarlo.*;
 import ai_util.LogFile;
@@ -94,9 +95,9 @@ public class ArimaaEngineInterface {
 					else if (bot_type == 4)
 						gc.setAgent(new NAVVClueless(null, false, 2, hyp));
 					else if (bot_type == 5)
-						gc.setAgent( new FairyAgent(1) );
+						gc.setAgent( new FairyAgent(2) );
 					else if (bot_type == 6)
-						gc.setAgent( new FairyTweakedAgent(1) );
+						gc.setAgent( new FairyAgentHeuristicHardcoded(2) );
 				}
 				else if (AEIcommand.command.equals("makemove")) {
 					String move_text = AEIcommand.getRestOfCommand();
