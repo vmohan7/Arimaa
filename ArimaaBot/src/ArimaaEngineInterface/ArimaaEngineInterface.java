@@ -95,6 +95,8 @@ public class ArimaaEngineInterface {
 						gc.setAgent(new NAVVClueless(null, false, 2, hyp));
 					else if (bot_type == 5)
 						gc.setAgent( new FairyAgent(1) );
+					else if (bot_type == 6)
+						gc.setAgent( new FairyTweakedAgent(1) );
 				}
 				else if (AEIcommand.command.equals("makemove")) {
 					String move_text = AEIcommand.getRestOfCommand();
