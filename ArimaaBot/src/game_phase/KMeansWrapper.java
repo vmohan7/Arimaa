@@ -1,6 +1,12 @@
 package game_phase;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Scanner;
 
 import net.sf.javaml.clustering.KMeans;
 import net.sf.javaml.clustering.evaluation.ClusterEvaluation;
@@ -33,6 +39,34 @@ public class KMeansWrapper {
 		centroids = null; //centroids need to be populated after clustering -- null used as sentinel
 	}
 	
+	/** 
+	 * Reads centroids from a file. No other instance vars are initialized.
+	 * @param centroidFileName must be a CSV file name
+	 */
+	public KMeansWrapper(String centroidFileName) {
+		hasClustered = true;
+		readCentroidsFromCSVFile(centroidFileName);
+	}
+	
+	//TODO need to read centroids from file for game phase discrimination with kmeans
+	private void readCentroidsFromCSVFile(String centroidFileName) {
+		try {
+			BufferedReader reader = new BufferedReader( (new FileReader(centroidFileName)));
+			String line = "";
+			while((line = reader.readLine()) != null) {
+				
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.exit(1); //cannot continue
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
 	/** 
 	 *  @return Out to in--which cluster, which feature, the coordinate of the feature
 	 *  <br><b> clusterArr[out][middle][in]</b> <p> 

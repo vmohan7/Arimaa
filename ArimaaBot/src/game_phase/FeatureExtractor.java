@@ -51,7 +51,8 @@ public class FeatureExtractor implements Constants {
 	}
 	
 	/**
-	 * Extract features to be used in GamePhaseHeuristicDiscriminator
+	 * Extract features to be used in GamePhaseHeuristicDiscriminator. Uses
+	 * heuristic features.
 	 */
 	public static double[] extractReducedFeatures(GameState state){
 		double[] features = new double[NUM_REDUCED_FEATURES];

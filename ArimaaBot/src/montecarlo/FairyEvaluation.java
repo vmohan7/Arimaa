@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 
 import feature_extractor.FeatureConstants;
+import game_phase.GamePhase;
 import ai_util.Util;
 import arimaa3.GameState;
 
@@ -533,7 +534,9 @@ public class FairyEvaluation {
 				String filename = readLineIgnoreComments(testsRd);
 				assert(filename != null);
 				
-				int score = fe.EVAL_Eval(fe.new FairyBoard(TESTS_EXTENSION + filename), 1);
+				// hacked this line to get it to work after changing the APIs...
+				int score = (int)fe.EVAL_Eval(fe.new FairyBoard(TESTS_EXTENSION + filename), 
+											  new FairyAgent(0).new DefaultCombiner(GamePhase.BEGINNING), 1);
 				testsWr.printf("File %s: %d\n", filename, score);
 				
 				
@@ -565,16 +568,15 @@ public class FairyEvaluation {
 	
 	
 	/** Evaluates a GameState according to Fairy's eval.c! */
-	public static double evaluate(GameState state){
+	public static double evaluate(GameState state, AbstractCombiner combiner) {
 		FairyEvaluation fe = new FairyEvaluation();
-		return (double)fe.EVAL_Eval(state, 0);
+		return fe.EVAL_Eval(state, combiner, 0);
 	}
 	
 	/** The real evaluation is done here... well, sort of... */
-	private int EVAL_Eval(GameState evalState, int verbose)
-	{
+	private double EVAL_Eval(GameState evalState, AbstractCombiner combiner, int verbose) {
 		FairyBoard bp = new FairyBoard(evalState);
-		return EVAL_Eval(bp, verbose);
+		return EVAL_Eval(bp, combiner, verbose);
 	}
 	
 	/** 
@@ -584,7 +586,7 @@ public class FairyEvaluation {
 	 * Evaluation is done from gold's perspective.  At the end of the evaluation, 
 	 * it's adjusted to be seen from current player's perspective.
 	 */
-	private int EVAL_Eval(FairyBoard bp, int verboseUnused) {
+	private double EVAL_Eval(FairyBoard bp, AbstractCombiner combiner, int verboseUnused) {
 		
 	    // evaluation constants
 	    int[] piece_value = {0,RABBIT_VALUE,CAT_VALUE,DOG_VALUE,HORSE_VALUE,CAMEL_VALUE,ELEPHANT_VALUE};
@@ -601,7 +603,7 @@ public class FairyEvaluation {
 	    int i;
 	            
 	    // value variables
-	    int value=0;
+	    double value=0.0; // originally an int in eval.c
 	    int[] material_value = new int[2];
 	    int[] trap_value = new int[2];
 	    int[] rabbit_value = new int[2];
@@ -1158,10 +1160,13 @@ public class FairyEvaluation {
 	    }
 	    
 	    // Add up all the factors
-	           
-	    value+=material_value[0]-material_value[1];
-	    value+=trap_value[0]-trap_value[1];
-	    value+=rabbit_value[0]-rabbit_value[1];
+	    int materialValue = material_value[0] - material_value[1];
+	    int trapValue = trap_value[0] - trap_value[1];
+	    int rabbitValue = rabbit_value[0] - rabbit_value[1];
+	    value = combiner.combineScore(materialValue, trapValue, rabbitValue);
+//	    value+=material_value[0]-material_value[1];
+//	    value+=trap_value[0]-trap_value[1];
+//	    value+=rabbit_value[0]-rabbit_value[1];
 	
 	    /* if (verbose)
 	    {
