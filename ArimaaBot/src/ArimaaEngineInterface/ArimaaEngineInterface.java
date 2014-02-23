@@ -141,6 +141,10 @@ public class ArimaaEngineInterface {
 			hyp = Utilities.getNBPredictor(value);
 		} else if (name.equals("type") ){
 			bot_type = Integer.parseInt(value);
+		} else if (name.equals("write") ){
+			LogMoveFile.setWrtie(true);
+		} else if (name.equals("nowrite") ){
+			LogMoveFile.setWrtie(false);
 		}
 		
 	}
