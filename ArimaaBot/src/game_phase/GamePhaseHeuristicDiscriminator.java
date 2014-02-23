@@ -2,6 +2,8 @@ package game_phase;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 
+import arimaa3.GameState;
+
 import utilities.GameData;
 import utilities.GameParser;
 import utilities.helper_classes.CSVDataFormatter;
@@ -22,19 +24,6 @@ public class GamePhaseHeuristicDiscriminator {
 	private static NormalDistribution BeginningDistr = new NormalDistribution(16.0, 2);
 	private static NormalDistribution MiddleDistr = new NormalDistribution(12.0, 2);
 	private static NormalDistribution EndDistr = new NormalDistribution(6.0, 2);
-	
-	
-	public enum GamePhase {
-        BEGINNING(0), MIDDLE(1), END(2);
-        private int value;
-
-        private GamePhase(int value) {
-                this.value = value;
-        }
-        public int getValue() {
-            return value;
-        }
-	}; 
 	
 	public static void main(String args[]){
 		Utilities.printInfo(String.format("<< Running heuristic game phase discrimination on %d games >>", NUM_GAMES));
@@ -81,17 +70,26 @@ public class GamePhaseHeuristicDiscriminator {
 	 * @param features
 	 * @return 0 for beginning, 1 for middle, 2 for end
 	 */
-	private static int assignCluster(double[] features){
+	private static GamePhase assignCluster(double[] features){
 		double score = dotProduct(features, WEIGHTS);
 
 		if (score > 14)
-			return 0;
+			return GamePhase.BEGINNING;
 		else if (score > 9)
-			return 1;
+			return GamePhase.MIDDLE;
 		else
-			return 2;		
+			return GamePhase.END;		
 	}
 
+	/**
+	 * Returns the one game phase this state most belongs to.
+	 * @param features
+	 * @return 0 for beginning, 1 for middle, 2 for end
+	 */
+	public static GamePhase getStrictGamePhase(GameState gs) {
+		return assignCluster(FeatureExtractor.extractReducedFeatures(gs));
+	}
+	
 	/** Uses the test games to assign each GameState to a cluster. Results output to CSV. */
 	private static void testAndOutputCSV(GameData myGameData) {
 		CSVDataFormatter csv = new CSVDataFormatter();
@@ -113,8 +111,8 @@ public class GamePhaseHeuristicDiscriminator {
 //				}
 				
 				// Assign ternary phases and print to csv for plotting
-				int currPhase = assignCluster(FeatureExtractor.extractReducedFeatures( myParser.getNextGameState().getCurr()));
-				csv.appendValue(Integer.toString(currPhase));
+				GamePhase currPhase = assignCluster(FeatureExtractor.extractReducedFeatures( myParser.getNextGameState().getCurr()));
+				csv.appendValue(Integer.toString(currPhase.getValue()));
 			}
 			
 			csv.nextLine();
