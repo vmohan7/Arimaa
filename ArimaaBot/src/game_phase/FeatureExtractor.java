@@ -92,6 +92,8 @@ public class FeatureExtractor implements Constants {
 	}
 	
 	/**
+	 * Determines whether there is a goal threat. More computationally expensive than
+	 * our other features.
 	 * @return 1 if a rabbit can reach the goal on the next move; else 0
 	 */
 	private static int extractImminentGoalFeature(GameState state){

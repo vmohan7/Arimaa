@@ -860,7 +860,7 @@ public class FairyEvaluation {
 	            }
 	            if (row>3)
 	            {
-	                material[dog_pos[side][i]]=material[dog_pos[side][i]]*197/200; // Advanced cat lose 1.5 % of its value
+	                material[dog_pos[side][i]]=material[dog_pos[side][i]]*197/200; // Advanced dog lose 1.5 % of its value
 	                /* if (verbose)
 	                {
 	                    PRINT_SQUARE(dog_pos[side][i]);
@@ -869,7 +869,7 @@ public class FairyEvaluation {
 	                } */
 	            } else if (row==3)
 	            {
-	                material[dog_pos[side][i]]=material[dog_pos[side][i]]*199/200; // Slightly advanced cat lose 0.5 % of its value
+	                material[dog_pos[side][i]]=material[dog_pos[side][i]]*199/200; // Slightly advanced dog lose 0.5 % of its value
 	                /* if (verbose)
 	                {
 	                    PRINT_SQUARE(dog_pos[side][i]);
@@ -1086,7 +1086,8 @@ public class FairyEvaluation {
 	    for (i=0; i<rabbits[1]; i++)
 	    {
 	        row=9-bp.ROW(rabbit_pos[1][i]);
-	        rabbit_value[1]+=(row-1)*(row-1);
+	        rabbit_value[1]+=(row-1)*(row-1)*(row-1); // Modified from original Fairy code to match gold rabbit value calculation
+//	        rabbit_value[1]+=(row-1)*(row-1);		  // Original
 	        if (row==7)
 	        {
 	            switch (bp.OWNER(rabbit_pos[1][i]+SOUTH))
