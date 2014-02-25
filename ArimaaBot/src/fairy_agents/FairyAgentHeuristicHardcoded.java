@@ -20,29 +20,40 @@ public class FairyAgentHeuristicHardcoded extends AlphaBetaSearchAgent {
 		/** Factor by which a value (e.g. rabbit value, trap value, 
 		 * material value) is favored depending on the game phase.
 		 */
-		
-		private static final double FAVOR_WEIGHT = 1.2;
+		public static final double MATERIAL_FAVOR_WEIGHT = 2.0,
+								   TRAP_FAVOR_WEIGHT = MATERIAL_FAVOR_WEIGHT,
+								   RABBIT_FAVOR_WEIGHT = 12.0;
 
 		public HardcodedCombiner(GamePhase whichPhase) {
 			super(whichPhase);
 		}
 
 		/**
-		 * Combine scores using hard-coded weights. If the game is in the beginning,
-		 * then favor trap value; if middle, then favor material value; if end, then
+		 * Combine scores using hard-coded weights. If the game is in the beginning
+		 * or middle, then favor material and trap value; if end, then greatly
 		 * favor rabbit value.
 		 */		
 		@Override
 		public int combineScore(int materialValue, int trapValue, int rabbitValue) {
 			switch (phase) {
 				case BEGINNING:
-					return (int) (materialValue + (FAVOR_WEIGHT * trapValue) + rabbitValue);
 				case MIDDLE:
-					return (int) ((FAVOR_WEIGHT * materialValue) + trapValue + rabbitValue);
+					return (int) ((MATERIAL_FAVOR_WEIGHT * materialValue) + (TRAP_FAVOR_WEIGHT * trapValue) + rabbitValue);
 				case END:
 				default:
-					return (int) (materialValue + trapValue + (FAVOR_WEIGHT * rabbitValue));
+					return (int) (materialValue + trapValue + (RABBIT_FAVOR_WEIGHT * rabbitValue));
 			}
+		}
+		
+		/** 
+		 * In the end game, framed pieces should not be penalized since
+		 * the opponent is making his/her own piece commitment in order
+		 * to maintain the frame. (This is very costly in end game.)
+		 */
+		@Override
+		public int frameValue(int materialValue) {
+			if (phase == GamePhase.END) return materialValue; 
+			return super.frameValue(materialValue);			
 		}
 		
 	}

@@ -1086,7 +1086,8 @@ public class FairyEvaluation {
 	    for (i=0; i<rabbits[1]; i++)
 	    {
 	        row=9-bp.ROW(rabbit_pos[1][i]);
-	        rabbit_value[1]+=(row-1)*(row-1);
+	        rabbit_value[1]+=(row-1)*(row-1)*(row-1); // Modified from original Fairy code to match gold rabbit value calculation
+//	        rabbit_value[1]+=(row-1)*(row-1);		  // Original
 	        if (row==7)
 	        {
 	            switch (bp.OWNER(rabbit_pos[1][i]+SOUTH))
