@@ -45,6 +45,7 @@ public class FairyAgentHeuristicHardcoded extends AlphaBetaSearchAgent {
 			}
 		}
 		
+		
 		/** 
 		 * In the end game, framed pieces should not be penalized since
 		 * the opponent is making his/her own piece commitment in order
@@ -56,7 +57,30 @@ public class FairyAgentHeuristicHardcoded extends AlphaBetaSearchAgent {
 			return super.frameValue(materialValue);			
 		}
 		
+		
+		/** 
+		 * The penalty should be increased in the beginning game since
+		 * the cat or dog would probably be on its own and very vulnerable.
+		 */
+		@Override
+		public int advancedValue(int catDogValue) {
+			if (phase == GamePhase.BEGINNING) return catDogValue * 9 / 10;
+			return super.advancedValue(catDogValue);
+		}
+		
+		
+		/** 
+		 * The penalty should be increased slightly in the beginning game since
+		 * the cat or dog would probably not have close support. 
+		 */
+		@Override
+		public int slightlyAdvancedValue(int catDogValue) {
+			if (phase == GamePhase.BEGINNING) return catDogValue * 99 / 100;
+			return super.advancedValue(catDogValue);
+		}
+		
 	}
+	
 	
 	private static final int GAME_OVER_SCORE = 500000;
 	private HardcodedCombiner hCombiner;

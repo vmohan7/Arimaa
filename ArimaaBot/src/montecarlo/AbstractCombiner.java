@@ -8,6 +8,8 @@ import game_phase.GamePhase;
  * computed by Fairy's evaluation function.
  * As a stylistic choice, each implementation of an AbstractCombiner
  * will live within its corresponding *Agent class.
+ * <br><br><b>NOTE: AbstractCombiner implements the default behavior of Fairy.</b>
+ * <br> (You must override if you want different behaviors for subclasses.)
  * @author Neema, Vivek
  */
 public abstract class AbstractCombiner {
