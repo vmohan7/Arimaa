@@ -20,6 +20,7 @@ public class FairyAgentHeuristicHardcoded extends AlphaBetaSearchAgent {
 		/** Factor by which a value (e.g. rabbit value, trap value, 
 		 * material value) is favored depending on the game phase.
 		 */
+		
 		private static final double FAVOR_WEIGHT = 1.2;
 
 		public HardcodedCombiner(GamePhase whichPhase) {
@@ -32,15 +33,15 @@ public class FairyAgentHeuristicHardcoded extends AlphaBetaSearchAgent {
 		 * favor rabbit value.
 		 */		
 		@Override
-		public double combineScore(double materialValue, double trapValue, double rabbitValue) {
+		public int combineScore(int materialValue, int trapValue, int rabbitValue) {
 			switch (phase) {
 				case BEGINNING:
-					return materialValue + (FAVOR_WEIGHT * trapValue) + rabbitValue;
+					return (int) (materialValue + (FAVOR_WEIGHT * trapValue) + rabbitValue);
 				case MIDDLE:
-					return (FAVOR_WEIGHT * materialValue) + trapValue + rabbitValue;
+					return (int) ((FAVOR_WEIGHT * materialValue) + trapValue + rabbitValue);
 				case END:
 				default:
-					return materialValue + trapValue + (FAVOR_WEIGHT * rabbitValue);
+					return (int) (materialValue + trapValue + (FAVOR_WEIGHT * rabbitValue));
 			}
 		}
 		

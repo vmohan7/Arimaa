@@ -785,7 +785,7 @@ public class FairyEvaluation {
 	        // special case - give minus for (possible) frames
 	        if (bp.OWNER(trap_square[trap])==GOLD && trap_adjacent[1]>2)
 	        {
-	            material[trap_square[trap]]=material[trap_square[trap]]*4/5; // Trapped piece loses 20% of its value
+	            material[trap_square[trap]]=combiner.frameValue(material[trap_square[trap]]); //*4/5; // Trapped piece loses 20% of its value
 	            /* if (verbose)
 	            {
 	                sprintf(message,"Piece at ");
@@ -797,7 +797,7 @@ public class FairyEvaluation {
 	        }
 	        if (bp.OWNER(trap_square[trap])==SILVER && trap_adjacent[0]>2)
 	        {
-	            material[trap_square[trap]]=material[trap_square[trap]]*4/5; // Trapped piece loses 20% of its value
+	            material[trap_square[trap]]=combiner.frameValue(material[trap_square[trap]]); //*4/5; // Trapped piece loses 20% of its value
 	            /* if (verbose)
 	            {
 	                sprintf(message,"Piece at ");
@@ -827,7 +827,7 @@ public class FairyEvaluation {
 	            }
 	            if (row>3)
 	            {
-	                material[cat_pos[side][i]]=material[cat_pos[side][i]]*197/200; // Advanced cat lose 1.5 % of its value
+	                material[cat_pos[side][i]]=combiner.advancedValue(material[cat_pos[side][i]]); //*197/200; // Advanced cat lose 1.5 % of its value
 	                /* if (verbose)
 	                {
 	                    PRINT_SQUARE(cat_pos[side][i]);
@@ -836,7 +836,7 @@ public class FairyEvaluation {
 	                } */
 	            } else if (row==3)
 	            {
-	                material[cat_pos[side][i]]=material[cat_pos[side][i]]*199/200; // Slightly advanced cat lose 0.5 % of its value
+	                material[cat_pos[side][i]]=combiner.slightlyAdvancedValue(material[cat_pos[side][i]]); //*199/200; // Slightly advanced cat lose 0.5 % of its value
 	                /* if (verbose)
 	                {
 	                    PRINT_SQUARE(cat_pos[side][i]);
@@ -860,7 +860,7 @@ public class FairyEvaluation {
 	            }
 	            if (row>3)
 	            {
-	                material[dog_pos[side][i]]=material[dog_pos[side][i]]*197/200; // Advanced cat lose 1.5 % of its value
+	                material[dog_pos[side][i]]=combiner.advancedValue(material[dog_pos[side][i]]); //*197/200; // Advanced dog lose 1.5 % of its value
 	                /* if (verbose)
 	                {
 	                    PRINT_SQUARE(dog_pos[side][i]);
@@ -869,7 +869,7 @@ public class FairyEvaluation {
 	                } */
 	            } else if (row==3)
 	            {
-	                material[dog_pos[side][i]]=material[dog_pos[side][i]]*199/200; // Slightly advanced cat lose 0.5 % of its value
+	                material[dog_pos[side][i]]=combiner.slightlyAdvancedValue(material[dog_pos[side][i]]); //*199/200; // Slightly advanced dog lose 0.5 % of its value
 	                /* if (verbose)
 	                {
 	                    PRINT_SQUARE(dog_pos[side][i]);
