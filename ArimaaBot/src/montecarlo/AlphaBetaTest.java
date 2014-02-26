@@ -12,7 +12,7 @@ import arimaa3.GameState;
 import arimaa3.MoveList;
 
 public class AlphaBetaTest {
-	public static int DEPTH = 3; //TODO: must be an even number so that the evaluation will evaluate from the perspective of the root node
+	public static int DEPTH = 1; //TODO: must be an even number so that the evaluation will evaluate from the perspective of the root node
 	private static class TestAgent extends AlphaBetaSearchAgent {
 
 		private boolean firstMove = false;
@@ -190,8 +190,10 @@ public class AlphaBetaTest {
 	@Test
 	public void test() {
 		TestAgent agent = new TestAgent(DEPTH);
-		ArimaaState game = new ArimaaState(new GameState("1w Rb1", "1b rg8"), null);
-		agent.selectMove(game, agent.getMoves(game.getCurr()) );
+		ArimaaState game = new ArimaaState(new GameState(
+					"17b %13 +-----------------+%138| r             r |%137| r   r d     r   |%136|             E   |%135|                 |%134|                 |%133| R     e C R     |%132|   R           R |%131|               R |%13+-----------------+%13   a b c d e f g h%13"), null);
+		ArimaaMove move = agent.selectMove(game, agent.getMoves(game.getCurr()) );
+		System.out.println(game.getCurr().toBoardString());
 	}
 
 }
