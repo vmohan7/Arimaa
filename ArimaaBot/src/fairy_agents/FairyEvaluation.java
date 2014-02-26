@@ -509,15 +509,13 @@ public class FairyEvaluation {
 	
 	
 /* ------------------------------------ FOR TESTING ONLY ------------------------------------ */ 
-	private static final String TESTS_EXTENSION = "C:/Users/Neema/Desktop/Downloaded Bots/faerie/botFairy/Fairy_full/";
+	private static final String TESTS_EXTENSION = "fairy-testing/";
 	private static final String TESTS_DOCUMENT = "tests.txt";
-	private static final String OUTPUT = "C:/Users/Neema/Desktop/" /*TESTS_EXTENSION*/ + "test_results_navv_Java.txt";
+	private static final String OUTPUT = TESTS_EXTENSION + "test_results_navv_Java.txt";
 	
 	/** 
-	 * Reads Fairy's test boards and outputs scores for each one. Ideally,
-	 * these will match the tests from the evaluation function in C.
-	 * I have written code in C that outputs in this exact format.
-	 * Currently, that C code is only local. I have included it at the bottom of this file.
+	 * Reads Fairy's test boards and outputs scores for each one in a pretty way.
+	 * Additionally, prints out the score components resulting in the file score.
 	 * See FairyBoard's constructor for "limitations" on the ASCII board.
 	 * @author Neema
 	 */
@@ -1842,105 +1840,4 @@ typedef struct
     unsigned long long int hashkey; // 64-bit hashkey, used for index into hash table, and for collision / repetition detection
 } board_t;
 
-*/
-
-
-/** REFERENCE 2 -- The C code which runs the C evaluation function and outputs scores **
-  *  			-- I have commented the code to the extent it made sense to make sense
-  *  			   of botFairy's code
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
-#include "board.h"
-#include "search.h"
-#include "hash.h"
-#include "eval.h"
-
-
-static const char *TESTS_DOCUMENT = "tests.txt";
-static const char *OUTPUT_DOCUMENT = "test_results_navv_C.txt";
-
-// copied over and modified runtest.c's main function
-int main() // returns 1 if an error occurs, 0 otherwise
-{
-	int error_code = 0;
-	board_t position;
-	move_t moves[4];
-	int i, j;
-	int steps = 0;
-	FILE *fp, *outputFP;
-	char line[100];
-	int number_of_tests = 0;
-
-	BOARD_Message_Init();
-	{
-		BOARD_Init(&position);
-		
-		fp = fopen(TESTS_DOCUMENT, "r");
-		outputFP = fopen(OUTPUT_DOCUMENT, "w");
-		if (fp == NULL || outputFP == NULL) {
-			error_code = 1;
-		}
-		else {
-			fgets(line, 100, fp);
-			while (line[0] == '#') {
-				fgets(line, 100, fp);
-			}
-
-			// at this point, the line buffer contains the number of tests to expect in the file (first line of file)
-			// note that each test is its own text file--an ASCII board
-
-			// hand-rolled reading of an integer... why not strtoul?
-			for (i = 0; line[i] >= '0' && line[i] <= '9'; i++) {
-				number_of_tests = number_of_tests * 10 + line[i] - '0';
-			}
-
-			// looping over each board/text file
-			for (i = 0; !error_code && i<number_of_tests; i++)
-			{
-				fgets(line, 100, fp);
-				while (line[0] == '#')
-				{
-					fgets(line, 100, fp);
-				}
-
-				// now, line contains the name of the file, terminated by a newline (\n)
-
-				for (j = 0; line[j] != '\n'; j++)
-				{
-				}
-				line[j] = '\0';
-				sprintf(message, "Reading position \"%s\" from file.\n", line);
-				BOARD_Message();
-
-				// populate the board from the ASCII representation at the given filename...
-				if (BOARD_Read_Position(&position, line))
-				{
-					sprintf(message, "Couldn't read position from file.\n");
-					BOARD_Message();
-					error_code = 1;
-				}
-				else
-				{
-					position.steps = 0;
-					fprintf(outputFP, "File %s: %d\n", line, EVAL_Eval(&position, TRUE));
-
-					// read a line of the tests.txt file we're not using (some limit for the search)
-					// in addition to any comments. NOTE this is done after fprintf so filename is preserved
-					fgets(line, 100, fp);
-					while (line[0] == '#')
-					{
-						fgets(line, 100, fp);
-					}
-				}
-			}
-			fclose(fp);
-			fclose(outputFP);
-		}
-	}
-	BOARD_Message_Exit();
-	return 0;
-}
 */
