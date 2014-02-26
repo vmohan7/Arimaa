@@ -1,16 +1,12 @@
 package game_phase;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Scanner;
 
 import net.sf.javaml.clustering.KMeans;
-import net.sf.javaml.clustering.evaluation.ClusterEvaluation;
-import net.sf.javaml.clustering.evaluation.SumOfSquaredErrors;
 import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
@@ -52,10 +48,9 @@ public class KMeansWrapper {
 	private void readCentroidsFromCSVFile(String centroidFileName) {
 		try {
 			BufferedReader reader = new BufferedReader( (new FileReader(centroidFileName)));
-			String line = "";
-			while((line = reader.readLine()) != null) {
-				
-			}
+			String line = reader.readLine();
+			while (line != null) line = reader.readLine();
+			
 			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
