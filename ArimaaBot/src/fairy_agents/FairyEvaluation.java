@@ -569,9 +569,18 @@ public class FairyEvaluation {
 	
 	
 	/** Evaluates a GameState according to Fairy's eval.c! */
-	public static double evaluate(GameState state, AbstractCombiner combiner) {
+	public static int evaluate(GameState state, AbstractCombiner combiner) {
 		FairyEvaluation fe = new FairyEvaluation();
-		return fe.EVAL_Eval(state, combiner, 0);
+		return fe.EVAL_Eval(fe.new FairyBoard(state), combiner, 0);
+	}
+	
+	/** 
+	 * Evaluates a GameState given a FairyBoard directly (rather than a GameState). 
+	 * (Used for testing! :D)
+	 * */
+	public static int evaluate(FairyBoard bp, AbstractCombiner combiner) {
+		FairyEvaluation fe = new FairyEvaluation();
+		return fe.EVAL_Eval(bp, combiner, 0);
 	}
 	
 	/** 
@@ -581,8 +590,7 @@ public class FairyEvaluation {
 	 * Evaluation is done from gold's perspective.  At the end of the evaluation, 
 	 * it's adjusted to be seen from current player's perspective.
 	 */
-	private double EVAL_Eval(GameState evalState, AbstractCombiner combiner, int verbose) {
-		FairyBoard bp = new FairyBoard(evalState);
+	private int EVAL_Eval(FairyBoard bp, AbstractCombiner combiner, int verbose) {
 				
 	    // evaluation constants
 	    int[] piece_value = {0,RABBIT_VALUE,CAT_VALUE,DOG_VALUE,HORSE_VALUE,CAMEL_VALUE,ELEPHANT_VALUE};
@@ -599,7 +607,7 @@ public class FairyEvaluation {
 	    int i;
 	            
 	    // value variables
-	    double value=0.0; // originally an int in eval.c
+	    int value=0;
 	    int[] material_value = new int[2];
 	    int[] trap_value = new int[2];
 	    int[] rabbit_value = new int[2];

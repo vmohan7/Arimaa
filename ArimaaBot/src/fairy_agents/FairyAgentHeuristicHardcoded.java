@@ -38,7 +38,8 @@ public class FairyAgentHeuristicHardcoded extends AlphaBetaSearchAgent {
 			switch (phase) {
 				case BEGINNING:
 				case MIDDLE:
-					return (int) ((MATERIAL_FAVOR_WEIGHT * materialValue) + (TRAP_FAVOR_WEIGHT * trapValue) + rabbitValue);
+					return (int) ((MATERIAL_FAVOR_WEIGHT * materialValue) + 
+									(TRAP_FAVOR_WEIGHT * trapValue) + rabbitValue);
 				case END:
 				default:
 					return (int) (materialValue + trapValue + (RABBIT_FAVOR_WEIGHT * rabbitValue));
