@@ -10,16 +10,11 @@ import arimaa3.MoveList;
 
 public class FairyAgent extends AlphaBetaSearchAgent {
 	
-	/** This is the original evaluation -- just sum up the values. */
+	/** This is the original evaluation -- uses the default AbstractCombiner implementation. */
 	protected class DefaultCombiner extends AbstractCombiner {
 
 		public DefaultCombiner(GamePhase whichPhase) {
 			super(whichPhase);
-		}
-
-		@Override
-		public double combineScore(double materialValue, double trapValue, double rabbitValue) {
-			return materialValue + trapValue + rabbitValue;
 		}
 		
 	}

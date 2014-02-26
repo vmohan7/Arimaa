@@ -8,6 +8,8 @@ import game_phase.GamePhase;
  * computed by Fairy's evaluation function.
  * As a stylistic choice, each implementation of an AbstractCombiner
  * will live within its corresponding *Agent class.
+ * <br><br><b>NOTE: AbstractCombiner implements the default behavior of Fairy.</b>
+ * <br> (You must override if you want different behaviors for subclasses.)
  * @author Neema, Vivek
  */
 public abstract class AbstractCombiner {
@@ -22,5 +24,23 @@ public abstract class AbstractCombiner {
 		phase = whichPhase;
 	}
 	
-	public abstract double combineScore(double materialValue, double trapValue, double rabbitValue);
+	/** Default combination. */
+	public int combineScore(int materialValue, int trapValue, int rabbitValue) {
+		return materialValue + trapValue + rabbitValue;
+	}
+	
+	/** Default framed-piece weighting. */
+	public int frameValue(int materialValue) {
+		return materialValue * 4/5;
+	}
+	
+	/** Default penalty for advanced (cat|dog). */
+	public int advancedValue(int catDogValue) {
+		return catDogValue * 197 / 200;
+	}
+	
+	/** Default penalty for slightly advanced (cat|dog). */
+	public int slightlyAdvancedValue(int catDogValue) {
+		return catDogValue * 199 / 200;
+	}
 }

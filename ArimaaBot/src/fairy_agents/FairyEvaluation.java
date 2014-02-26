@@ -9,7 +9,6 @@ import java.util.Arrays;
 
 import montecarlo.AbstractCombiner;
 import feature_extractor.FeatureConstants;
-import game_phase.GamePhase;
 import ai_util.Util;
 import arimaa3.GameState;
 
@@ -512,7 +511,7 @@ public class FairyEvaluation {
 /* ------------------------------------ FOR TESTING ONLY ------------------------------------ */ 
 	private static final String TESTS_EXTENSION = "C:/Users/Neema/Desktop/Downloaded Bots/faerie/botFairy/Fairy_full/";
 	private static final String TESTS_DOCUMENT = "tests.txt";
-	private static final String OUTPUT = "test_results_navv_Java.txt";
+	private static final String OUTPUT = "C:/Users/Neema/Desktop/" /*TESTS_EXTENSION*/ + "test_results_navv_Java.txt";
 	
 	/** 
 	 * Reads Fairy's test boards and outputs scores for each one. Ideally,
@@ -523,23 +522,24 @@ public class FairyEvaluation {
 	 * @author Neema
 	 */
 	public static void main(String args[]) {
-		// Currently, I've overloaded EVAL_Eval to take a FairyBoard,
-		// so that EVAL_Eval can be tested directly from ASCII files
 		try {
 			FairyEvaluation fe = new FairyEvaluation(); // for the eval method
 			BufferedReader testsRd = new BufferedReader(new FileReader(TESTS_EXTENSION + TESTS_DOCUMENT));
-			PrintWriter testsWr = new PrintWriter(TESTS_EXTENSION + OUTPUT);
+			PrintWriter testsWr = new PrintWriter(OUTPUT);
 			
 			int nTestCases = Integer.parseInt(readLineIgnoreComments(testsRd));
 			for (int test = 0; test < nTestCases; test++) {
 				String filename = readLineIgnoreComments(testsRd);
 				assert(filename != null);
 				
-				// hacked this line to get it to work after changing the APIs...
-				int score = (int)fe.EVAL_Eval(fe.new FairyBoard(TESTS_EXTENSION + filename), 
-											  new FairyAgent(0).new DefaultCombiner(GamePhase.BEGINNING), 1);
-				testsWr.printf("File %s: %d\n", filename, score);
 				
+				int[] scoreComponents = fe.mainTestEval(fe.new FairyBoard(TESTS_EXTENSION + filename));
+				
+				int score = 0;
+				for (int i = 0; i < scoreComponents.length; i++) score += scoreComponents[i];
+				
+				testsWr.printf("File %s: Score = %5d   ||||   (material: %5d || trap: %5d || rabbit: %5d)%n",
+						filename, score, scoreComponents[0], scoreComponents[1], scoreComponents[2]);
 				
 				String toSkip = readLineIgnoreComments(testsRd);
 				assert(toSkip != null);
@@ -574,21 +574,16 @@ public class FairyEvaluation {
 		return fe.EVAL_Eval(state, combiner, 0);
 	}
 	
-	/** The real evaluation is done here... well, sort of... */
-	private double EVAL_Eval(GameState evalState, AbstractCombiner combiner, int verbose) {
-		FairyBoard bp = new FairyBoard(evalState);
-		return EVAL_Eval(bp, combiner, verbose);
-	}
-	
 	/** 
-	 * Overloaded for our testing purposes. (See main in this file.)
+	 * The real evaluation is done here... 
 	 * DISCLAIMER: This code has been transposed from C (from bot_Fairy) -- it is not ours.
 	 * 
 	 * Evaluation is done from gold's perspective.  At the end of the evaluation, 
 	 * it's adjusted to be seen from current player's perspective.
 	 */
-	private double EVAL_Eval(FairyBoard bp, AbstractCombiner combiner, int verboseUnused) {
-		
+	private double EVAL_Eval(GameState evalState, AbstractCombiner combiner, int verbose) {
+		FairyBoard bp = new FairyBoard(evalState);
+				
 	    // evaluation constants
 	    int[] piece_value = {0,RABBIT_VALUE,CAT_VALUE,DOG_VALUE,HORSE_VALUE,CAMEL_VALUE,ELEPHANT_VALUE};
 	    // variables        
@@ -605,6 +600,615 @@ public class FairyEvaluation {
 	            
 	    // value variables
 	    double value=0.0; // originally an int in eval.c
+	    int[] material_value = new int[2];
+	    int[] trap_value = new int[2];
+	    int[] rabbit_value = new int[2];
+	    
+	    // how many of the pieces do the players have, and where are they?
+	    int[] elephants = new int[2];
+	    int[][] elephant_pos = new int[2][1]; 
+	    int[] camels = new int[2];
+	    int[][] camel_pos = new int[2][1];
+	    int[] horses = new int[2];
+	    int[][] horse_pos = new int[2][2];
+	    int[] dogs = new int[2];
+	    int[][] dog_pos = new int[2][2];
+	    int[] cats = new int[2];
+	    int[][] cat_pos = new int[2][2];
+	    int[] rabbits = new int[2];
+	    int[][] rabbit_pos = new int[2][8];
+	    
+	    // trap evaluation variables
+	    int[] trap_adjacent = new int[2];
+	    int[] trap_adjacent_strength = new int[2];
+	    int[] trap_adjacent_strongest = new int[2];
+	                                     
+	    // material evaluation variables
+	    int[] material = new int[100]; // What is the piece on this square worth?
+	    int piece_frozen;
+	    int piece_adjacent_stronger_enemy;
+	    int piece_adjacent_empty;
+	    int[] piece_adjacent_strongest = new int[2];
+	    int[] piece_adjacent = new int[2];
+	    int piece_adjacent_trap;
+	    
+	    // rabbit evaluation variables
+	    int row;
+	    
+	    // Initialize some evaluation stuff
+	
+	    side_mask[GOLD]=0;
+	    side_mask[SILVER]=1;
+	
+	    // Determine extra information about the board state
+	
+	    for (square=11; square<=88; square++) // loop over board, initialize board state info and find where all the pieces are.
+	    {
+	        if (square%10==9) square+=2;
+	        switch (bp.PIECE(square))
+	        {
+	            case ELEPHANT_PIECE :
+	                elephant_pos[side_mask[bp.OWNER(square)]][elephants[side_mask[bp.OWNER(square)]]]=square;
+	                elephants[side_mask[bp.OWNER(square)]]++;
+	                break;
+	            case CAMEL_PIECE :
+	                camel_pos[side_mask[bp.OWNER(square)]][camels[side_mask[bp.OWNER(square)]]]=square;
+	                camels[side_mask[bp.OWNER(square)]]++;
+	                break;
+	            case HORSE_PIECE :
+	                horse_pos[side_mask[bp.OWNER(square)]][horses[side_mask[bp.OWNER(square)]]]=square;
+	                horses[side_mask[bp.OWNER(square)]]++;
+	                break;
+	            case DOG_PIECE :
+	                dog_pos[side_mask[bp.OWNER(square)]][dogs[side_mask[bp.OWNER(square)]]]=square;
+	                dogs[side_mask[bp.OWNER(square)]]++;
+	                break;
+	            case CAT_PIECE :
+	                cat_pos[side_mask[bp.OWNER(square)]][cats[side_mask[bp.OWNER(square)]]]=square;
+	                cats[side_mask[bp.OWNER(square)]]++;
+	                break;
+	            case RABBIT_PIECE :
+	                rabbit_pos[side_mask[bp.OWNER(square)]][rabbits[side_mask[bp.OWNER(square)]]]=square;
+	                rabbits[side_mask[bp.OWNER(square)]]++;
+	                break;
+	        }
+	        if (bp.OWNER(square)==GOLD || bp.OWNER(square)==SILVER)
+	        {
+	            material[square]=piece_value[bp.PIECE(square)];
+	        } else
+	        {
+	            material[square]=0;
+	        }
+	    }
+	    
+	    // Evaluate trap squares, decide trap ownership.
+	
+	    /* if (verbose)
+	    {
+	        sprintf(message,"Evaluating traps:\n");
+	        BOARD_Message();
+	    } */       
+	    for (trap=0; trap<4; trap++)
+	    {
+	        for (side=0; side<2; side++)
+	        {
+	            trap_adjacent[side]=0;
+	            trap_adjacent_strength[side]=0;
+	            trap_adjacent_strongest[side]=0;
+	        }
+	        for (dir=0; dir<4; dir++)
+	        {
+	            switch (bp.OWNER(trap_square[trap]+direction[dir]))
+	            {
+	                case GOLD :
+	                    trap_adjacent[0]++;
+	                    trap_adjacent_strength[0]+=bp.PIECE(trap_square[trap]+direction[dir]);
+	                    if (bp.PIECE(trap_square[trap]+direction[dir])>trap_adjacent_strongest[0])
+	                    {
+	                        trap_adjacent_strongest[0]=bp.PIECE(trap_square[trap]+direction[dir]);
+	                    }
+	                    break;
+	                case SILVER :
+	                    trap_adjacent[1]++;
+	                    trap_adjacent_strength[1]+=bp.PIECE(trap_square[trap]+direction[dir]);
+	                    if (bp.PIECE(trap_square[trap]+direction[dir])>trap_adjacent_strongest[1])
+	                    {
+	                        trap_adjacent_strongest[1]=bp.PIECE(trap_square[trap]+direction[dir]);
+	                    }
+	                    break;
+	            }
+	        }
+	        // Basically, 200 points are given out per trap.  50 to whoever has the strongest piece by the trap, 
+	        // and 150 points split according to total strength of pieces, with two neutral strength added.
+	        
+	        // case 1 - only one side has pieces by the trap.
+	        if (trap_adjacent[0]>0 && trap_adjacent[1]==0) 
+	        {
+	            trap_value[0]+=50+trap_adjacent_strength[0]*150/(trap_adjacent_strength[0]+1);
+	            /* if (verbose)
+	            {
+	                PRINT_SQUARE(trap_square[trap]);
+	                sprintf(message," is worth Gold (%d) - Silver (%d).\n",50+trap_adjacent_strength[0]*150/(trap_adjacent_strength[0]+1),0);
+	                BOARD_Message();
+	            } */
+	        }
+	        if (trap_adjacent[1]>0 && trap_adjacent[0]==0)
+	        {
+	            trap_value[1]+=50+trap_adjacent_strength[1]*150/(trap_adjacent_strength[1]+1);
+	            /* if (verbose)
+	            {
+	                PRINT_SQUARE(trap_square[trap]);
+	                sprintf(message," is worth Gold (%d) - Silver (%d).\n",0,50+trap_adjacent_strength[1]*150/(trap_adjacent_strength[1]+1));
+	                BOARD_Message();
+	            } */
+	        }
+	        // case 2 - both sides have pieces by the trap.
+	        if (trap_adjacent[0]>0 && trap_adjacent[1]>0)
+	        {
+	            // subcase 1 - they are equally strong.  Split 100 points according to number of pieces.
+	            if (trap_adjacent_strongest[0]==trap_adjacent_strongest[1])
+	            {
+	                trap_value[0]+=trap_adjacent_strength[0]*200/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1);
+	                trap_value[1]+=trap_adjacent_strength[1]*200/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1);
+	                /* if (verbose)
+	                {
+	                    PRINT_SQUARE(trap_square[trap]);
+	                    sprintf(message," is worth Gold (%d) - Silver (%d).\n",trap_adjacent_strength[0]*200/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1),trap_adjacent_strength[1]*200/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1));
+	                    BOARD_Message();
+	                } */
+	            }
+	            // subcase 2 - gold is stronger.  Give 50 points to gold, and split 50 according to number of pieces.
+	            if (trap_adjacent_strongest[0]>trap_adjacent_strongest[1])
+	            {
+	                trap_value[0]+=50+trap_adjacent_strength[0]*150/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1);
+	                trap_value[1]+=trap_adjacent_strength[1]*150/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1);
+	                /* if (verbose)
+	                {
+	                    PRINT_SQUARE(trap_square[trap]);
+	                    sprintf(message," is worth Gold (%d) - Silver (%d).\n",50+trap_adjacent_strength[0]*150/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1),trap_adjacent_strength[1]*150/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1));
+	                    BOARD_Message();
+	                } */
+	            }
+	            // subcase 3 - silver is stronger.  Give 50 points to silver, and split 50 according to number of pieces.
+	            if (trap_adjacent_strongest[1]>trap_adjacent_strongest[0])
+	            {
+	                trap_value[0]+=trap_adjacent_strength[0]*150/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1);
+	                trap_value[1]+=50+trap_adjacent_strength[1]*150/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1);
+	                /* if (verbose)
+	                {
+	                    PRINT_SQUARE(trap_square[trap]);
+	                    sprintf(message," is worth Gold (%d) - Silver (%d).\n",trap_adjacent_strength[0]*150/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1),50+trap_adjacent_strength[1]*150/(trap_adjacent_strength[0]+trap_adjacent_strength[1]+1));
+	                    BOARD_Message();
+	                } */
+	            }
+	        }
+	        // special case - give minus for (possible) frames
+	        if (bp.OWNER(trap_square[trap])==GOLD && trap_adjacent[1]>2)
+	        {
+	            material[trap_square[trap]]=combiner.frameValue(material[trap_square[trap]]); //*4/5; // Trapped piece loses 20% of its value
+	            /* if (verbose)
+	            {
+	                sprintf(message,"Piece at ");
+	                BOARD_Message();
+	                PRINT_SQUARE(trap_square[trap]);
+	                sprintf(message," is worth %d due to being (possibly) framed.\n",material[trap_square[trap]]);
+	                BOARD_Message();
+	            } */
+	        }
+	        if (bp.OWNER(trap_square[trap])==SILVER && trap_adjacent[0]>2)
+	        {
+	            material[trap_square[trap]]=combiner.frameValue(material[trap_square[trap]]); //*4/5; // Trapped piece loses 20% of its value
+	            /* if (verbose)
+	            {
+	                sprintf(message,"Piece at ");
+	                BOARD_Message();
+	                PRINT_SQUARE(trap_square[trap]);
+	                sprintf(message," is worth %d due to being (possibly) framed.\n",material[trap_square[trap]]);
+	                BOARD_Message();
+	            } */
+	        }
+	    }
+	    
+	    // Evaluate material and individual pieces.
+	
+	    for (side=0; side<2; side++)
+	    {
+	        for (i=0; i<cats[side]; i++)
+	        {
+	            switch (side)
+	            {
+	                case 0 : 
+	                    row=bp.ROW(cat_pos[0][i]);
+	                    break;
+	                case 1 :
+	                default: // needed to include so Java knows row was initialized
+	                    row=9-bp.ROW(cat_pos[1][i]);
+	                    break;
+	            }
+	            if (row>3)
+	            {
+	                material[cat_pos[side][i]]=combiner.advancedValue(material[cat_pos[side][i]]); //*197/200; // Advanced cat lose 1.5 % of its value
+	                /* if (verbose)
+	                {
+	                    PRINT_SQUARE(cat_pos[side][i]);
+	                    sprintf(message," is worth %d due to being an advanced cat.\n",material[cat_pos[side][i]]);
+	                    BOARD_Message();
+	                } */
+	            } else if (row==3)
+	            {
+	                material[cat_pos[side][i]]=combiner.slightlyAdvancedValue(material[cat_pos[side][i]]); //*199/200; // Slightly advanced cat lose 0.5 % of its value
+	                /* if (verbose)
+	                {
+	                    PRINT_SQUARE(cat_pos[side][i]);
+	                    sprintf(message," is worth %d due to being a slightly advanced cat.\n",material[cat_pos[side][i]]);
+	                    BOARD_Message();
+	                } */
+	            }
+	        }
+	    
+	        for (i=0; i<dogs[side]; i++)
+	        {
+	            switch (side)
+	            {
+	                case 0 : 
+	                    row=bp.ROW(dog_pos[0][i]);
+	                    break;
+	                case 1 :
+	                default: // needed to include so Java knows row was initialized
+	                    row=9-bp.ROW(dog_pos[1][i]);
+	                    break;
+	            }
+	            if (row>3)
+	            {
+	                material[dog_pos[side][i]]=combiner.advancedValue(material[dog_pos[side][i]]); //*197/200; // Advanced dog lose 1.5 % of its value
+	                /* if (verbose)
+	                {
+	                    PRINT_SQUARE(dog_pos[side][i]);
+	                    sprintf(message," is worth %d due to being an advanced dog.\n",material[dog_pos[side][i]]);
+	                    BOARD_Message();
+	                } */
+	            } else if (row==3)
+	            {
+	                material[dog_pos[side][i]]=combiner.slightlyAdvancedValue(material[dog_pos[side][i]]); //*199/200; // Slightly advanced dog lose 0.5 % of its value
+	                /* if (verbose)
+	                {
+	                    PRINT_SQUARE(dog_pos[side][i]);
+	                    sprintf(message," is worth %d due to being a slightly advanced dog.\n",material[dog_pos[side][i]]);
+	                    BOARD_Message();
+	                } */
+	            }
+	        }
+	    }
+	
+	    for (square=11; square<=88; square++)
+	    {    
+	        if (square%10==9) square+=2;
+	        if (bp.OWNER(square)==GOLD || bp.OWNER(square)==SILVER)
+	        {
+	            // Check if it's frozen, number of adjacent empty, strongest adjacent, and all that
+	            piece_adjacent[0]=0;
+	            piece_adjacent[1]=0;
+	            piece_adjacent_empty=0;
+	            piece_adjacent_strongest[0]=0;
+	            piece_adjacent_strongest[1]=0;
+	            for (dir=0; dir<4; dir++)
+	            {
+	                switch (bp.OWNER(square+direction[dir]))
+	                {
+	                    case GOLD :
+	                        piece_adjacent[0]++;
+	                        if (bp.PIECE(square+direction[dir])>piece_adjacent_strongest[0])
+	                        {
+	                            piece_adjacent_strongest[0]=bp.PIECE(square+direction[dir]);
+	                        }
+	                        break;
+	                    case SILVER :
+	                        piece_adjacent[1]++;
+	                        if (bp.PIECE(square+direction[dir])>piece_adjacent_strongest[1])
+	                        {
+	                            piece_adjacent_strongest[1]=bp.PIECE(square+direction[dir]);
+	                        }
+	                        break;
+	                    case EMPTY :
+	                        piece_adjacent_empty++;
+	                        break;
+	                }
+	            }
+	            switch (bp.OWNER(square))
+	            {
+	                case GOLD :
+	                    piece_adjacent_stronger_enemy=piece_adjacent_strongest[1]>bp.PIECE(square) ? 1 : 0; // used ternary to mimic c evaluation of conditions
+	                    piece_frozen=(piece_adjacent_stronger_enemy == 1 && piece_adjacent[0]==0) ? 1 : 0;
+	                    break;
+	                case SILVER :
+	                default		: // more initialization hacks
+	                    piece_adjacent_stronger_enemy=piece_adjacent_strongest[0]>bp.PIECE(square) ? 1 : 0;
+	                    piece_frozen=(piece_adjacent_stronger_enemy == 1 && piece_adjacent[1]==0) ? 1 : 0;
+	                    break;
+	            }
+	            if (piece_frozen == 1)
+	            {
+	                material[square]=material[square]*9/10; // Frozen piece loses 10% of its value
+	                /* if (verbose)
+	                {
+	                    PRINT_SQUARE(square);
+	                    sprintf(message," is worth %d due to being frozen.\n",material[square]);
+	                    BOARD_Message();
+	                } */
+	            }
+	            if (piece_adjacent_empty==0) 
+	            {
+	                material[square]=material[square]*199/200; // Immobile piece loses 0.5% of its value
+	                /* if (verbose)
+	                {
+	                    PRINT_SQUARE(square);
+	                    sprintf(message," is worth %d due to being immobile.\n",material[square]);
+	                    BOARD_Message();
+	                } */
+	            }
+	            if ((piece_frozen == 1 || piece_adjacent_empty==0) && piece_adjacent_stronger_enemy == 1) // Our piece has limited mobility, and there is a stronger enemy piece adjacent
+	            {
+	                // Check if it's held hostage or threatened by a capture
+	                if (adjacent_trap[square] != 0) // It's adjacent to a trap
+	                {
+	                    // If we have no other piece next to the trap, then consider this piece to be threatened, losing 30% of its value
+	                    piece_adjacent_trap=0;
+	                    for (dir=0; dir<4; dir++)
+	                    {
+	                        if (bp.OWNER(adjacent_trap[square]+direction[dir])==bp.OWNER(square))
+	                        {
+	                            piece_adjacent_trap++;
+	                        }
+	                    }
+	                    if (piece_adjacent_trap==1)
+	                    {
+	                        material[square]=material[square]*7/10;
+	                        /* if (verbose)
+	                        {
+	                            PRINT_SQUARE(square);
+	                            sprintf(message," is worth %d due to being threatened (distance 1).\n",material[square]);
+	                            BOARD_Message();
+	                        } */
+	                    }
+	                }
+	                if (adjacent2_trap[square] != 0 && bp.BOARD(adjacent2_trap[square])==EMPTY_SQUARE) 
+	                // It's two steps away from an empty trap
+	                {
+	                    // If we have no piece next to the trap,
+	                    // Really - should check so that there is a free path to trap.
+	                    // then consider this piece to be threatened, losing 30% of its value
+	                    piece_adjacent_trap=0;
+	                    for (dir=0; dir<4; dir++)
+	                    {
+	                        if (bp.OWNER(adjacent2_trap[square]+direction[dir])==bp.OWNER(square))
+	                        {
+	                            piece_adjacent_trap++;
+	                        }
+	                    }
+	                    if (piece_adjacent_trap==0)
+	                    {
+	                        material[square]=material[square]*7/10;
+	                        /* if (verbose)
+	                        {
+	                            PRINT_SQUARE(square);
+	                            sprintf(message," is worth %d due to being threatened (distance 2).\n",material[square]);
+	                            BOARD_Message();
+	                        } */
+	                    }
+	                }
+	            }
+	            // Another case - if adjacent to a trap, and no other friendly piece adjacent, various possibilities for being threatened....
+	            switch (bp.OWNER(square))
+	            {
+	                case GOLD :
+	                    material_value[0]+=material[square];
+	                    break;
+	                case SILVER :
+	                    material_value[1]+=material[square];
+	                    break;
+	            }
+	        }
+	    }
+	    
+	    // Evaluate rabbits
+	
+	    for (i=0; i<rabbits[0]; i++)
+	    {
+	        row=bp.ROW(rabbit_pos[0][i]);
+	        rabbit_value[0]+=(row-1)*(row-1)*(row-1);
+	        if (row==7)
+	        {
+	            switch (bp.OWNER(rabbit_pos[0][i]+NORTH))
+	            {
+	                case EMPTY :
+	                    rabbit_value[0]+=RABBIT_FREE_AHEAD;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[0][i]);
+	                        sprintf(message," : gold rabbit value increased by %d due to free space ahead\n",RABBIT_FREE_AHEAD);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	                case GOLD :
+	                    rabbit_value[0]+=RABBIT_FRIENDLY_AHEAD;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[0][i]);
+	                        sprintf(message," : gold rabbit value increased by %d due to friendly piece ahead\n",RABBIT_FRIENDLY_AHEAD);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	            }
+	            switch (bp.OWNER(rabbit_pos[0][i]+EAST))
+	            {
+	                case EMPTY :
+	                    rabbit_value[0]+=RABBIT_FREE_SIDE;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[0][i]);
+	                        sprintf(message," : gold rabbit value increased by %d due to free space to the east\n",RABBIT_FREE_SIDE);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	                case GOLD :
+	                    rabbit_value[0]+=RABBIT_FRIENDLY_SIDE;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[0][i]);
+	                        sprintf(message," : gold rabbit value increased by %d due to friendly piece to the east\n",RABBIT_FRIENDLY_SIDE);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	            }
+	            switch (bp.OWNER(rabbit_pos[0][i]+WEST))
+	            {
+	                case EMPTY :
+	                    rabbit_value[0]+=RABBIT_FREE_SIDE;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[0][i]);
+	                        sprintf(message," : gold rabbit value increased by %d due to free space to the west\n",RABBIT_FREE_SIDE);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	                case GOLD :
+	                    rabbit_value[0]+=RABBIT_FRIENDLY_SIDE;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[0][i]);
+	                        sprintf(message," : gold rabbit value increased by %d due to friendly piece to the west\n",RABBIT_FRIENDLY_SIDE);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	            }
+	        }
+	    }
+	    for (i=0; i<rabbits[1]; i++)
+	    {
+	        row=9-bp.ROW(rabbit_pos[1][i]);
+	        rabbit_value[1]+=(row-1)*(row-1)*(row-1); // Modified from original Fairy code to match gold rabbit value calculation
+//	        rabbit_value[1]+=(row-1)*(row-1);		  // Original
+	        if (row==7)
+	        {
+	            switch (bp.OWNER(rabbit_pos[1][i]+SOUTH))
+	            {
+	                case EMPTY :
+	                    rabbit_value[1]+=RABBIT_FREE_AHEAD;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[1][i]);
+	                        sprintf(message," : silver rabbit value increased by %d due to free space ahead\n",RABBIT_FREE_AHEAD);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	                case SILVER :
+	                    rabbit_value[1]+=RABBIT_FRIENDLY_AHEAD;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[1][i]);
+	                        sprintf(message," : silver rabbit value increased by %d due to friendly piece ahead\n",RABBIT_FRIENDLY_AHEAD);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	            }
+	            switch (bp.OWNER(rabbit_pos[1][i]+EAST))
+	            {
+	                case EMPTY :
+	                    rabbit_value[1]+=RABBIT_FREE_SIDE;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[1][i]);
+	                        sprintf(message," : silver rabbit value increased by %d due to free space to the east\n",RABBIT_FREE_SIDE);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	                case SILVER :
+	                    rabbit_value[1]+=RABBIT_FRIENDLY_SIDE;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[1][i]);
+	                        sprintf(message," : silver rabbit value increased by %d due to friendly piece to the east\n",RABBIT_FRIENDLY_SIDE);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	            }
+	            switch (bp.OWNER(rabbit_pos[1][i]+WEST))
+	            {
+	                case EMPTY :
+	                    rabbit_value[1]+=RABBIT_FREE_SIDE;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[1][i]);
+	                        sprintf(message," : silver rabbit value increased by %d due to free space to the west\n",RABBIT_FREE_SIDE);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	                case SILVER :
+	                    rabbit_value[1]+=RABBIT_FRIENDLY_SIDE;
+	                    /* if (verbose)
+	                    {
+	                        PRINT_SQUARE(rabbit_pos[1][i]);
+	                        sprintf(message," : silver rabbit value increased by %d due to friendly piece to the west\n",RABBIT_FRIENDLY_SIDE);
+	                        BOARD_Message();
+	                    } */
+	                    break;
+	            }
+	        }
+	    }
+	    
+	    // Add up all the factors
+	    int materialValue = material_value[0] - material_value[1];
+	    int trapValue = trap_value[0] - trap_value[1];
+	    int rabbitValue = rabbit_value[0] - rabbit_value[1];
+	    value = combiner.combineScore(materialValue, trapValue, rabbitValue);
+//	    value+=material_value[0]-material_value[1];
+//	    value+=trap_value[0]-trap_value[1];
+//	    value+=rabbit_value[0]-rabbit_value[1];
+	
+	    /* if (verbose)
+	    {
+	        sprintf(message,"Material value Gold (%d) - Silver (%d)\n",material_value[0],material_value[1]);
+	        BOARD_Message();
+	        sprintf(message,"Trap value Gold (%d) - Silver (%d)\n",trap_value[0],trap_value[1]);
+	        BOARD_Message();
+	        sprintf(message,"Rabbit value Gold (%d) - Silver (%d)\n",rabbit_value[0],rabbit_value[1]);
+	        BOARD_Message();
+	    } */
+	        
+	    // Adjust evaluation to be from the perspective of the present player.
+	
+	    if (bp.getAtMove()==SILVER)
+	    {
+	        value=-value;
+	    }
+	    return value;
+	}
+
+
+
+
+	/** 
+	 * Copied and slightly modified version of evaluation for our test in main.
+	 * Returns each component of the score calculation.
+	 */
+	private int[] mainTestEval(FairyBoard bp) {
+		
+	    // evaluation constants
+	    int[] piece_value = {0,RABBIT_VALUE,CAT_VALUE,DOG_VALUE,HORSE_VALUE,CAMEL_VALUE,ELEPHANT_VALUE};
+	    // variables        
+	    
+	    // utility variables
+	    int[] side_mask = new int[OWNER_MASK];
+	     
+	    // loop variables
+	    int square; 
+	    int side;
+	    int trap;
+	    int dir;
+	    int i;
+	            
+	    // value variables
+	    // double value=0.0; // originally an int in eval.c
 	    int[] material_value = new int[2];
 	    int[] trap_value = new int[2];
 	    int[] rabbit_value = new int[2];
@@ -1164,28 +1768,18 @@ public class FairyEvaluation {
 	    int materialValue = material_value[0] - material_value[1];
 	    int trapValue = trap_value[0] - trap_value[1];
 	    int rabbitValue = rabbit_value[0] - rabbit_value[1];
-	    value = combiner.combineScore(materialValue, trapValue, rabbitValue);
-//	    value+=material_value[0]-material_value[1];
-//	    value+=trap_value[0]-trap_value[1];
-//	    value+=rabbit_value[0]-rabbit_value[1];
-	
-	    /* if (verbose)
-	    {
-	        sprintf(message,"Material value Gold (%d) - Silver (%d)\n",material_value[0],material_value[1]);
-	        BOARD_Message();
-	        sprintf(message,"Trap value Gold (%d) - Silver (%d)\n",trap_value[0],trap_value[1]);
-	        BOARD_Message();
-	        sprintf(message,"Rabbit value Gold (%d) - Silver (%d)\n",rabbit_value[0],rabbit_value[1]);
-	        BOARD_Message();
-	    } */
-	        
-	    // Adjust evaluation to be from the perspective of the present player.
-	
-	    if (bp.getAtMove()==SILVER)
-	    {
-	        value=-value;
-	    }
-	    return value;
+	    
+	    int[] toPopulate = new int[3];
+	    toPopulate[0] = materialValue;
+	    toPopulate[1] = trapValue;
+	    toPopulate[2] = rabbitValue;
+	    
+	//    if (bp.getAtMove()==SILVER)
+	//    {
+	//        
+	//    }
+	    
+	    return toPopulate;
 	}
 }
 

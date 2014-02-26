@@ -16,6 +16,9 @@ Plotting/*.csv
 Plotting/*.jpg
 Plotting/*.fig
 
+# Python (compiled python files?)
+*.pyc
+
 # OS Files #
 .DS_Store
  

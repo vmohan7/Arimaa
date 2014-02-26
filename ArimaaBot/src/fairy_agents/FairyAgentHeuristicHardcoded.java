@@ -20,31 +20,67 @@ public class FairyAgentHeuristicHardcoded extends AlphaBetaSearchAgent {
 		/** Factor by which a value (e.g. rabbit value, trap value, 
 		 * material value) is favored depending on the game phase.
 		 */
-		private static final double FAVOR_WEIGHT = 1.2;
+		public static final double MATERIAL_FAVOR_WEIGHT = 2.0,
+								   TRAP_FAVOR_WEIGHT = MATERIAL_FAVOR_WEIGHT,
+								   RABBIT_FAVOR_WEIGHT = 12.0;
 
 		public HardcodedCombiner(GamePhase whichPhase) {
 			super(whichPhase);
 		}
 
 		/**
-		 * Combine scores using hard-coded weights. If the game is in the beginning,
-		 * then favor trap value; if middle, then favor material value; if end, then
+		 * Combine scores using hard-coded weights. If the game is in the beginning
+		 * or middle, then favor material and trap value; if end, then greatly
 		 * favor rabbit value.
 		 */		
 		@Override
-		public double combineScore(double materialValue, double trapValue, double rabbitValue) {
+		public int combineScore(int materialValue, int trapValue, int rabbitValue) {
 			switch (phase) {
 				case BEGINNING:
-					return materialValue + (FAVOR_WEIGHT * trapValue) + rabbitValue;
 				case MIDDLE:
-					return (FAVOR_WEIGHT * materialValue) + trapValue + rabbitValue;
+					return (int) ((MATERIAL_FAVOR_WEIGHT * materialValue) + (TRAP_FAVOR_WEIGHT * trapValue) + rabbitValue);
 				case END:
 				default:
-					return materialValue + trapValue + (FAVOR_WEIGHT * rabbitValue);
+					return (int) (materialValue + trapValue + (RABBIT_FAVOR_WEIGHT * rabbitValue));
 			}
 		}
 		
+		
+		/** 
+		 * In the end game, framed pieces should not be penalized since
+		 * the opponent is making his/her own piece commitment in order
+		 * to maintain the frame. (This is very costly in end game.)
+		 */
+		@Override
+		public int frameValue(int materialValue) {
+			if (phase == GamePhase.END) return materialValue; 
+			return super.frameValue(materialValue);			
+		}
+		
+		
+		/** 
+		 * The penalty should be increased in the beginning game since
+		 * the cat or dog would probably be on its own and very vulnerable.
+		 */
+		@Override
+		public int advancedValue(int catDogValue) {
+			if (phase == GamePhase.BEGINNING) return catDogValue * 9 / 10;
+			return super.advancedValue(catDogValue);
+		}
+		
+		
+		/** 
+		 * The penalty should be increased slightly in the beginning game since
+		 * the cat or dog would probably not have close support. 
+		 */
+		@Override
+		public int slightlyAdvancedValue(int catDogValue) {
+			if (phase == GamePhase.BEGINNING) return catDogValue * 99 / 100;
+			return super.advancedValue(catDogValue);
+		}
+		
 	}
+	
 	
 	private static final int GAME_OVER_SCORE = 500000;
 	private HardcodedCombiner hCombiner;

@@ -98,6 +98,7 @@ public class ArimaaEngineInterface {
 						gc.setAgent( new FairyAgent(1) );
 					else if (bot_type == 6)
 						gc.setAgent( new FairyAgentHeuristicHardcoded(1) );
+
 				}
 				else if (AEIcommand.command.equals("makemove")) {
 					String move_text = AEIcommand.getRestOfCommand();
