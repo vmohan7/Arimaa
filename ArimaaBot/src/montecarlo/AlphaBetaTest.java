@@ -12,7 +12,7 @@ import arimaa3.GameState;
 import arimaa3.MoveList;
 
 public class AlphaBetaTest {
-	public static int DEPTH = 1; //TODO: must be an even number so that the evaluation will evaluate from the perspective of the root node
+	public static int DEPTH = 2;
 	private static class TestAgent extends AlphaBetaSearchAgent {
 
 		private boolean firstMove = false;
@@ -71,20 +71,10 @@ public class AlphaBetaTest {
 			}
 			//return eval.Evaluate(state.getCurr(), false);
 		}
-
-		public static int PRUNE = 3;
-		
 	
 		public MoveList getMoves(GameState state) {
 			MoveList moves = engine.genRootMoves(state); 
-			MoveList m = new MoveList(PRUNE);
-			int[] positions = {1,6,12};
-			for(int i = 0; i < PRUNE; i++ ){
-				ArimaaMove move = m.getMove();
-				move.copy( moves.move_list[ positions[i] ] );
-			}
-			
-			return m;
+			return moves;
 		}
 		
 		@Override
@@ -174,14 +164,7 @@ public class AlphaBetaTest {
 		@Override
 		protected MoveList getMoves(ArimaaState state) {
 			MoveList moves = engine.genRootMoves(state.getCurr()); 
-			MoveList m = new MoveList(PRUNE);
-			int[] positions = {1,6,12};
-			for(int i = 0; i < PRUNE; i++ ){
-				ArimaaMove move = m.getMove();
-				move.copy( moves.move_list[ positions[i] ] );
-			}
-			
-			return m;
+			return moves;
 		}
 		
 		
@@ -190,10 +173,15 @@ public class AlphaBetaTest {
 	@Test
 	public void test() {
 		TestAgent agent = new TestAgent(DEPTH);
-		ArimaaState game = new ArimaaState(new GameState(
-					"17b %13 +-----------------+%138| r             r |%137| r   r d     r   |%136|             E   |%135|                 |%134|                 |%133| R     e C R     |%132|   R           R |%131|               R |%13+-----------------+%13   a b c d e f g h%13"), null);
+		String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
+	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
+		ArimaaState game = new ArimaaState(new GameState(white, black), null);
+
+		double time = System.currentTimeMillis();
+		
 		ArimaaMove move = agent.selectMove(game, agent.getMoves(game.getCurr()) );
 		System.out.println(game.getCurr().toBoardString());
+		System.out.println( System.currentTimeMillis() - time );
 	}
 
 }
