@@ -1,5 +1,9 @@
 package montecarlo;
 
+import fairy_agents.FairyEvaluation;
+import game_phase.GamePhase;
+import game_phase.GamePhaseHeuristicDiscriminator;
+
 import java.util.ArrayList;
 
 import org.junit.Test;
@@ -18,7 +22,16 @@ public class AlphaBetaTest {
 		private boolean firstMove = false;
 		private ArimaaEvaluate2 eval;
 		public ArrayList< ArrayList<Double> > depthPrint;
-		
+		private DefaultCombiner dCombiner;
+
+		/** This is the original evaluation -- uses the default AbstractCombiner implementation. */
+		protected class DefaultCombiner extends AbstractCombiner {
+
+			public DefaultCombiner(GamePhase whichPhase) {
+				super(whichPhase);
+			}
+			
+		}
 
 		public TestAgent(int depth) {
 			super(null, false, depth);
@@ -27,6 +40,7 @@ public class AlphaBetaTest {
 			for(int i = 0; i < DEPTH; i++){
 				depthPrint.add( new ArrayList<Double>() );
 			}
+			dCombiner = new DefaultCombiner(null); //expect the null to be overwritten before use
 		}
 
 		@Override
@@ -64,18 +78,18 @@ public class AlphaBetaTest {
 		
 		@Override
 		protected double evaluation(ArimaaState state) {
-			if (state.getCurr().player == Constants.PL_WHITE ){
-				return getRank( state.getCurr().piece_bb[Constants.PT_WHITE_RABBIT] );
-			} else {
-				return -getRank( state.getCurr().piece_bb[Constants.PT_WHITE_RABBIT] );
-			}
-			//return eval.Evaluate(state.getCurr(), false);
+//			if (state.getCurr().player == Constants.PL_WHITE ){
+//				return getRank( state.getCurr().piece_bb[Constants.PT_WHITE_RABBIT] );
+//			} else {
+//				return -getRank( state.getCurr().piece_bb[Constants.PT_WHITE_RABBIT] );
+//			}
+//			
+			// Copied from FairyAgent.java
+			GameState curr = state.getCurr();
+			dCombiner.setGamePhase(GamePhaseHeuristicDiscriminator.getStrictGamePhase(curr));
+			return FairyEvaluation.evaluate(curr, dCombiner);
 		}
-	
-		public MoveList getMoves(GameState state) {
-			MoveList moves = engine.genRootMoves(state); 
-			return moves;
-		}
+
 		
 		@Override
 		public ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves){
@@ -163,7 +177,9 @@ public class AlphaBetaTest {
 
 		@Override
 		protected MoveList getMoves(ArimaaState state) {
+			double time = System.currentTimeMillis();
 			MoveList moves = engine.genRootMoves(state.getCurr()); 
+			System.out.println((System.currentTimeMillis() - time) + " ms for 'getMoves'");
 			return moves;
 		}
 		
@@ -179,10 +195,14 @@ public class AlphaBetaTest {
 
 		double time = System.currentTimeMillis();
 		
-		ArimaaMove move = agent.selectMove(game, agent.getMoves(game.getCurr()) );
+		ArimaaMove move = agent.selectMove(game, agent.getMoves(game) );
 		System.out.println(game.getCurr().toBoardString());
-		System.out.println( System.currentTimeMillis() - time );
+		System.out.println( System.currentTimeMillis() - time + " ms elapsed");
 	}
+	
+	// Vivek's laptop gets 440 ms for dummy eval at depth 1
+	// 					   750 ms for Fairy (default combiner) eval at depth 1
+	// 					   100 to 2000 ms for one call to getMoves()
 
 }
 
