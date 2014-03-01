@@ -78,12 +78,13 @@ public class AlphaBetaTest {
 		
 		@Override
 		protected double evaluation(ArimaaState state) {
+			// Use dummy evaluation
 //			if (state.getCurr().player == Constants.PL_WHITE ){
 //				return getRank( state.getCurr().piece_bb[Constants.PT_WHITE_RABBIT] );
 //			} else {
 //				return -getRank( state.getCurr().piece_bb[Constants.PT_WHITE_RABBIT] );
 //			}
-//			
+			
 			// Copied from FairyAgent.java
 			GameState curr = state.getCurr();
 			dCombiner.setGamePhase(GamePhaseHeuristicDiscriminator.getStrictGamePhase(curr));
@@ -111,20 +112,21 @@ public class AlphaBetaTest {
 			System.out.println("Root Alpha:"+maxAlpha);
 			System.out.println("Best Move:"+bestMove);
 			
-			for(int i = depthPrint.size() - 1; i >= 0; i-- ){
-				ArrayList<Double> nodes = depthPrint.get(i);
-				for(int j = 0; j < nodes.size(); j++){
-					double t = nodes.get(j);
-					if (t == Double.POSITIVE_INFINITY ){
-						System.out.print( "| ");
-					}
-					else {
-						System.out.print( nodes.get(j) + " ");
-					}
-				}
-				
-				System.out.println();
-			}
+			// Print out node scores for all nodes in tree
+//			for(int i = depthPrint.size() - 1; i >= 0; i-- ){
+//				ArrayList<Double> nodes = depthPrint.get(i);
+//				for(int j = 0; j < nodes.size(); j++){
+//					double t = nodes.get(j);
+//					if (t == Double.POSITIVE_INFINITY ){
+//						System.out.print( "| ");
+//					}
+//					else {
+//						System.out.print( nodes.get(j) + " ");
+//					}
+//				}
+//				
+//				System.out.println();
+//			}
 			
 			return bestMove;
 		}
@@ -149,7 +151,7 @@ public class AlphaBetaTest {
 				return score; //TODO determine if we should put a negative here 
 			}
 
-			MoveList moves = getMoves(nextState);  //Changed getMoves for just a GameState and called it on next as oppsed to curr
+			MoveList moves = getMoves(nextState); 
 			
 			if (isMaxPlayer){
 				for(ArimaaMove move: moves){
@@ -177,9 +179,9 @@ public class AlphaBetaTest {
 
 		@Override
 		protected MoveList getMoves(ArimaaState state) {
-			double time = System.currentTimeMillis();
+//			double time = System.currentTimeMillis();
 			MoveList moves = engine.genRootMoves(state.getCurr()); 
-			System.out.println((System.currentTimeMillis() - time) + " ms for 'getMoves'");
+//			System.out.println((System.currentTimeMillis() - time) + " ms for 'getMoves'");
 			return moves;
 		}
 		
@@ -200,9 +202,15 @@ public class AlphaBetaTest {
 		System.out.println( System.currentTimeMillis() - time + " ms elapsed");
 	}
 	
-	// Vivek's laptop gets 440 ms for dummy eval at depth 1
-	// 					   750 ms for Fairy (default combiner) eval at depth 1
-	// 					   100 to 2000 ms for one call to getMoves()
+	/*
+	 *  Vivek's laptop gets...
+	 *  440 ms for dummy eval at depth 1
+	 *  750 ms for Fairy (default combiner) eval at depth 1
+	 *  100 to 2000 ms for one call to getMoves()
+	 *  30 seconds for depth 2 search with Fairy eval and movelist size capped at 20,000
+	 *  14 seconds for depth 2 search with dummy eval and movelist size capped at 20,000
+	 */
+				   
 
 }
 
