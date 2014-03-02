@@ -179,9 +179,8 @@ public class AlphaBetaTest {
 
 		@Override
 		protected MoveList getMoves(ArimaaState state) {
-//			double time = System.currentTimeMillis();
-			MoveList moves = engine.genRootMoves(state.getCurr()); 
-//			System.out.println((System.currentTimeMillis() - time) + " ms for 'getMoves'");
+//			MoveList moves = engine.genRootMoves(state.getCurr()); 
+			MoveList moves = genRootMovesArrayList(state.getCurr()); 
 			return moves;
 		}
 		
