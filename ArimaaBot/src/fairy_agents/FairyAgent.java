@@ -48,9 +48,4 @@ public class FairyAgent extends AlphaBetaSearchAgent {
 		return FairyEvaluation.evaluate(curr, dCombiner);
 	}
 
-	@Override
-	protected MoveList getMoves(ArimaaState state) {
-		return engine.genRootMoves(state.getCurr());
-	}
-
 }

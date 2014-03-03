@@ -8,11 +8,9 @@ import arimaa3.MoveList;
 
 public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 
-	protected ArimaaEngine engine;
 	protected int maxDepth;
 	public AlphaBetaSearchAgent(double[] weights, boolean training, int depth) {
 		super(weights, training);
-		engine = new ArimaaEngine();
 		maxDepth = depth;
 	}
 
@@ -25,7 +23,13 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 	 */
 	protected abstract double getGameOverScore(GameState gs);
 	protected abstract double evaluation(ArimaaState state);
-	protected abstract MoveList getMoves(ArimaaState state);
+
+	/** Uses the ArrayList implementation of genRootMoves() to get all 
+	 * moves from an ArimaaState.
+	 */
+	protected MoveList getMoves(ArimaaState state){
+		return genRootMovesArrayList(state.getCurr()); 
+	}
 	
 	//use ArimaaState such that the next move is filled in by this function
 	//we assume that the next move is null

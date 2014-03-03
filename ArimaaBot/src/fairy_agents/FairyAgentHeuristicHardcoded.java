@@ -107,9 +107,4 @@ public class FairyAgentHeuristicHardcoded extends AlphaBetaSearchAgent {
 		return FairyEvaluation.evaluate(curr, hCombiner);
 	}
 
-	@Override
-	protected MoveList getMoves(ArimaaState state) {
-		return engine.genRootMoves(state.getCurr());
-	}
-
 }
