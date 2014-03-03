@@ -95,7 +95,7 @@ public class ArimaaEngineInterface {
 					else if (bot_type == 4)
 						gc.setAgent(new NAVVClueless(null, false, 2, hyp));
 					else if (bot_type == 5)
-						gc.setAgent( new FairyAgent(1) );
+						gc.setAgent( new FairyAgent(2) );
 					else if (bot_type == 6)
 						gc.setAgent( new FairyAgentHeuristicHardcoded(1) );
 
