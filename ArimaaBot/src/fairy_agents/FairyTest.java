@@ -5,18 +5,15 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import arimaa3.GameState;
 import montecarlo.AbstractCombiner;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import fairy_agents.FairyEvaluation;
 import fairy_agents.FairyEvaluation.FairyBoard;
 import game_phase.GamePhase;
-import game_phase.GamePhaseHeuristicDiscriminator;
 
 public class FairyTest {
 	private static String tests[] = {

@@ -1,7 +1,6 @@
 package game_phase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import utilities.GameData;
 import utilities.GameParser;

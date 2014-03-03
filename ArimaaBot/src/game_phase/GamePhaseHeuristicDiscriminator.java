@@ -61,9 +61,8 @@ public class GamePhaseHeuristicDiscriminator {
 		double totalProb = beginningProb + middleProb + endProb;
 		
 		return new double[]{beginningProb / totalProb, middleProb / totalProb, endProb / totalProb};
-		
-
 	}
+	
 	
 	/**
 	 * 

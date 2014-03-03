@@ -3,7 +3,10 @@ package montecarlo;
 import java.util.Random;
 
 import arimaa3.ArimaaMove;
+import arimaa3.GameState;
+import arimaa3.GenTurn;
 import arimaa3.MoveList;
+import utilities.MoveArrayList;
 import utilities.helper_classes.ArimaaState;
 
 public abstract class AbstractAgent {
@@ -45,4 +48,17 @@ public abstract class AbstractAgent {
 		
 		return null;
 	}
+	
+
+	  GenTurn gen_turn = new GenTurn();
+	  
+	  /**
+	   * Modified version of Jeff Bacher's genRootMoves that uses an ArrayList version
+	   * of the MoveList. 
+	   */
+	  public MoveList genRootMovesArrayList(GameState root_position) {
+	    MoveArrayList root_moves = new MoveArrayList(20000);
+	    gen_turn.genAllTurns(root_position, root_moves);
+	    return root_moves;
+	  }
 }

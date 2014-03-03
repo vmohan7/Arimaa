@@ -1,5 +1,9 @@
 package montecarlo;
 
+import fairy_agents.FairyEvaluation;
+import game_phase.GamePhase;
+import game_phase.GamePhaseHeuristicDiscriminator;
+
 import java.util.ArrayList;
 
 import org.junit.Test;
@@ -12,13 +16,22 @@ import arimaa3.GameState;
 import arimaa3.MoveList;
 
 public class AlphaBetaTest {
-	public static int DEPTH = 1; //TODO: must be an even number so that the evaluation will evaluate from the perspective of the root node
+	public static int DEPTH = 2;
 	private static class TestAgent extends AlphaBetaSearchAgent {
 
 		private boolean firstMove = false;
 		private ArimaaEvaluate2 eval;
 		public ArrayList< ArrayList<Double> > depthPrint;
-		
+		private DefaultCombiner dCombiner;
+
+		/** This is the original evaluation -- uses the default AbstractCombiner implementation. */
+		protected class DefaultCombiner extends AbstractCombiner {
+
+			public DefaultCombiner(GamePhase whichPhase) {
+				super(whichPhase);
+			}
+			
+		}
 
 		public TestAgent(int depth) {
 			super(null, false, depth);
@@ -27,6 +40,7 @@ public class AlphaBetaTest {
 			for(int i = 0; i < DEPTH; i++){
 				depthPrint.add( new ArrayList<Double>() );
 			}
+			dCombiner = new DefaultCombiner(null); //expect the null to be overwritten before use
 		}
 
 		@Override
@@ -64,28 +78,19 @@ public class AlphaBetaTest {
 		
 		@Override
 		protected double evaluation(ArimaaState state) {
-			if (state.getCurr().player == Constants.PL_WHITE ){
-				return getRank( state.getCurr().piece_bb[Constants.PT_WHITE_RABBIT] );
-			} else {
-				return -getRank( state.getCurr().piece_bb[Constants.PT_WHITE_RABBIT] );
-			}
-			//return eval.Evaluate(state.getCurr(), false);
+			// Use dummy evaluation
+//			if (state.getCurr().player == Constants.PL_WHITE ){
+//				return getRank( state.getCurr().piece_bb[Constants.PT_WHITE_RABBIT] );
+//			} else {
+//				return -getRank( state.getCurr().piece_bb[Constants.PT_WHITE_RABBIT] );
+//			}
+			
+			// Copied from FairyAgent.java
+			GameState curr = state.getCurr();
+			dCombiner.setGamePhase(GamePhaseHeuristicDiscriminator.getStrictGamePhase(curr));
+			return FairyEvaluation.evaluate(curr, dCombiner);
 		}
 
-		public static int PRUNE = 3;
-		
-	
-		public MoveList getMoves(GameState state) {
-			MoveList moves = engine.genRootMoves(state); 
-			MoveList m = new MoveList(PRUNE);
-			int[] positions = {1,6,12};
-			for(int i = 0; i < PRUNE; i++ ){
-				ArimaaMove move = m.getMove();
-				move.copy( moves.move_list[ positions[i] ] );
-			}
-			
-			return m;
-		}
 		
 		@Override
 		public ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves){
@@ -107,20 +112,21 @@ public class AlphaBetaTest {
 			System.out.println("Root Alpha:"+maxAlpha);
 			System.out.println("Best Move:"+bestMove);
 			
-			for(int i = depthPrint.size() - 1; i >= 0; i-- ){
-				ArrayList<Double> nodes = depthPrint.get(i);
-				for(int j = 0; j < nodes.size(); j++){
-					double t = nodes.get(j);
-					if (t == Double.POSITIVE_INFINITY ){
-						System.out.print( "| ");
-					}
-					else {
-						System.out.print( nodes.get(j) + " ");
-					}
-				}
-				
-				System.out.println();
-			}
+			// Print out node scores for all nodes in tree
+//			for(int i = depthPrint.size() - 1; i >= 0; i-- ){
+//				ArrayList<Double> nodes = depthPrint.get(i);
+//				for(int j = 0; j < nodes.size(); j++){
+//					double t = nodes.get(j);
+//					if (t == Double.POSITIVE_INFINITY ){
+//						System.out.print( "| ");
+//					}
+//					else {
+//						System.out.print( nodes.get(j) + " ");
+//					}
+//				}
+//				
+//				System.out.println();
+//			}
 			
 			return bestMove;
 		}
@@ -145,7 +151,7 @@ public class AlphaBetaTest {
 				return score; //TODO determine if we should put a negative here 
 			}
 
-			MoveList moves = getMoves(nextState);  //Changed getMoves for just a GameState and called it on next as oppsed to curr
+			MoveList moves = getMoves(nextState); 
 			
 			if (isMaxPlayer){
 				for(ArimaaMove move: moves){
@@ -173,15 +179,9 @@ public class AlphaBetaTest {
 
 		@Override
 		protected MoveList getMoves(ArimaaState state) {
-			MoveList moves = engine.genRootMoves(state.getCurr()); 
-			MoveList m = new MoveList(PRUNE);
-			int[] positions = {1,6,12};
-			for(int i = 0; i < PRUNE; i++ ){
-				ArimaaMove move = m.getMove();
-				move.copy( moves.move_list[ positions[i] ] );
-			}
-			
-			return m;
+//			MoveList moves = engine.genRootMoves(state.getCurr()); 
+			MoveList moves = genRootMovesArrayList(state.getCurr()); 
+			return moves;
 		}
 		
 		
@@ -190,11 +190,26 @@ public class AlphaBetaTest {
 	@Test
 	public void test() {
 		TestAgent agent = new TestAgent(DEPTH);
-		ArimaaState game = new ArimaaState(new GameState(
-					"17b %13 +-----------------+%138| r             r |%137| r   r d     r   |%136|             E   |%135|                 |%134|                 |%133| R     e C R     |%132|   R           R |%131|               R |%13+-----------------+%13   a b c d e f g h%13"), null);
-		ArimaaMove move = agent.selectMove(game, agent.getMoves(game.getCurr()) );
+		String white = "1w Ee2 Md2 Ha2 Hh2 Db2 Dg2 Cf2 Cc1 Ra1 Rb1 Rd1 Re1 Rf1 Rg1 Rh1 Rc2"; 
+	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
+		ArimaaState game = new ArimaaState(new GameState(white, black), null);
+
+		double time = System.currentTimeMillis();
+		
+		ArimaaMove move = agent.selectMove(game, agent.getMoves(game) );
 		System.out.println(game.getCurr().toBoardString());
+		System.out.println( System.currentTimeMillis() - time + " ms elapsed");
 	}
+	
+	/*
+	 *  Vivek's laptop gets...
+	 *  440 ms for dummy eval at depth 1
+	 *  750 ms for Fairy (default combiner) eval at depth 1
+	 *  100 to 2000 ms for one call to getMoves()
+	 *  30 seconds for depth 2 search with Fairy eval and movelist size capped at 20,000
+	 *  14 seconds for depth 2 search with dummy eval and movelist size capped at 20,000
+	 */
+				   
 
 }
 
