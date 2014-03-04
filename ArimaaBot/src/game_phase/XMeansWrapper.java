@@ -1,7 +1,6 @@
 package game_phase;
 
 import java.io.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -36,6 +35,20 @@ public class XMeansWrapper extends XMeans {
 	private static final String FILE_PREFIX = "../Plotting/game_phase/";
 	private static final String SERIALIZED_FILE = FILE_PREFIX + "XMeans.ser";
 	
+	private int minNumClusters;
+	private int maxNumClusters;
+	
+	
+	/**
+	 * @param minClusters The minimum number of clusters allowed to be created.
+	 * @param maxClusters The maximum number of clusters allowed to be created.
+	 */
+	public XMeansWrapper(int minClusters, int maxClusters) {
+		minNumClusters = minClusters;
+		maxNumClusters = maxClusters;
+	}
+	
+	
 	/** Deserializes an XMeansWrapper and returns it, or NULL on error. */
 	public static XMeansWrapper getXMeansWrapper() {
 		XMeansWrapper recoveredXMW = null;
@@ -60,6 +73,7 @@ public class XMeansWrapper extends XMeans {
 		return recoveredXMW;
 	}
 	
+	
 	/**
 	 * Once buildClusterer(*args*) has been called, this assigns the double array
 	 * to the appropriate cluster.<br>
@@ -74,6 +88,24 @@ public class XMeansWrapper extends XMeans {
 	
 	
 	
+	
+	
+	/**
+	 * Do not call this method unless you are testing.
+	 * @param designMatrix Array of features
+	 * @throws Exception Passing on the exception from buildClusterer (ball's in your court)
+	 */
+	public void buildClustererTestOnly(double[][] designMatrix) throws Exception {
+		buildClusterer(designMatrix);
+	}
+	
+	/**
+	 * Do not call this method unless you are testing.
+	 * Automatically serializes to the same location that getXMeansWrapper() reads from.
+	 */
+	public void serializeTestOnly() {
+		serialize(SERIALIZED_FILE);
+	}
 	
 	
 	
@@ -99,19 +131,6 @@ public class XMeansWrapper extends XMeans {
 	 * feature vectors differently...
 	 */
 	private static final double DEFAULT_WEIGHT = 1.0;
-	
-	private int minNumClusters;
-	private int maxNumClusters;
-	
-	
-	/**
-	 * @param minClusters The minimum number of clusters allowed to be created.
-	 * @param maxClusters The maximum number of clusters allowed to be created.
-	 */
-	private XMeansWrapper(int minClusters, int maxClusters) {
-		minNumClusters = minClusters;
-		maxNumClusters = maxClusters;
-	}
 	
 	
 	/** 
@@ -258,47 +277,5 @@ ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo----ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_
 		xmw.train(); 
 		xmw.serialize(SERIALIZED_FILE);
 	}
-
 	
-	
-	//TODO: Move this to JUnit test?
-	public static void test(String[] args) {
-		// Declare some dummy test values
-		final int minNumClusters = 4, maxNumClusters = 8;
-		double[][] designMatrix = { {2, 1}, {2, 2}, {2, 3}, {1, 2}, {3, 2}, // quadrant 1
-									{-2, 1}, {-2, 2}, {-2, 3}, {-1, 2}, {-3, 2}, // quadrant 2
-									{-2, -1}, {-2, -2}, {-2, -3}, {-1, -2}, {-3, -2}, // quadrant 3
-									{2, -1}, {2, -2}, {2, -3}, {1, -2}, {3, -2}, // quadrant 4
-		};
-		
-		for (int row = 0; row < designMatrix.length; row++)
-			for (int col = 0; col < designMatrix[row].length; col++)
-				designMatrix[row][col] *= 1000;
-		
-		XMeansWrapper xmw = new XMeansWrapper(minNumClusters, maxNumClusters);
-
-		try {
-			xmw.buildClusterer(designMatrix);
-			for (int i = 0; i < designMatrix.length; i++) {
-				System.out.println("Cluster result of feature" + i + " (" +  
-						Arrays.toString(designMatrix[i]) + "): " + xmw.clusterInstance(designMatrix[i]));
-			}
-			
-			System.out.println();
-			
-			Instances clusters = xmw.getClusterCenters();
-			for (int c = 0; c < clusters.numInstances(); c++) {
-				System.out.println("Cluster " + c + ": " + Arrays.toString(clusters.instance(c).toDoubleArray()) );
-			}
-			
-			System.out.println("Number of clusters: " + xmw.numberOfClusters());
-		} catch (Exception e) {
-			System.err.println("Something went wrong went clustering in XMeansWrapper.");
-			e.printStackTrace();
-			System.err.println("Exiting...");
-			System.exit(1);
-		}
-		
-		
-	}
 }
