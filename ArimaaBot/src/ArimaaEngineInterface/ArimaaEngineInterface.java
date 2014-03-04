@@ -5,12 +5,32 @@ import java.util.*;
 
 import fairy_agents.FairyAgent;
 import fairy_agents.FairyAgentHeuristicHardcoded;
+import game_phase.XMeansWrapper;
 import naive_bayes.NBHypothesis;
 import montecarlo.*;
 import ai_util.LogFile;
 
 
 public class ArimaaEngineInterface {
+	/*
+	 * Step 1 -- Run XMeansWrapper to train the clusters.
+	 * Step 2 -- Run MultiNBMain to train move ordering.
+	 * Step 3 -- Run loop_games.py.
+	 * Step $ -- Profit.
+	 */
+	
+	private XMeansWrapper xMeansWrapper;
+	
+	/** 
+	 * Initializes the xMeansWrapper from an existing file.
+	 * <br><i>-- This requires that XMeansWrapper.main(argv) has been run. --</i>
+	 */
+	public ArimaaEngineInterface() {
+		xMeansWrapper = XMeansWrapper.getXMeansWrapper();
+		assert(xMeansWrapper != null);
+	}
+	
+	
 	// All messages must by sent thru here so they get logged
 	private static void send_message(String text) {
 		text += "\n";

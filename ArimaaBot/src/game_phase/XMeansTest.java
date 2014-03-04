@@ -39,7 +39,7 @@ public class XMeansTest implements Constants {
 		xmw.serializeTestOnly();
 	}
 	
-	private void deserializeAndTest() throws Exception {
+	private void deserializeAndTest() {
 		XMeansWrapper xmw = XMeansWrapper.getXMeansWrapper();
 		assertTrue(xmw != null);
 		

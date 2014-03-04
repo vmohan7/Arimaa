@@ -2,7 +2,6 @@ package game_phase;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import utilities.GameData;
 import utilities.GameParser;
@@ -27,17 +26,27 @@ import weka.core.Instances;
  * (You can extract just the JAR to the folder ".../ArimaaBot/weka-3-6-10".)
  */
 public class XMeansWrapper extends XMeans {
-	//TODO: Testing / debugging
-	//TODO: Update file layout slightly
-	//TODO: Add to ArimaaEngineInterface
-	//TODO: Make comments clearer?
 	
 	private static final String FILE_PREFIX = "../Plotting/game_phase/";
 	private static final String SERIALIZED_FILE = FILE_PREFIX + "XMeans.ser";
 	
+	private static final int MIN_NUM_CLUSTERS = 2;
+	private static final int MAX_NUM_CLUSTERS = 8;
+	
+	private static final int NUM_GAMES = 2000;
+	
+	
+	/** Run main to train and output the .ser file */
+	public static void main(String[] unused) {
+		XMeansWrapper xmw = new XMeansWrapper(MIN_NUM_CLUSTERS, MAX_NUM_CLUSTERS);
+		xmw.train(); 
+		xmw.serialize(SERIALIZED_FILE);
+	}
+	
+	
+	
 	private int minNumClusters;
 	private int maxNumClusters;
-	
 	
 	/**
 	 * @param minClusters The minimum number of clusters allowed to be created.
@@ -52,6 +61,7 @@ public class XMeansWrapper extends XMeans {
 	/** Deserializes an XMeansWrapper and returns it, or NULL on error. */
 	public static XMeansWrapper getXMeansWrapper() {
 		XMeansWrapper recoveredXMW = null;
+		
 		try {
 			InputStream buffer = new BufferedInputStream(new FileInputStream(SERIALIZED_FILE));
 			ObjectInput input = new ObjectInputStream(buffer);
@@ -79,16 +89,24 @@ public class XMeansWrapper extends XMeans {
 	 * to the appropriate cluster.<br>
 	 * Call this wrapper if you have a raw vector rather than an Instance object.
 	 * @param vector The feature to be assigned to a cluster.
-	 * @throws Exception Passing on the Exception from the original method
 	 */
-	public int clusterInstance(double[] vector) throws Exception {
+	public int clusterInstance(double[] vector) {
 		Instance datapoint = new Instance(DEFAULT_WEIGHT, vector);
-		return clusterInstance(datapoint);
+		int retVal = -1;
+		
+		try {
+			retVal = clusterInstance(datapoint);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		
+		return retVal;
 	}
 	
 	
 	
-	
+	// ----- TESTING METHODS -----
 	
 	/**
 	 * Do not call this method unless you are testing.
@@ -137,7 +155,7 @@ public class XMeansWrapper extends XMeans {
 	 * Clusters the data in designMatrix. <br>
 	 * 
 	 * Call this method instead of the XMeans implementation to have some of
-	 * the administrivia handled for you. (e.g. setting cluster ranges).
+	 * the administrivia handled for you. (e.g. setting cluster ranges, creating an Instances object...).
 	 * 
 	 * @param designMatrix Each array is a coordinate (feature)
 	 * @throws Exception Passing on the Exception from the superclass
@@ -213,7 +231,7 @@ public class XMeansWrapper extends XMeans {
 			GameParser myParser = new GameParser(trainGameInfo);
 			
 			while (myParser.hasNextGameState()){
-				trainMatrix.add( FeatureExtractor.extractFeatures(myParser.getNextGameState().getCurr()) );
+				trainMatrix.add( game_phase.FeatureExtractor.extractFeatures(myParser.getNextGameState().getCurr()) );
 			}
 			
 			final long endTime = System.currentTimeMillis();
@@ -223,6 +241,8 @@ public class XMeansWrapper extends XMeans {
 		return trainMatrix.toArray(new double[0][0]);
 	}
 
+	
+	/** Outputs the XMeansWrapper object to the file at outfile. */
 	private void serialize(String outfile) {
 		assert(outfile.indexOf(".ser") != -1);
 		
@@ -258,24 +278,6 @@ public class XMeansWrapper extends XMeans {
     (o o)         (o o)         (o o)            (o o)        {}o o{}       :(o o):  .     (o o)            (o o)         (o o)         (o o)         (o o)      #  (o o)       8(o o)(_)Ooo   
 ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo----ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo----ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--`o'--Ooo-ooO--(_)--Ooo--8---(_)--Ooo-ooO-(_)---Ooo----	
   
-			   Look no further **/
-	
-	
-	
-	// main creates serialized file
-	// running python, AEI will have XMeans object that keeps reading the serialized file?
-	
-	 
-	private static final int MIN_NUM_CLUSTERS = 2;
-	private static final int MAX_NUM_CLUSTERS = 8;
-	
-	private static final int NUM_GAMES = 2000;
-	
-	
-	public static void main(String[] unused) {
-		XMeansWrapper xmw = new XMeansWrapper(MIN_NUM_CLUSTERS, MAX_NUM_CLUSTERS);
-		xmw.train(); 
-		xmw.serialize(SERIALIZED_FILE);
-	}
+			   Look no further **/ 
 	
 }
