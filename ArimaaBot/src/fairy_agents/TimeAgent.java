@@ -28,9 +28,9 @@ public class TimeAgent {
 		FairyAgentHeuristicHardcoded goalThreatAgent = new FairyAgentHeuristicHardcoded(DEPTH);
 		FairyAgent fairyAgent = new FairyAgent(DEPTH);
 		
-		printTimeForAgent(fairyAgent);
-		System.out.println("---------------------------------------------------------------");
 		printTimeForAgent(goalThreatAgent);
+		System.out.println("---------------------------------------------------------------");
+		printTimeForAgent(fairyAgent);
 
 	}
 	

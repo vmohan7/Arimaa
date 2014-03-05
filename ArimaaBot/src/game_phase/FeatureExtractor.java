@@ -82,9 +82,12 @@ public class FeatureExtractor implements Constants {
 		// NOTE: we've added this timing code for testing on the branch 
 		// FasterAB. These should never be on a master / "production" 
 		// branch!!
-		System.out.println("Average time to extract num pieces = " + extractNumPiecesTime / numTimesFeaturesExtracted);
-		System.out.println("Average time to extract num displaced = " + extractNumDisplacedTime / numTimesFeaturesExtracted);
-		System.out.println("Average time to extract goal threats = " + extractGoalThreatsTime / numTimesFeaturesExtracted);
+		if (numTimesFeaturesExtracted == 0)
+			return;
+		
+		System.out.println("Average time (ms) to extract num pieces = " + extractNumPiecesTime / numTimesFeaturesExtracted);
+		System.out.println("Average time (ms) to extract num displaced = " + extractNumDisplacedTime / numTimesFeaturesExtracted);
+		System.out.println("Average time (ms) to extract goal threats = " + extractGoalThreatsTime / numTimesFeaturesExtracted);
 		
 		extractNumPiecesTime = 0.0;
 		extractNumDisplacedTime = 0.0;
