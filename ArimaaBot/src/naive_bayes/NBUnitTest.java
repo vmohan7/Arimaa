@@ -91,7 +91,7 @@ public class NBUnitTest {
 		//now we test a feature with x_0 = 1
 		BitSet bs = new BitSet(1);
 		if (featureOn) bs.set(0);
-		double weight = hyp.evaluate(bs);
+		double weight = hyp.evaluate(bs, null);
 		assertEquals(weight, weightToMatch, 0.0000000001);
 	}
 

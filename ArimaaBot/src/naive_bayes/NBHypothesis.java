@@ -3,6 +3,8 @@ package naive_bayes;
 import static java.lang.Math.*;
 
 import java.util.BitSet;
+
+import arimaa3.GameState;
 import utilities.AbstractHypothesis;
 
 public class NBHypothesis extends AbstractHypothesis {
@@ -35,7 +37,7 @@ public class NBHypothesis extends AbstractHypothesis {
 	}
 
 	@Override
-	public double evaluate(BitSet bs) {
+	public double evaluate(BitSet bs, GameState unused) {
 		double weight = x0LogProb + y1LogProb - y0LogProb;
 
 		//loops through x = 1

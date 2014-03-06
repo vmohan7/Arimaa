@@ -116,12 +116,12 @@ public class HypothesisTest {
 		int numAbove = 0;
 		ArimaaMove expertMove = arimaaState.getNextMove();
 		BitSet bs = fe.extractFeatures( expertMove );
-		double expertWeight = hyp.evaluate(bs);
+		double expertWeight = hyp.evaluate(bs, arimaaState.getCurr());
 		
 		for (ArimaaMove possibleMove : possibleMoves){
 			if ( !possibleMove.equals( expertMove ) ){ //make sure that this is not the expert move
 				bs = fe.extractFeatures(possibleMove);
-				if ( hyp.evaluate(bs) > expertWeight ){ // must be greater than expert in ordering
+				if ( hyp.evaluate(bs, arimaaState.getCurr()) > expertWeight ){ // must be greater than expert in ordering
 					numAbove++;
 				}
 			}

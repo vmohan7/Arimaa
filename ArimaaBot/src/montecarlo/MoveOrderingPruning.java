@@ -7,6 +7,7 @@ import feature_extractor.FeatureExtractor;
 import naive_bayes.NBHypothesis;
 import utilities.helper_classes.ArimaaState;
 import arimaa3.ArimaaMove;
+import arimaa3.GameState;
 import arimaa3.MoveList;
 
 public abstract class MoveOrderingPruning extends AlphaBetaSearchAgent {
@@ -28,7 +29,7 @@ public abstract class MoveOrderingPruning extends AlphaBetaSearchAgent {
 						state.getPrevMove(), state.getPrevPrevMove() );
 
 		MoveList moves = engine.genRootMoves(state.getCurr()); //TODO pass in as a parameter
-		PriorityQueue<MoveOrder> minMoves = topMoves(fe, moves);
+		PriorityQueue<MoveOrder> minMoves = topMoves(fe, moves, state.getCurr());
 		MoveList bestMoves = new MoveList(minMoves.size());
 		
 		for(MoveOrder mo : minMoves){
@@ -38,7 +39,8 @@ public abstract class MoveOrderingPruning extends AlphaBetaSearchAgent {
 		return bestMoves;
 	}
 
-	private PriorityQueue<MoveOrder> topMoves(FeatureExtractor fe, MoveList moves){
+	// Added "curr" as a parameter since evalaute now requires a game-state.
+	private PriorityQueue<MoveOrder> topMoves(FeatureExtractor fe, MoveList moves, GameState curr){
 		//int topk =  ( (int) (moves.size() * 0.1) ) + 1;
 		int topk =  ( (int) (moves.size() * 0.2) ) + 1; //ceiling
 		//int topk = 30;
@@ -50,7 +52,7 @@ public abstract class MoveOrderingPruning extends AlphaBetaSearchAgent {
 		int counter = 0;
 		for (ArimaaMove move : moves){
 			//in future if extracting features is time consuming we can merge with logLinear
-			MoveOrder mo = new MoveOrder(move, hyp.evaluate(fe.extractFeatures(move)) ); 
+			MoveOrder mo = new MoveOrder(move, hyp.evaluate(fe.extractFeatures(move), curr) ); 
 			maxPQ.add( mo );
 			minPQ.add( mo );
 			counter++;
