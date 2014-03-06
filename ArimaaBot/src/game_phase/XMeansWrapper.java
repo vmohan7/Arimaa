@@ -87,8 +87,9 @@ public class XMeansWrapper extends XMeans {
 	/**
 	 * Once buildClusterer(*args*) has been called, this assigns the double array
 	 * to the appropriate cluster.<br>
-	 * Call this wrapper if you have a raw vector rather than an Instance object.
+	 * Call this wrapper if you have a raw vector rather than an Instance object
 	 * @param vector The feature to be assigned to a cluster.
+	 * @return Cluster index (0-based)
 	 */
 	public int clusterInstance(double[] vector) {
 		Instance datapoint = new Instance(DEFAULT_WEIGHT, vector);
