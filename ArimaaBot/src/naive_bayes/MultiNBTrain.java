@@ -75,7 +75,7 @@ public class MultiNBTrain {
 	
 	
 	// This method is packaged so that it can be accessed in NBTest only. 
-	void trainOnTurn(long[][][] frequencyTable, ArimaaState myState, ArimaaEngine myEngine) {
+	void trainOnTurn(long[][][] frequencyTables, ArimaaState myState, ArimaaEngine myEngine) {
 		ArimaaMove expertMove = myState.getNextMove();
 		
 		int whichTable = getTableIndexFromState(myState.getCurr());
@@ -83,17 +83,17 @@ public class MultiNBTrain {
 		// Extract features for the expert move
 		FeatureExtractor myExtractor = new feature_extractor.FeatureExtractor(myState.getCurr(), myState.getPrev(), myState.getPrevPrev(), myState.getPrevMove(), myState.getPrevPrevMove());
 		BitSet featureVector = myExtractor.extractFeatures(expertMove); // extract features from expert move
-		updateFrequencies(featureVector, frequencyTable[whichTable], true);
+		updateFrequencies(featureVector, frequencyTables[whichTable], true);
 		numExpertMoves[whichTable]++;
 		
 		// Extract features for all non-expert possible moves
-		MoveList allPossibleMoves = myEngine.genRootMoves(myState.getCurr()); // upper limit of 400,000 possible moves
-		// Note: for optimization, we should consider reducing this number from 400,000 to 40,000-50,000
+		// TODO: Use the new MoveList?
+		MoveList allPossibleMoves = myEngine.genRootMoves(myState.getCurr());
 		
 		for (ArimaaMove possibleMove : allPossibleMoves){
 			if (!possibleMove.equals(expertMove)){
 				featureVector = myExtractor.extractFeatures(possibleMove); // extract features from non-expert move
-				updateFrequencies(featureVector, frequencyTable[whichTable], false);
+				updateFrequencies(featureVector, frequencyTables[whichTable], false);
 				numNonExpertMoves[whichTable]++;
 			}
 		}

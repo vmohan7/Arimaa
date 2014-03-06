@@ -40,7 +40,7 @@ public class XMeansWrapper extends XMeans {
 	public static void main(String[] unused) {
 		XMeansWrapper xmw = new XMeansWrapper(MIN_NUM_CLUSTERS, MAX_NUM_CLUSTERS);
 		xmw.train(); 
-		xmw.serialize(SERIALIZED_FILE);
+		xmw.serialize();
 	}
 	
 	
@@ -123,7 +123,7 @@ public class XMeansWrapper extends XMeans {
 	 * Automatically serializes to the same location that getXMeansWrapper() reads from.
 	 */
 	public void serializeTestOnly() {
-		serialize(SERIALIZED_FILE);
+		serialize();
 	}
 	
 	
@@ -243,12 +243,12 @@ public class XMeansWrapper extends XMeans {
 	}
 
 	
-	/** Outputs the XMeansWrapper object to the file at outfile. */
-	private void serialize(String outfile) {
-		assert(outfile.indexOf(".ser") != -1);
+	/** Outputs the XMeansWrapper object to a specific file. */
+	private void serialize() {
+		assert(SERIALIZED_FILE.indexOf(".ser") != -1);
 		
 		try {
-			OutputStream buffer = new BufferedOutputStream(new FileOutputStream(outfile));
+			OutputStream buffer = new BufferedOutputStream(new FileOutputStream(SERIALIZED_FILE));
 			ObjectOutput output = new ObjectOutputStream(buffer);
 			
 			try {
