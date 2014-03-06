@@ -6,9 +6,12 @@ import utilities.MyDB;
 import utilities.helper_classes.Utilities;
 
 public class MultiNBMain {
+
 	
 	/* ================ VALUES TO CONFIGURE ================ */
 	
+
+
 	private static final boolean RUN_FROM_COMMAND_LINE = true;
 	
 	/* These values are used if RUN_FROM_COMMAND_LINE is false. They specify the size
@@ -89,7 +92,7 @@ public class MultiNBMain {
 		
 		// The MultiNBHypothesis contains all of the trained parameters...
 		MultiNBHypothesis mnbh = trainAndTest(NUM_GAMES, DO_NOT_TEST);
-		mnhb.serialize();
+		mnbh.serialize();
 	}
 	
 	
