@@ -27,7 +27,7 @@ public final class MultiNBHypothesis extends AbstractHypothesis
 	private static final String FILE_PREFIX = "../Plotting/game_phase/";
 	private static final String SERIALIZED_FILE = FILE_PREFIX + "MultiNBHypothesis.ser";
 	
-	private XMeansWrapper xMeansWrapper;
+	transient private XMeansWrapper xMeansWrapper;
 	private NBHypothesis[] nbHypotheses;
 	
 	/** 
@@ -73,6 +73,7 @@ public final class MultiNBHypothesis extends AbstractHypothesis
 			ex.printStackTrace();
 		}
 		
+		recoveredMNBH.xMeansWrapper = XMeansWrapper.getXMeansWrapper();
 		return recoveredMNBH;
 	}
 	

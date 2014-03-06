@@ -9,19 +9,6 @@ public class MultiNBMain {
 
 	
 	/* ================ VALUES TO CONFIGURE ================ */
-	
-
-
-	private static final boolean RUN_FROM_COMMAND_LINE = true;
-	
-	/* These values are used if RUN_FROM_COMMAND_LINE is false. They specify the size
-	 * of the example set for the start round and the end round, and the amount by which
-	 * to increment the size of the example set. E.g. if {START_SIZE, END_SIZE, INCREMENT} 
-	 * == {10, 50, 10}, then the program will train on example sets of size 10, 20, ... 50. 
-	 */
-	private static final int START_SIZE = 10;
-	private static final int END_SIZE = 50;
-	private static final int INCREMENT = 10;
 
 	private static final double TRAIN_FRACTION = 0.7;
 	
@@ -76,7 +63,7 @@ public class MultiNBMain {
 
 	
 	private static final boolean TEST_TRAINING_SET_SIZES = false;
-	private static final int NUM_GAMES = 50;
+	private static final int NUM_GAMES = 10;
 	
 	private static final boolean DO_NOT_TEST = false, TEST = true;
 	
@@ -95,6 +82,21 @@ public class MultiNBMain {
 		mnbh.serialize();
 	}
 	
+	
+	
+	
+	/** LEGACY CODE **/
+	
+	private static final boolean RUN_FROM_COMMAND_LINE = true;
+	
+	/* These values are used if RUN_FROM_COMMAND_LINE is false. They specify the size
+	 * of the example set for the start round and the end round, and the amount by which
+	 * to increment the size of the example set. E.g. if {START_SIZE, END_SIZE, INCREMENT} 
+	 * == {10, 50, 10}, then the program will train on example sets of size 10, 20, ... 50. 
+	 */
+	private static final int START_SIZE = 10;
+	private static final int END_SIZE = 50;
+	private static final int INCREMENT = 10;
 	
 	// Instructions to redirect console output to file:
 	// right click MultiNBMain.java -> Run as -> Run Configurations... -> select "Common" tab
