@@ -27,11 +27,12 @@ public class MultiNBTest implements Constants {
 	}
 	
 	private void trainAndWriteToFile() {
-		
+		MultiNBMain.main(null);
 	}
 	
 	private void deserializeAndTest() {
-		
+		MultiNBHypothesis nb = MultiNBHypothesis.getMultiNBHypothesis();
+		assertTrue(nb.validateState());
 	}
 	
 }

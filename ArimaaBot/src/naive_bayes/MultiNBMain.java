@@ -28,7 +28,7 @@ public class MultiNBMain {
 		Utilities.printInfo("-------------------------------\n");
 		final long startTime = System.currentTimeMillis();
 		
-		Utilities.printInfo("Training" + (testing ? " and testing" : "") + " on " + numGames + " games...");
+		Utilities.printInfo("Training" + (testing ? " and testing" : "") + " on " + (int)((testing ? TRAIN_FRACTION : 0.99) * numGames) + " games...");
 		
 		GameData myGameData = new GameData(numGames, testing ? TRAIN_FRACTION : 0.99);
 		Utilities.printInfo("Finished fetching game data");
@@ -39,7 +39,7 @@ public class MultiNBMain {
 		NBHypothesis[] nbParameters = trainingModel.train(myGameData);
 		Utilities.printInfo("Just finished training!");
 		
-		Utilities.printInfo("About to evaluate model: creating a hypothesis...");
+		Utilities.printInfo("Creating a hypothesis...");
 		MultiNBHypothesis myHypothesis = new MultiNBHypothesis(nbParameters); 
 
 		
@@ -63,7 +63,7 @@ public class MultiNBMain {
 
 	
 	private static final boolean TEST_TRAINING_SET_SIZES = false;
-	private static final int NUM_GAMES = 10;
+	private static final int NUM_GAMES = 2;
 	
 	private static final boolean DO_NOT_TEST = false, TEST = true;
 	

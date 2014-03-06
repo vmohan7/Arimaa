@@ -104,4 +104,13 @@ public final class MultiNBHypothesis extends AbstractHypothesis
 		
 	}
 	
+	/**
+	 * Testing purposes.
+	 * @return
+	 */
+	public boolean validateState() {
+		if (xMeansWrapper.numberOfClusters() != nbHypotheses.length)
+			return false;
+		return true;
+	}
 }

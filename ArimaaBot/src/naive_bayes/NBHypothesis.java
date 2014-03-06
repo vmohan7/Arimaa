@@ -2,12 +2,13 @@ package naive_bayes;
 
 import static java.lang.Math.*;
 
+import java.io.Serializable;
 import java.util.BitSet;
 
 import arimaa3.GameState;
 import utilities.AbstractHypothesis;
 
-public class NBHypothesis extends AbstractHypothesis {
+public class NBHypothesis extends AbstractHypothesis implements Serializable {
 	
 	private static final int LAPLACE_SMOOTHING = 1;
 	private final double[][] logLikelihoodRatios;
