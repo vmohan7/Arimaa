@@ -53,23 +53,9 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 		
 		return bestMove;
 	}
-	
-	//these variables is used strictly for the FasterAB branch and the time agent class
-	private int numEvals = 0;
-	private double timeToEval = 0.0;
-	private int numNodes = 0;
-	
-	public void printAndResetLeafEvals(){
-		System.out.println("The total number of nodes explored: " + numNodes);
-		System.out.println("The number of leaf nodes explored: " + numEvals);
-		System.out.println("The average time of the evaluation function: " + timeToEval/numEvals);
-		numEvals = 0;
-		timeToEval = 0.0;
-		numNodes = 0;
-	}
+
 	
 	private double AlphaBeta(final ArimaaState state, int depth, double alpha, double beta, boolean isMaxPlayer){
-		numNodes++;
 		GameState next = new GameState();
 		next.playFullClear(state.getNextMove(), state.getCurr());
 		
@@ -83,10 +69,7 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 			double score =  sign*(next.getGameResult() < 0 ? 1 : -1)*(this.getGameOverScore(next)); 
 			return score;
 		} else if (depth == 0){
-			numEvals++; //this line is strictly for testing
-			double start = System.currentTimeMillis();
-				double score =  sign*evaluation(nextState);
-			timeToEval += (System.currentTimeMillis() - start);
+			double score =  sign*evaluation(nextState);
 			return score; //TODO determine if we should put a negative here 
 		}
 
