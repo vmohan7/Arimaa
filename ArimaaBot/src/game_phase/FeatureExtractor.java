@@ -29,6 +29,7 @@ public class FeatureExtractor implements Constants {
 	
 	/* Constants for reduced feature set alternative */
 	private static final int NUM_REDUCED_FEATURES = 3;
+	private static final int NUM_REDUCED_FEATURES_NO_GOAL_THREATS = NUM_REDUCED_FEATURES - 1;
 	
 	private static final long RANKS_FOUR_THRU_EIGHT = RANK_4 | RANK_5 | RANK_6 | RANK_7 | RANK_8;
 	private static final long RANKS_ONE_THRU_FIVE = RANK_1 | RANK_2 | RANK_3 | RANK_4 | RANK_5;
@@ -75,6 +76,17 @@ public class FeatureExtractor implements Constants {
 		extractNumDisplacedTime = mid2 - mid1;
 		extractGoalThreatsTime = end - mid2;
 		numTimesFeaturesExtracted++;
+		return features;
+	}
+
+	/**
+	 * Extract features to be used in GamePhaseHeuristicDiscriminatorReduced. Uses
+	 * heuristic features and no goal threat feature. 
+	 */
+	public static double[] extractReducedFeaturesNoGoalThreats(GameState state){
+		double[] features = new double[NUM_REDUCED_FEATURES_NO_GOAL_THREATS];
+		features[0] = extractMinNumPieces(state);
+		features[1] = extractMaxNumDisplaced(state);
 		return features;
 	}
 	
