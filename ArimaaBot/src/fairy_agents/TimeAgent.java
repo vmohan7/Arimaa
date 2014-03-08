@@ -46,7 +46,7 @@ public class TimeAgent {
 			double totalTime = System.currentTimeMillis() - startTime;
 			
 			System.out.println(board.toBoardString() + "\n" 
-								+ "Time to select move: " + totalTime
+								+ "Time to select move (ms): " + totalTime
 			);
 			agent.printAndResetLeafEvals();
 			System.out.flush();

@@ -73,8 +73,8 @@ public class FeatureExtractor implements Constants {
 		features[2] = extractImminentGoalFeature(state);
 		double end = System.currentTimeMillis();
 		extractNumPiecesTime += mid1 - start;
-		extractNumDisplacedTime = mid2 - mid1;
-		extractGoalThreatsTime = end - mid2;
+		extractNumDisplacedTime += mid2 - mid1;
+		extractGoalThreatsTime += end - mid2;
 		numTimesFeaturesExtracted++;
 		return features;
 	}
