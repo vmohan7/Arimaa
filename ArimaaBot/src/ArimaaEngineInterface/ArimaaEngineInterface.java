@@ -97,7 +97,7 @@ public class ArimaaEngineInterface {
 					else if (bot_type == 5)
 						gc.setAgent( new FairyAgent(2) );
 					else if (bot_type == 6)
-						gc.setAgent( new FairyAgentHeuristicHardcoded(1) );
+						gc.setAgent( new FairyAgentHeuristicHardcoded(2) );
 
 				}
 				else if (AEIcommand.command.equals("makemove")) {
