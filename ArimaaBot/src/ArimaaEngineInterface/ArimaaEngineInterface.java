@@ -3,9 +3,9 @@ package ArimaaEngineInterface;
 import java.io.*;
 import java.util.*;
 
-import fairy_agents.FairyAgent;
-import fairy_agents.FairyAgentHeuristicHardcoded;
+import fairy_agents.*;
 import game_phase.XMeansWrapper;
+import naive_bayes.MultiNBHypothesis;
 import naive_bayes.NBHypothesis;
 import montecarlo.*;
 import ai_util.LogFile;
@@ -19,15 +19,16 @@ public class ArimaaEngineInterface {
 	 * Step $ -- Profit.
 	 */
 	
-	private XMeansWrapper xMeansWrapper;
+	private MultiNBHypothesis multiNBHyp;
 	
 	/** 
-	 * Initializes the xMeansWrapper from an existing file.
-	 * <br><i>-- This requires that XMeansWrapper.main(argv) has been run. --</i>
+	 * Reads in the MultiNBHypothesis from an existing serialized file.
+	 * <br><i>-- This requires that MultiNBMain.main(argv) has been run. Make sure to change
+	 * the constants (such as number of games, etc.) to the right values. --</i>
 	 */
 	public ArimaaEngineInterface() {
-		xMeansWrapper = XMeansWrapper.getXMeansWrapper();
-		assert(xMeansWrapper != null);
+		multiNBHyp = MultiNBHypothesis.getMultiNBHypothesis();
+		assert(multiNBHyp != null);
 	}
 	
 	
@@ -118,6 +119,8 @@ public class ArimaaEngineInterface {
 						gc.setAgent( new FairyAgent(1) );
 					else if (bot_type == 6)
 						gc.setAgent( new FairyAgentHeuristicHardcoded(1) );
+					else if (bot_type == 7)
+						gc.setAgent( new FairyMoveOrderingClusteringAgent(1, multiNBHyp) );
 
 				}
 				else if (AEIcommand.command.equals("makemove")) {

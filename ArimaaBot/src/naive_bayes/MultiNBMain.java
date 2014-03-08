@@ -63,7 +63,7 @@ public class MultiNBMain {
 
 	
 	private static final boolean TEST_TRAINING_SET_SIZES = false;
-	private static final int NUM_GAMES = 2;
+	private static final int NUM_GAMES = 20;
 	
 	private static final boolean DO_NOT_TEST = false, TEST = true;
 	
