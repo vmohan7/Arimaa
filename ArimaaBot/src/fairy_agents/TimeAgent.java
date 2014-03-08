@@ -48,12 +48,11 @@ public class TimeAgent {
 			System.out.println(board.toBoardString() + "\n" 
 								+ "Time to select move (ms): " + totalTime
 			);
-			agent.printAndResetLeafEvals();
+
 			System.out.flush();
 			
 			avgTime += totalTime;
-			
-			FeatureExtractor.printFeatureExtractionTimes();
+
 		}
 		
 		
