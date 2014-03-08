@@ -44,7 +44,11 @@ public class FairyAgent extends AlphaBetaSearchAgent {
 	 */
 	protected double evaluation(ArimaaState state) {
 		GameState curr = state.getCurr();
-		dCombiner.setGamePhase(GamePhase.BEGINNING); 
+		//dCombiner.setGamePhase(GamePhaseHeuristicDiscriminator.getStrictGamePhase(curr));
+		//For shorter time, we do not want to call getStrictGamePhase
+		//So we pass a dummy phase in
+		dCombiner.setGamePhase(GamePhase.BEGINNING);
+
 		return FairyEvaluation.evaluate(curr, dCombiner);
 	}
 
