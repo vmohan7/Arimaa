@@ -16,46 +16,22 @@ import arimaa3.MoveList;
 /**
  * This bot uses MultiNBHypothesis to order moves and prunes all but TOP_K_PERCENT of them.
  * The MultiNB model uses game phase discrimination to "better" (?) order moves.
- * It uses the default AbstractCombiner for the Fairy Evaluation.
  * @author Arzav, Neema
  *
  */
-public class FairyMoveOrderingClusteringAgent extends AlphaBetaSearchAgent {
+public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 
 	private static final double TOP_K_PERCENT = 0.3;
-	private static final int GAME_OVER_SCORE = 500000;
 
 	private MultiNBHypothesis hyp;
-	private DefaultCombiner dCombiner;
-
-	/** This is the original evaluation -- uses the default AbstractCombiner implementation. */
-	protected class DefaultCombiner extends AbstractCombiner {
-
-		public DefaultCombiner(GamePhase whichPhase) {
-			super(whichPhase);
-		}
-
-	}
 
 	public FairyMoveOrderingClusteringAgent(int depth, MultiNBHypothesis hyp) {
-		super(null, false, depth);
+		super(depth);
 		this.hyp = hyp;
-		this.dCombiner = new DefaultCombiner(GamePhase.AGNOSTIC);
 	}
 
+	
 	@Override
-	protected double getGameOverScore(GameState gs) {
-		// subtract total steps to slightly favor shorter wins
-		return GAME_OVER_SCORE - gs.total_steps;
-	}
-
-
-	@Override
-	protected double evaluation(ArimaaState state) {
-		return FairyEvaluation.evaluate(state.getCurr(), dCombiner);
-	}
-
-
 	public ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves){
 		return super.selectMove( arimaaState, getMoves(arimaaState) ); //does the limiting for the first set as well
 	}

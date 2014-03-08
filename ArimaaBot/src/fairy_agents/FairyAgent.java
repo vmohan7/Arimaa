@@ -28,7 +28,7 @@ public class FairyAgent extends AlphaBetaSearchAgent {
 	 */
 	public FairyAgent(int depth) {
 		super(null, false, depth);
-		dCombiner = new DefaultCombiner(null); //expect the null to be overwritten before use
+		dCombiner = new DefaultCombiner(GamePhase.AGNOSTIC);
 	}
 
 	@Override
@@ -43,12 +43,7 @@ public class FairyAgent extends AlphaBetaSearchAgent {
 	 * @return Evaluation score with respect to the current player
 	 */
 	protected double evaluation(ArimaaState state) {
-		GameState curr = state.getCurr();
-		//dCombiner.setGamePhase(GamePhaseHeuristicDiscriminator.getStrictGamePhase(curr));
-		//For shorter time, we do not want to call getStrictGamePhase
-		//So we pass a dummy phase in
-		dCombiner.setGamePhase(GamePhase.BEGINNING);
-		return FairyEvaluation.evaluate(curr, dCombiner);
+		return FairyEvaluation.evaluate(state.getCurr(), dCombiner);
 	}
 
 	@Override
