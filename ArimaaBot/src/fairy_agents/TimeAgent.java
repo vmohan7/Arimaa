@@ -25,10 +25,10 @@ public class TimeAgent {
 	};
 	
 	public static void main(String[] args) {
-		FairyAgentHeuristicHardcoded goalThreatAgent = new FairyAgentHeuristicHardcoded(DEPTH);
+		FairyAgentHeuristicHardcodedReduced phaseAgent = new FairyAgentHeuristicHardcodedReduced(DEPTH);
 		FairyAgent fairyAgent = new FairyAgent(DEPTH);
 		
-		printTimeForAgent(goalThreatAgent);
+		printTimeForAgent(phaseAgent);
 		System.out.println("---------------------------------------------------------------");
 		printTimeForAgent(fairyAgent);
 
