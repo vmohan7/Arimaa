@@ -121,7 +121,7 @@ public class ArimaaEngineInterface {
 					else if (bot_type == 7)
 						gc.setAgent( new FairyAgentHeuristicHardcodedReduced(2) );
 					else if (bot_type == 8)
-						gc.setAgent( new FairyMoveOrderingClusteringAgent(1, multiNBHyp) );
+						gc.setAgent( new FairyMoveOrderingClusteringAgent(2, multiNBHyp) );
 
 				}
 				else if (AEIcommand.command.equals("makemove")) {
