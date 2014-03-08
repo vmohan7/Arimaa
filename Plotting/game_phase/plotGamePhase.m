@@ -2,6 +2,9 @@
 %color: 'r'
 
 function plotGamePhase(gamePhaseVector, titleAddition, color)
+    AXIS_LABEL_SIZE = 14;
+    TITLE_SIZE = 16;
+
     figure;
     if (strcmp(titleAddition, ''))
         titleAddition = 'no args';
@@ -20,7 +23,8 @@ function plotGamePhase(gamePhaseVector, titleAddition, color)
         ylim([min(gamePhaseVector)-.5 max(gamePhaseVector)+.5]);
     end
     
-    xlabel('Move Number');
-    ylabel('Game Phase encoded as a number');
-    title(strcat('Game Phase Performance (', titleAddition, ')'));
+    xlabel('Move Number', 'FontSize', AXIS_LABEL_SIZE);
+    ylabel('Game Phase (0 = beginning, 1 = middle, 2 = end)', 'FontSize', AXIS_LABEL_SIZE);
+    title(strcat('Game Phase Performance (Game ID: ', titleAddition, ')'), 'FontSize', TITLE_SIZE);
+    set(gcf,'color','w');
 end

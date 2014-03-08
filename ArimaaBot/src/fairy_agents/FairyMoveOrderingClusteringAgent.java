@@ -46,7 +46,7 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 		FeatureExtractor fe = new feature_extractor.FeatureExtractor( state.getCurr(), state.getPrev(), state.getPrevPrev(),
 				state.getPrevMove(), state.getPrevPrevMove() );
 
-		MoveList moves = engine.genRootMoves(state.getCurr());
+		MoveList moves = genRootMovesArrayList(state.getCurr());
 		int k = (int) Math.ceil(moves.size() * TOP_K_PERCENT);
 		ScoredMove[] sortedMoves = topKMoves(fe, moves, state.getCurr(), k);
 		// NOTE: moves' internal count for .getMove() has been modified...

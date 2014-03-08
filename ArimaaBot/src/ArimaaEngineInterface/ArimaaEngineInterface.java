@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.*;
 
 import fairy_agents.*;
-import game_phase.XMeansWrapper;
 import naive_bayes.MultiNBHypothesis;
 import naive_bayes.NBHypothesis;
 import montecarlo.*;
@@ -116,10 +115,12 @@ public class ArimaaEngineInterface {
 					else if (bot_type == 4)
 						gc.setAgent(new NAVVClueless(null, false, 2, hyp));
 					else if (bot_type == 5)
-						gc.setAgent( new FairyAgent(1) );
+						gc.setAgent( new FairyAgent(2) );
 					else if (bot_type == 6)
 						gc.setAgent( new FairyAgentHeuristicHardcoded(1) );
 					else if (bot_type == 7)
+						gc.setAgent( new FairyAgentHeuristicHardcodedReduced(2) );
+					else if (bot_type == 8)
 						gc.setAgent( new FairyMoveOrderingClusteringAgent(1, multiNBHyp) );
 
 				}

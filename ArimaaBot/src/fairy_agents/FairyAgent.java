@@ -3,26 +3,24 @@ package fairy_agents;
 import montecarlo.AbstractCombiner;
 import montecarlo.AlphaBetaSearchAgent;
 import game_phase.GamePhase;
-import game_phase.GamePhaseHeuristicDiscriminator;
 import utilities.helper_classes.ArimaaState;
 import arimaa3.GameState;
-import arimaa3.MoveList;
 
 public class FairyAgent extends AlphaBetaSearchAgent {
-	
+
 	/** This is the original evaluation -- uses the default AbstractCombiner implementation. */
 	protected class DefaultCombiner extends AbstractCombiner {
 
 		public DefaultCombiner(GamePhase whichPhase) {
 			super(whichPhase);
 		}
-		
+
 	}
-	
-	
+
+
 	private static final int GAME_OVER_SCORE = 500000;
 	private DefaultCombiner dCombiner;
-	
+
 	/**
 	 * @param depth for AlphaBeta Search
 	 */
@@ -46,9 +44,5 @@ public class FairyAgent extends AlphaBetaSearchAgent {
 		return FairyEvaluation.evaluate(state.getCurr(), dCombiner);
 	}
 
-	@Override
-	protected MoveList getMoves(ArimaaState state) {
-		return engine.genRootMoves(state.getCurr());
-	}
 
 }

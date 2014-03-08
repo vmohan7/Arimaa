@@ -1,7 +1,5 @@
 package game_phase;
 
-import org.apache.commons.math3.distribution.NormalDistribution;
-
 import arimaa3.GameState;
 
 import utilities.GameData;
@@ -10,23 +8,16 @@ import utilities.helper_classes.CSVDataFormatter;
 import utilities.helper_classes.GameInfo;
 import utilities.helper_classes.Utilities;
 
-public class GamePhaseHeuristicDiscriminator {
+public class GamePhaseHeuristicDiscriminatorReduced extends GamePhaseHeuristicDiscriminator{
 
 	private static final int NUM_GAMES = 10;
 	private static final String PATH_PREFIX = "../Plotting/game_phase/"; //optional
-	private static final String FILE_NAME = PATH_PREFIX + "kmeans_heuristic_ternary.csv";
-	private static final double[] WEIGHTS = {1.0, -0.5, -10.0};
+	private static final String FILE_NAME = PATH_PREFIX + "kmeans_heuristic_reduced_ternary.csv";
+	private static final double[] WEIGHTS = {1.0, -0.5};
 	
-	// Probability distributions: http://commons.apache.org/proper/commons-math/userguide/distribution.html
-	// Normal distribution: http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/distribution/NormalDistribution.html
-	// Find jar here: http://mvnrepository.com/artifact/org.apache.commons/commons-math3/3.0
-	
-	private static NormalDistribution BeginningDistr = new NormalDistribution(16.0, 2);
-	private static NormalDistribution MiddleDistr = new NormalDistribution(12.0, 2);
-	private static NormalDistribution EndDistr = new NormalDistribution(6.0, 2);
 	
 	public static void main(String args[]){
-		Utilities.printInfo(String.format("<< Running heuristic game phase discrimination on %d games >>", NUM_GAMES));
+		Utilities.printInfo(String.format("<< Running heuristic game phase discrimination without goal threats on %d games >>", NUM_GAMES));
 		GameData myGameData = new GameData(NUM_GAMES, 0.0);
 		Utilities.printInfo("Finished fetching game data");
 		myGameData.setMode(GameData.Mode.TEST);		
@@ -35,35 +26,7 @@ public class GamePhaseHeuristicDiscriminator {
 		testAndOutputCSV(myGameData);
 		
 	}
-	
-	protected static double dotProduct(double[] vector1, double[] vector2){
-		double sum = 0.0;
-		assert(vector1.length == vector2.length);
-		
-		for (int i = 0; i < vector1.length; i++){
-			sum += (vector1[i] * vector2[i]);
-		}
-		
-		return sum;
-	}
-	
-	
-	private static double[] assignClusterProbs(double[] features){
-		// TODO: deal with end game in an entirely different way (i.e. with at dedicated set of features)
-		// That is, build decision tree
-		// TODO: tune probability distributions and weights
-		
-		double score = dotProduct(features, WEIGHTS);
-		
-		double beginningProb = BeginningDistr.density(score);
-		double middleProb = MiddleDistr.density(score);
-		double endProb = EndDistr.density(score);
-		double totalProb = beginningProb + middleProb + endProb;
-		
-		return new double[]{beginningProb / totalProb, middleProb / totalProb, endProb / totalProb};
-	}
-	
-	
+
 	/**
 	 * 
 	 * @param features
@@ -86,7 +49,7 @@ public class GamePhaseHeuristicDiscriminator {
 	 * @return 0 for beginning, 1 for middle, 2 for end
 	 */
 	public static GamePhase getStrictGamePhase(GameState gs) {
-		return assignCluster(FeatureExtractor.extractReducedFeatures(gs));
+		return assignCluster(FeatureExtractor.extractReducedFeaturesNoGoalThreats(gs));
 	}
 	
 	/** Uses the test games to assign each GameState to a cluster. Results output to CSV. */
@@ -97,7 +60,7 @@ public class GamePhaseHeuristicDiscriminator {
 		while (myGameData.hasNextGame()){
 			final long startTime = System.currentTimeMillis();
 			
-			Utilities.printInfoInline("Testing on game # " + ++count + "..."); //time will be appended in-line
+			Utilities.printInfoInline("Testing (without goal threats) on game # " + ++count + "..."); //time will be appended in-line
 			GameInfo trainGameInfo = myGameData.getNextGame();
 			GameParser myParser = new GameParser(trainGameInfo);
 			
@@ -110,7 +73,7 @@ public class GamePhaseHeuristicDiscriminator {
 //				}
 				
 				// Assign ternary phases and print to csv for plotting
-				GamePhase currPhase = assignCluster(FeatureExtractor.extractReducedFeatures( myParser.getNextGameState().getCurr()));
+				GamePhase currPhase = assignCluster(FeatureExtractor.extractReducedFeaturesNoGoalThreats( myParser.getNextGameState().getCurr()));
 				csv.appendValue(Integer.toString(currPhase.getValue()));
 			}
 			

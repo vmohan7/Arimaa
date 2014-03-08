@@ -69,6 +69,7 @@ public class GameControl {
 			}
 		}
 		
+		//TODO change this to call genRootMovesArrayList
 		MoveList moves = engine.genRootMoves(state.getCurr());
 		ArimaaMove bestMove = agent.selectMove(state, moves);
 		

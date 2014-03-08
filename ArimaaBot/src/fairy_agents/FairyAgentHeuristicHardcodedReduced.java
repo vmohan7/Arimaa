@@ -9,10 +9,10 @@ import arimaa3.GameState;
 import arimaa3.MoveList;
 
 /** 
- * FairyAgent using heuristic game phase discrimination and hard-coded
- * combiner weights.
+ * FairyAgentHeuristicHardcoded using heuristic game phase discrimination and hard-coded
+ * combiner weights; does not include goal threats as a feature informing game phase. 
  */
-public class FairyAgentHeuristicHardcoded extends AlphaBetaSearchAgent {
+public class FairyAgentHeuristicHardcodedReduced extends AlphaBetaSearchAgent {
 
 	/** Uses hard-coded coefficients to linearly combine values. */
 	protected class HardcodedCombiner extends AbstractCombiner {
@@ -22,7 +22,7 @@ public class FairyAgentHeuristicHardcoded extends AlphaBetaSearchAgent {
 		 */
 		public static final double MATERIAL_FAVOR_WEIGHT = 2.0,
 								   TRAP_FAVOR_WEIGHT = MATERIAL_FAVOR_WEIGHT,
-								   RABBIT_FAVOR_WEIGHT = 12.0;
+								   RABBIT_FAVOR_WEIGHT = 3.0;
 
 		public HardcodedCombiner(GamePhase whichPhase) {
 			super(whichPhase);
@@ -89,7 +89,7 @@ public class FairyAgentHeuristicHardcoded extends AlphaBetaSearchAgent {
 	/**
 	 * @param depth for AlphaBeta Search
 	 */
-	public FairyAgentHeuristicHardcoded(int depth) {
+	public FairyAgentHeuristicHardcodedReduced(int depth) {
 		super(null, false, depth);
 		hCombiner = new HardcodedCombiner(null); //expect the null to be overwritten before use	
 	}

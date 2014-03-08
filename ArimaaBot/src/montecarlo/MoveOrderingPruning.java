@@ -28,8 +28,9 @@ public abstract class MoveOrderingPruning extends AlphaBetaSearchAgent {
 		FeatureExtractor fe = new FeatureExtractor( state.getCurr(), state.getPrev(), state.getPrevPrev(),
 						state.getPrevMove(), state.getPrevPrevMove() );
 
-		MoveList moves = engine.genRootMoves(state.getCurr()); //TODO pass in as a parameter
+		MoveList moves = genRootMovesArrayList(state.getCurr()); //TODO pass in as a parameter
 		PriorityQueue<MoveOrder> minMoves = topMoves(fe, moves, state.getCurr());
+		
 		MoveList bestMoves = new MoveList(minMoves.size());
 		
 		for(MoveOrder mo : minMoves){
