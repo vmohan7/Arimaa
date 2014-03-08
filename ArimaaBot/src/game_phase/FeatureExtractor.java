@@ -50,6 +50,26 @@ public class FeatureExtractor implements Constants {
 		return features;
 	}
 	
+	private static double extractNumPiecesTime, extractNumDisplacedTime, extractGoalThreatsTime;
+	private static int numTimesFeaturesExtracted;
+	
+	public static void printFeatureExtractionTimes(){
+		// NOTE: we've added this timing code for testing on the branch 
+		// FasterAB. These should never be on a master / "production" 
+		// branch!!
+		if (numTimesFeaturesExtracted == 0)
+			return;
+		
+		System.out.println("Average time (ms) to extract num pieces = " + extractNumPiecesTime / numTimesFeaturesExtracted);
+		System.out.println("Average time (ms) to extract num displaced = " + extractNumDisplacedTime / numTimesFeaturesExtracted);
+		System.out.println("Average time (ms) to extract goal threats = " + extractGoalThreatsTime / numTimesFeaturesExtracted);
+		
+		extractNumPiecesTime = 0.0;
+		extractNumDisplacedTime = 0.0;
+		extractGoalThreatsTime = 0.0;
+		numTimesFeaturesExtracted = 0;	
+	}
+	
 	/**
 	 * Extract features to be used in GamePhaseHeuristicDiscriminator. Uses
 	 * heuristic features.
@@ -59,10 +79,17 @@ public class FeatureExtractor implements Constants {
 		// on the branch FasterAB. These should never be on a master / "production" 
 		// branch!!
 		double[] features = new double[NUM_REDUCED_FEATURES];
+		double start = System.currentTimeMillis();
 		features[0] = extractMinNumPieces(state);
+		double mid1 = System.currentTimeMillis();
 		features[1] = extractMaxNumDisplaced(state);
+		double mid2 = System.currentTimeMillis();
 		features[2] = extractImminentGoalFeature(state);
-
+		double end = System.currentTimeMillis();
+		extractNumPiecesTime += mid1 - start;
+		extractNumDisplacedTime += mid2 - mid1;
+		extractGoalThreatsTime += end - mid2;
+		numTimesFeaturesExtracted++;
 		return features;
 	}
 
