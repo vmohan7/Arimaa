@@ -1,7 +1,7 @@
 package game_phase;
 
 public enum GamePhase {
-    BEGINNING(0), MIDDLE(1), END(2);
+    AGNOSTIC(0), BEGINNING(1), MIDDLE(2), END(3);
     private int value;
 
     private GamePhase(int value) {

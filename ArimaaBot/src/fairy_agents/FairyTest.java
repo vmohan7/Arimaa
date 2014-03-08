@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Random;
 
 import arimaa3.GameState;
 import montecarlo.AbstractCombiner;
@@ -14,6 +16,7 @@ import org.junit.Test;
 import fairy_agents.FairyEvaluation;
 import fairy_agents.FairyEvaluation.FairyBoard;
 import game_phase.GamePhase;
+import static fairy_agents.FairyMoveOrderingClusteringAgent.ScoredMove;
 
 public class FairyTest {
 	private static String tests[] = {
@@ -54,7 +57,6 @@ public class FairyTest {
 		}
 		
 	}
-	
 	
 	/** Needed an implementation of AbstractCombiner... */
 	private class DefaultTestCombiner extends AbstractCombiner {
@@ -123,6 +125,30 @@ public class FairyTest {
 		}
 	}
 
+	@Test
+	public void testQuickSelect() {
+		Random rgen = new Random();
+		
+		final int numMoves = 500;
+		
+		for (int topK = 1; topK < numMoves; topK++) {
+			ScoredMove[] movesKSorted = new ScoredMove[numMoves];
+			ScoredMove[] movesAllSorted = new ScoredMove[numMoves];
+			
+			for (int i = 0; i < numMoves; i++) {
+				double randScore = rgen.nextDouble();
+				movesKSorted[i] = new ScoredMove(null, randScore);
+				movesAllSorted[i] = new ScoredMove(null, randScore);
+			}
+			
+			FairyMoveOrderingClusteringAgent.testSelect(movesKSorted, topK); // -1 handled in testSelect
+			Arrays.sort(movesKSorted, 0, topK);
+			Arrays.sort(movesAllSorted);
+			
+			for (int i = 0; i < topK; i++)
+				assertTrue(movesKSorted[i].compareTo(movesAllSorted[i]) == 0);
+		}
+	}
 }
 
 
