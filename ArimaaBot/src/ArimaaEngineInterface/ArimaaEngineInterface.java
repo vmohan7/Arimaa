@@ -5,6 +5,7 @@ import java.util.*;
 
 import fairy_agents.FairyAgent;
 import fairy_agents.FairyAgentHeuristicHardcoded;
+import fairy_agents.FairyAgentHeuristicHardcodedReduced;
 import naive_bayes.NBHypothesis;
 import montecarlo.*;
 import ai_util.LogFile;
@@ -97,7 +98,7 @@ public class ArimaaEngineInterface {
 					else if (bot_type == 5)
 						gc.setAgent( new FairyAgent(2) );
 					else if (bot_type == 6)
-						gc.setAgent( new FairyAgentHeuristicHardcoded(2) );
+						gc.setAgent( new FairyAgentHeuristicHardcodedReduced(2) );
 
 				}
 				else if (AEIcommand.command.equals("makemove")) {
