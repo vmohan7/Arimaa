@@ -8,6 +8,7 @@ import game_phase.GamePhase;
 import montecarlo.AbstractCombiner;
 import montecarlo.AlphaBetaSearchAgent;
 import naive_bayes.MultiNBHypothesis;
+import utilities.MoveArrayList;
 import utilities.helper_classes.ArimaaState;
 import arimaa3.ArimaaMove;
 import arimaa3.GameState;
@@ -46,12 +47,12 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 		FeatureExtractor fe = new feature_extractor.FeatureExtractor( state.getCurr(), state.getPrev(), state.getPrevPrev(),
 				state.getPrevMove(), state.getPrevPrevMove() );
 
-		MoveList moves = genRootMovesArrayList(state.getCurr());
+		MoveArrayList moves = genRootMovesArrayList(state.getCurr());
 		int k = (int) Math.ceil(moves.size() * TOP_K_PERCENT);
 		ScoredMove[] sortedMoves = topKMoves(fe, moves, state.getCurr(), k);
 		// NOTE: moves' internal count for .getMove() has been modified...
 
-		MoveList bestMoves = new MoveList(k);
+		MoveArrayList bestMoves = new MoveArrayList(k);
 
 		for(int i = 0; i < k; i++)
 			bestMoves.getMove().copy(sortedMoves[i].move);	

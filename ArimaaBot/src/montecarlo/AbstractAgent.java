@@ -57,7 +57,7 @@ public abstract class AbstractAgent {
 	   * Modified version of Jeff Bacher's genRootMoves that uses an ArrayList version
 	   * of the MoveList. 
 	   */
-	  public MoveList genRootMovesArrayList(GameState root_position) {
+	  public MoveArrayList genRootMovesArrayList(GameState root_position) {
 	    MoveArrayList root_moves = new MoveArrayList(SIZE_HINT);
 	    gen_turn.genAllTurns(root_position, root_moves);
 	    return root_moves;
