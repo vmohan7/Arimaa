@@ -1,7 +1,7 @@
 package fairy_agents;
 
 import game_phase.GamePhase;
-import game_phase.GamePhaseHeuristicDiscriminator;
+import game_phase.GamePhaseHeuristicDiscriminatorReduced;
 import montecarlo.AbstractCombiner;
 import montecarlo.AlphaBetaSearchAgent;
 import utilities.helper_classes.ArimaaState;
@@ -103,7 +103,7 @@ public class FairyAgentHeuristicHardcodedReduced extends AlphaBetaSearchAgent {
 	@Override
 	protected double evaluation(ArimaaState state) {
 		GameState curr = state.getCurr();
-		hCombiner.setGamePhase(GamePhaseHeuristicDiscriminator.getStrictGamePhase(curr));
+		hCombiner.setGamePhase(GamePhaseHeuristicDiscriminatorReduced.getStrictGamePhase(curr));
 		return FairyEvaluation.evaluate(curr, hCombiner);
 	}
 
