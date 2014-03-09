@@ -10,7 +10,10 @@ public class MultiNBMain {
 	
 	/* ================ VALUES TO CONFIGURE ================ */
 
+	/** Used in trainAndTest if testing == false. */
 	private static final double TRAIN_FRACTION = 0.7;
+	/** Used in trainAndTest if testing == true. */
+	private static final double ALMOST_ALL = 0.999999;
 	
 	/* If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
@@ -28,9 +31,9 @@ public class MultiNBMain {
 		Utilities.printInfo("-------------------------------\n");
 		final long startTime = System.currentTimeMillis();
 		
-		Utilities.printInfo("Training" + (testing ? " and testing" : "") + " on " + (int)((testing ? TRAIN_FRACTION : 0.99) * numGames) + " games...");
+		Utilities.printInfo("Training" + (testing ? " and testing" : "") + " on " + (int)((testing ? TRAIN_FRACTION : ALMOST_ALL) * numGames) + " games...");
 		
-		GameData myGameData = new GameData(numGames, testing ? TRAIN_FRACTION : 0.99);
+		GameData myGameData = new GameData(numGames, testing ? TRAIN_FRACTION : ALMOST_ALL);
 		Utilities.printInfo("Finished fetching game data");
 		
 		MultiNBTrain trainingModel = new MultiNBTrain();
@@ -63,7 +66,7 @@ public class MultiNBMain {
 
 	
 	private static final boolean TEST_TRAINING_SET_SIZES = false;
-	private static final int NUM_GAMES = 20;
+	private static final int NUM_GAMES = 151;
 	
 	private static final boolean DO_NOT_TEST = false, TEST = true;
 	

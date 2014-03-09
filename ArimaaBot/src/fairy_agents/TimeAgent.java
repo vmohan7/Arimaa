@@ -1,5 +1,6 @@
 package fairy_agents;
 
+import naive_bayes.MultiNBHypothesis;
 import game_phase.FeatureExtractor;
 import montecarlo.AlphaBetaSearchAgent;
 import utilities.helper_classes.ArimaaState;
@@ -25,7 +26,10 @@ public class TimeAgent {
 	};
 	
 	public static void main(String[] args) {
-		FairyAgentHeuristicHardcodedReduced phaseAgent = new FairyAgentHeuristicHardcodedReduced(DEPTH);
+		//TODO: 
+		/* Step 1 -- Run XMeansWrapper to train the clusters.
+		 * Step 2 -- Run MultiNBMain to train move ordering. */
+		FairyMoveOrderingClusteringAgent phaseAgent = new FairyMoveOrderingClusteringAgent(DEPTH, MultiNBHypothesis.getMultiNBHypothesis());
 		FairyAgent fairyAgent = new FairyAgent(DEPTH);
 		
 		printTimeForAgent(phaseAgent);

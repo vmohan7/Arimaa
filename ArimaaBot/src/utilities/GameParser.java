@@ -82,7 +82,9 @@ public class GameParser {
 		String black = gi.getBlackStartState();
 		
 		GameState gs = new GameState(white, black);
-		arimaaState = new ArimaaState(gs, new ArimaaMove(moveList[0])); //no previous GameState
+		
+		boolean isGarbageGame = moveList.length == 0;
+		arimaaState = new ArimaaState(gs, isGarbageGame ? null : new ArimaaMove(moveList[0])); //no previous GameState
 	}
 	
 }

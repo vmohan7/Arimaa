@@ -33,7 +33,9 @@ public class XMeansWrapper extends XMeans {
 	private static final int MIN_NUM_CLUSTERS = 2;
 	private static final int MAX_NUM_CLUSTERS = 8;
 	
-	private static final int NUM_GAMES = 2000;
+	// Clustering on 15000 games took ~3GB of RAM -- plan accordingly
+	// (It created a 980MB .ser file.)
+	private static final int NUM_GAMES = 15000;
 	
 	
 	/** Run main to train and output the .ser file */
@@ -201,7 +203,7 @@ public class XMeansWrapper extends XMeans {
 		Utilities.printInfo(String.format("<< Running with %d games, and %d to %d clusters >>", 
 												NUM_GAMES, MIN_NUM_CLUSTERS, MAX_NUM_CLUSTERS));
 		
-		GameData myGameData = new GameData(NUM_GAMES, 0.99); // 1.0 doesn't work? janky
+		GameData myGameData = new GameData(NUM_GAMES, 0.99999); // 1.0 doesn't work? janky
 		Utilities.printInfo("Finished fetching game data");
 		double[][] designMatrix = getFeatureMatrix(myGameData); 
 
