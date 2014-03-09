@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-numGames = 30
+numGames = 2
 for i in xrange(numGames):
 	if (i % 2 == 0):
 		os.chdir("FairyGold")
