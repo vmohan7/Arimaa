@@ -25,6 +25,11 @@ public class TimeAgent {
 			  "2b %13 +-----------------+%138| r r r r r r r r |%137| d m c e h c h d |%136|                 |%135|       E         |%134|                 |%133|                 |%132| D H C M   C H D |%131| R R R R R R R R |%13 +-----------------+%13   a b c d e f g h%13"
 	};
 	
+	
+	// Instructions to redirect console output to file:
+	// right click TimeAgent.java -> Run as -> Run Configurations... -> select "Common" tab
+	// 						      -> check "File" under "Standard Input and Output"
+	//                            -> enter destination file name :D
 	public static void main(String[] args) {
 		/* If the (XMeans|MultiNBMain).ser files are not already on your computer: 
 		 * Step 1 -- Run XMeansWrapper to train the clusters.
