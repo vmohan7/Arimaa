@@ -99,8 +99,15 @@ public class FeatureExtractor implements Constants {
 	 */
 	public static double[] extractReducedFeaturesNoGoalThreats(GameState state){
 		double[] features = new double[NUM_REDUCED_FEATURES_NO_GOAL_THREATS];
+		double start = System.currentTimeMillis();
 		features[0] = extractMinNumPieces(state);
+		double mid = System.currentTimeMillis();
 		features[1] = extractMaxNumDisplaced(state);
+		double end = System.currentTimeMillis();
+		
+		extractNumPiecesTime += mid - start;
+		extractNumDisplacedTime += end - mid;
+		numTimesFeaturesExtracted++;
 		return features;
 	}
 	
