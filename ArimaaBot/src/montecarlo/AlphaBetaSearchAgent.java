@@ -54,7 +54,7 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 		return bestMove;
 	}
 	
-	//these variables is used strictly for the FasterAB branch and the time agent class
+	//these variables are used strictly for the FasterAB branch and the time agent class
 	private int numEvals = 0;
 	private double timeToEval = 0.0;
 	private int numNodes = 0;
@@ -88,7 +88,7 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 			double start = System.currentTimeMillis();
 				double score =  sign*evaluation(nextState);
 			timeToEval += (System.currentTimeMillis() - start);
-			return score; //TODO determine if we should put a negative here 
+			return score; 
 		}
 
 		MoveList moves = getMoves(nextState);  //Changed getMoves for just a GameState and called it on next as oppsed to curr
