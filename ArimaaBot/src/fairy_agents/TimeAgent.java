@@ -26,19 +26,25 @@ public class TimeAgent {
 	};
 	
 	public static void main(String[] args) {
-		//TODO: 
-		/* Step 1 -- Run XMeansWrapper to train the clusters.
+		/* If the (XMeans|MultiNBMain).ser files are not already on your computer: 
+		 * Step 1 -- Run XMeansWrapper to train the clusters.
 		 * Step 2 -- Run MultiNBMain to train move ordering. */
 		FairyMoveOrderingClusteringAgent phaseAgent = new FairyMoveOrderingClusteringAgent(DEPTH, MultiNBHypothesis.getMultiNBHypothesis());
-		FairyAgent fairyAgent = new FairyAgent(DEPTH);
+		//FairyAgent fairyAgent = new FairyAgent(DEPTH);
 		
 		printTimeForAgent(phaseAgent);
 		System.out.println("---------------------------------------------------------------");
-		printTimeForAgent(fairyAgent);
+		System.out.println("\tNot running fairy...");
+		//printTimeForAgent(fairyAgent);
 
 	}
 	
 	public static void printTimeForAgent(AlphaBetaSearchAgent agent){
+		if (agent instanceof FairyMoveOrderingClusteringAgent) {
+			FairyMoveOrderingClusteringAgent fmocAgent = (FairyMoveOrderingClusteringAgent)agent;
+			fmocAgent.printSettingsStats();
+		}
+		
 		double avgTime = 0.0;
 		for(String test_pos : test_positions){
 			GameState board = new GameState(test_pos);
@@ -66,6 +72,11 @@ public class TimeAgent {
 		
 		avgTime /= test_positions.length;
 		System.out.println("Average Time: " + avgTime);
+		
+		if (agent instanceof FairyMoveOrderingClusteringAgent) {
+			FairyMoveOrderingClusteringAgent fmocAgent = (FairyMoveOrderingClusteringAgent)agent;
+			fmocAgent.printPostRunStats();
+		}
 	}
 
 }

@@ -31,9 +31,10 @@ public class MultiNBMain {
 		Utilities.printInfo("-------------------------------\n");
 		final long startTime = System.currentTimeMillis();
 		
-		Utilities.printInfo("Training" + (testing ? " and testing" : "") + " on " + (int)((testing ? TRAIN_FRACTION : ALMOST_ALL) * numGames) + " games...");
+		double trainFraction = (testing ? TRAIN_FRACTION : ALMOST_ALL);
+		Utilities.printInfo("Training" + (testing ? " and testing" : "") + " on " + (int)(trainFraction * numGames) + " games...");
 		
-		GameData myGameData = new GameData(numGames, testing ? TRAIN_FRACTION : ALMOST_ALL);
+		GameData myGameData = new GameData(numGames, trainFraction);
 		Utilities.printInfo("Finished fetching game data");
 		
 		MultiNBTrain trainingModel = new MultiNBTrain();
@@ -43,7 +44,7 @@ public class MultiNBMain {
 		Utilities.printInfo("Just finished training!");
 		
 		Utilities.printInfo("Creating a hypothesis...");
-		MultiNBHypothesis myHypothesis = new MultiNBHypothesis(nbParameters); 
+		MultiNBHypothesis myHypothesis = new MultiNBHypothesis(nbParameters, (int)(numGames * trainFraction)); 
 
 		
 		// TODO: Update testing code for MultiNB

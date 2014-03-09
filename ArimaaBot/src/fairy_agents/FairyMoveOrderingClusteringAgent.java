@@ -4,12 +4,10 @@ import java.util.Arrays;
 import java.util.Random;
 
 import feature_extractor.FeatureExtractor;
-import game_phase.GamePhase;
-import montecarlo.AbstractCombiner;
-import montecarlo.AlphaBetaSearchAgent;
 import naive_bayes.MultiNBHypothesis;
 import utilities.MoveArrayList;
 import utilities.helper_classes.ArimaaState;
+import utilities.helper_classes.Utilities;
 import arimaa3.ArimaaMove;
 import arimaa3.GameState;
 import arimaa3.MoveList;
@@ -25,10 +23,47 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 	private static final double TOP_K_PERCENT = 0.3;
 
 	private MultiNBHypothesis hyp;
+	
+	/** For internal time-keeping. */
+	private long timeExtractingInMS = 0L;
+	private long timeSelectingInMS = 0L;
+	private long timeSortingKInMS = 0L;
+	
+	/** For reporting. */
+	private int depth;
+	public long getTotalExtractTimeMS() { return timeExtractingInMS; }
+	public long getTotalSortTime() { return timeSelectingInMS + timeSortingKInMS; }
+	public long getPartitionTime() { return timeSelectingInMS; }
+	public long getSortingKTime() { return timeSortingKInMS; }
+	public int getNumXMeansGames() { return hyp.getNumXMeansGames(); }
+	public int getNumTrainedGames() { return hyp.getNumTrainedGames(); }
+	
+	
+	/** Prints human-readable formatted output about the settings of the agent. */
+	public void printSettingsStats() {
+		Utilities.printInfo(String.format("-----%nRunning stats for FairyMoveOrderingClusteringAgent only:"));
+		Utilities.printInfo("Top K percent: " + (TOP_K_PERCENT*100) + "%");
+		Utilities.printInfo("Depth: " + depth);
+		Utilities.printInfo("XMeans trained on: " + getNumXMeansGames() + " games");
+		Utilities.printInfo("MultiNB trained on: " + getNumTrainedGames() + " games");
+		Utilities.printInfo(String.format("-----%n"));
+	}
+	
+	/** Prints human-readable formatted output about the agent after being run. */
+	public void printPostRunStats() {
+		Utilities.printInfo(String.format("%n-----%Post-run stats for FairyMoveOrderingClusteringAgent only:"));
+		Utilities.printInfo("Time extracting (ms): " + getTotalExtractTimeMS());
+		Utilities.printInfo("Time partitioning (ms): " + getPartitionTime());
+		Utilities.printInfo("Time sorting (ms): " + getSortingKTime());
+		Utilities.printInfo("Time partitioning + sorting (ms): " + getTotalSortTime());
+		Utilities.printInfo(String.format("%n-----"));
+	}
+	
 
 	public FairyMoveOrderingClusteringAgent(int depth, MultiNBHypothesis hyp) {
 		super(depth);
 		this.hyp = hyp;
+		this.depth = depth;
 	}
 
 	
@@ -74,11 +109,20 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 
 		ScoredMove[] topKMoves = new ScoredMove[moves.size()];
 		int i = 0;
-		for (ArimaaMove m : moves)
-			topKMoves[i++] = new ScoredMove(m, hyp.evaluate(fe.extractFeatures(m), curr));
+		
+		long extractStart = System.currentTimeMillis();
+			for (ArimaaMove m : moves)
+				topKMoves[i++] = new ScoredMove(m, hyp.evaluate(fe.extractFeatures(m), curr));
+		timeExtractingInMS += System.currentTimeMillis() - extractStart;
 
-		select(topKMoves, 0, topKMoves.length-1, k-1);
-		Arrays.sort(topKMoves, 0, k);
+		long selectStart = System.currentTimeMillis();
+			select(topKMoves, 0, topKMoves.length-1, k-1);
+		timeSelectingInMS += System.currentTimeMillis() - selectStart;
+		
+		long sortStart = System.currentTimeMillis();
+			Arrays.sort(topKMoves, 0, k);
+		timeSortingKInMS += System.currentTimeMillis() - sortStart;
+		
 		return topKMoves;
 	}
 

@@ -30,13 +30,20 @@ public final class MultiNBHypothesis extends AbstractHypothesis
 	transient private XMeansWrapper xMeansWrapper;
 	private NBHypothesis[] nbHypotheses;
 	
+	
+	/** For printing info. */
+	private int numGamesTrained;
+	public int getNumXMeansGames() { return xMeansWrapper.getNumGames(); } // number of games XMeans trained on
+	public int getNumTrainedGames() { return numGamesTrained; } // number of games MultiNBHypothesis trained on
+	
 	/** 
 	 * Keeps an internal pointer to the parameter.
 	 * Do not modify nbParameters after passing in to this constructor.
 	 */
-	public MultiNBHypothesis(NBHypothesis[] nbParameters) {
+	public MultiNBHypothesis(NBHypothesis[] nbParameters, int numGamesTrainedOn) {
 		nbHypotheses = nbParameters;
 		xMeansWrapper = XMeansWrapper.getXMeansWrapper();
+		numGamesTrained = numGamesTrainedOn;
 	}
 
 	/**
