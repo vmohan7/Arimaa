@@ -45,15 +45,13 @@ public class TimeAgent {
 			agent.selectMove(state, moves);
 			double totalTime = System.currentTimeMillis() - startTime;
 			
-			System.out.println(board.toBoardString() + "\n" 
-								+ "Time to select move (ms): " + totalTime
-			);
+			System.out.println( board.toBoardString() );
+			System.out.println( "Time to select move (ms): " + totalTime );
+			System.out.println( "Number of moves to consider at depth 1: " + moves.size() );
 			agent.printAndResetLeafEvals();
-			System.out.flush();
-			
-			avgTime += totalTime;
-			
 			FeatureExtractor.printFeatureExtractionTimes();
+			System.out.flush();
+
 			
 			avgTime += totalTime;
 
