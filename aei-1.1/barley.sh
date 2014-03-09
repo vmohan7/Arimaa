@@ -9,4 +9,5 @@
 # tell grid engine to use current directory
 #$ -cwd
 
+cd ..
 python loop_games.py

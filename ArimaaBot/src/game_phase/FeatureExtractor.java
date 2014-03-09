@@ -35,12 +35,6 @@ public class FeatureExtractor implements Constants {
 	private static final long RANKS_ONE_THRU_FIVE = RANK_1 | RANK_2 | RANK_3 | RANK_4 | RANK_5;
 	
 	private static GoalTestWrapper GOAL_TEST_WRAPPER = new GoalTestWrapper();
-	
-	// Keep track of the average time it takes to extract each feature
-	private static double extractNumPiecesTime = 0.0;
-	private static double extractNumDisplacedTime = 0.0;
-	private static double extractGoalThreatsTime = 0.0;
-	private static int numTimesFeaturesExtracted = 0;
 
 	//PL_WHITE and PL_BLACK are constants that refer to the index into the features array
 	
@@ -54,6 +48,26 @@ public class FeatureExtractor implements Constants {
 		extractRank(state, features);
 		extractTrapDominance(state, features);
 		return features;
+	}
+	
+	private static double extractNumPiecesTime, extractNumDisplacedTime, extractGoalThreatsTime;
+	private static int numTimesFeaturesExtracted;
+	
+	public static void printFeatureExtractionTimes(){
+		// NOTE: we've added this timing code for testing on the branch 
+		// FasterAB. These should never be on a master / "production" 
+		// branch!!
+		if (numTimesFeaturesExtracted == 0)
+			return;
+		
+		System.out.println("Average time (ms) to extract num pieces = " + extractNumPiecesTime / numTimesFeaturesExtracted);
+		System.out.println("Average time (ms) to extract num displaced = " + extractNumDisplacedTime / numTimesFeaturesExtracted);
+		System.out.println("Average time (ms) to extract goal threats = " + extractGoalThreatsTime / numTimesFeaturesExtracted);
+		
+		extractNumPiecesTime = 0.0;
+		extractNumDisplacedTime = 0.0;
+		extractGoalThreatsTime = 0.0;
+		numTimesFeaturesExtracted = 0;	
 	}
 	
 	/**
@@ -73,8 +87,8 @@ public class FeatureExtractor implements Constants {
 		features[2] = extractImminentGoalFeature(state);
 		double end = System.currentTimeMillis();
 		extractNumPiecesTime += mid1 - start;
-		extractNumDisplacedTime = mid2 - mid1;
-		extractGoalThreatsTime = end - mid2;
+		extractNumDisplacedTime += mid2 - mid1;
+		extractGoalThreatsTime += end - mid2;
 		numTimesFeaturesExtracted++;
 		return features;
 	}
@@ -85,27 +99,18 @@ public class FeatureExtractor implements Constants {
 	 */
 	public static double[] extractReducedFeaturesNoGoalThreats(GameState state){
 		double[] features = new double[NUM_REDUCED_FEATURES_NO_GOAL_THREATS];
+		double start = System.currentTimeMillis();
 		features[0] = extractMinNumPieces(state);
+		double mid = System.currentTimeMillis();
 		features[1] = extractMaxNumDisplaced(state);
+		double end = System.currentTimeMillis();
+		
+		extractNumPiecesTime += mid - start;
+		extractNumDisplacedTime += end - mid;
+		numTimesFeaturesExtracted++;
 		return features;
 	}
 	
-	public static void printFeatureExtractionTimes(){
-		// NOTE: we've added this timing code for testing on the branch 
-		// FasterAB. These should never be on a master / "production" 
-		// branch!!
-		if (numTimesFeaturesExtracted == 0)
-			return;
-		
-		System.out.println("Average time (ms) to extract num pieces = " + extractNumPiecesTime / numTimesFeaturesExtracted);
-		System.out.println("Average time (ms) to extract num displaced = " + extractNumDisplacedTime / numTimesFeaturesExtracted);
-		System.out.println("Average time (ms) to extract goal threats = " + extractGoalThreatsTime / numTimesFeaturesExtracted);
-		
-		extractNumPiecesTime = 0.0;
-		extractNumDisplacedTime = 0.0;
-		extractGoalThreatsTime = 0.0;
-		numTimesFeaturesExtracted = 0;	
-	}
 	
 	/**
 	 * @return the smaller of the number of gold or silver pieces on the board

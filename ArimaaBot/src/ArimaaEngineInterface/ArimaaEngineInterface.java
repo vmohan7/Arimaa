@@ -3,15 +3,34 @@ package ArimaaEngineInterface;
 import java.io.*;
 import java.util.*;
 
-import fairy_agents.FairyAgent;
-import fairy_agents.FairyAgentHeuristicHardcoded;
-import fairy_agents.FairyAgentHeuristicHardcodedReduced;
+import fairy_agents.*;
+import naive_bayes.MultiNBHypothesis;
 import naive_bayes.NBHypothesis;
 import montecarlo.*;
 import ai_util.LogFile;
 
 
 public class ArimaaEngineInterface {
+	/*
+	 * Step 1 -- Run XMeansWrapper to train the clusters.
+	 * Step 2 -- Run MultiNBMain to train move ordering.
+	 * Step 3 -- Run loop_games.py.
+	 * Step $ -- Profit.
+	 */
+	
+	private MultiNBHypothesis multiNBHyp;
+	
+	/** 
+	 * Reads in the MultiNBHypothesis from an existing serialized file.
+	 * <br><i>-- This requires that MultiNBMain.main(argv) has been run. Make sure to change
+	 * the constants (such as number of games, etc.) to the right values. --</i>
+	 */
+	public ArimaaEngineInterface() {
+		multiNBHyp = MultiNBHypothesis.getMultiNBHypothesis();
+		assert(multiNBHyp != null);
+	}
+	
+	
 	// All messages must by sent thru here so they get logged
 	private static void send_message(String text) {
 		text += "\n";
@@ -98,7 +117,11 @@ public class ArimaaEngineInterface {
 					else if (bot_type == 5)
 						gc.setAgent( new FairyAgent(2) );
 					else if (bot_type == 6)
+						gc.setAgent( new FairyAgentHeuristicHardcoded(1) );
+					else if (bot_type == 7)
 						gc.setAgent( new FairyAgentHeuristicHardcodedReduced(2) );
+					else if (bot_type == 8)
+						gc.setAgent( new FairyMoveOrderingClusteringAgent(2, multiNBHyp) );
 
 				}
 				else if (AEIcommand.command.equals("makemove")) {

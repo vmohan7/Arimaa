@@ -25,10 +25,10 @@ public class TimeAgent {
 	};
 	
 	public static void main(String[] args) {
-		FairyAgentHeuristicHardcoded goalThreatAgent = new FairyAgentHeuristicHardcoded(DEPTH);
+		FairyAgentHeuristicHardcodedReduced phaseAgent = new FairyAgentHeuristicHardcodedReduced(DEPTH);
 		FairyAgent fairyAgent = new FairyAgent(DEPTH);
 		
-		printTimeForAgent(goalThreatAgent);
+		printTimeForAgent(phaseAgent);
 		System.out.println("---------------------------------------------------------------");
 		printTimeForAgent(fairyAgent);
 
@@ -46,7 +46,7 @@ public class TimeAgent {
 			double totalTime = System.currentTimeMillis() - startTime;
 			
 			System.out.println(board.toBoardString() + "\n" 
-								+ "Time to select move: " + totalTime
+								+ "Time to select move (ms): " + totalTime
 			);
 			agent.printAndResetLeafEvals();
 			System.out.flush();
@@ -54,6 +54,9 @@ public class TimeAgent {
 			avgTime += totalTime;
 			
 			FeatureExtractor.printFeatureExtractionTimes();
+			
+			avgTime += totalTime;
+
 		}
 		
 		

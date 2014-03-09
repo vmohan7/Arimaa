@@ -51,13 +51,14 @@ public abstract class AbstractAgent {
 	
 
 	  GenTurn gen_turn = new GenTurn();
+	  private static final int SIZE_HINT = 20000;
 	  
 	  /**
 	   * Modified version of Jeff Bacher's genRootMoves that uses an ArrayList version
 	   * of the MoveList. 
 	   */
-	  public MoveList genRootMovesArrayList(GameState root_position) {
-	    MoveArrayList root_moves = new MoveArrayList(20000);
+	  public MoveArrayList genRootMovesArrayList(GameState root_position) {
+	    MoveArrayList root_moves = new MoveArrayList(SIZE_HINT);
 	    gen_turn.genAllTurns(root_position, root_moves);
 	    return root_moves;
 	  }

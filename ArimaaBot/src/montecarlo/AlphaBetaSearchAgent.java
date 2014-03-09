@@ -67,6 +67,7 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 		timeToEval = 0.0;
 		numNodes = 0;
 	}
+
 	
 	private double AlphaBeta(final ArimaaState state, int depth, double alpha, double beta, boolean isMaxPlayer){
 		numNodes++;
