@@ -17,7 +17,7 @@ public class MultiNBMain {
 	
 	/* If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
-	public static final boolean PARSEABLE_OUTPUT = true;
+	public static final boolean PARSEABLE_OUTPUT = false;
 
 	/* If set to true, then the percentile of each expert move evaluated will be printed
 	 * in a csv-importable format. */
@@ -32,7 +32,13 @@ public class MultiNBMain {
 		final long startTime = System.currentTimeMillis();
 		
 		double trainFraction = (testing ? TRAIN_FRACTION : ALMOST_ALL);
-		Utilities.printInfo("Training" + (testing ? " and testing" : "") + " on " + (int)(trainFraction * numGames) + " games...");
+		Utilities.printInfo("Train fraction: " + trainFraction);
+		Utilities.printInfo("Game data rating threshold <" +
+							(GameData.USING_EXPERT ? "using" : "not using") +
+							">: " + GameData.RATING_THRESHOLD);
+		
+		
+		Utilities.printInfo("Training on " + (int)(trainFraction * numGames) + " games...");
 		
 		GameData myGameData = new GameData(numGames, trainFraction);
 		Utilities.printInfo("Finished fetching game data");
@@ -47,11 +53,17 @@ public class MultiNBMain {
 		MultiNBHypothesis myHypothesis = new MultiNBHypothesis(nbParameters, (int)(numGames * trainFraction)); 
 
 		
-		// TODO: Update testing code for MultiNB
 		if (testing) {
-			Utilities.printInfo("\nTesting hypothesis on TEST set...");
+			Utilities.printInfoInline("\nTesting hypothesis on TEST set...");
+			Utilities.printInfo(" (" + (int)((1 - trainFraction) * numGames) + " games...)");
 			myGameData.setMode(GameData.Mode.TEST);
 			HypothesisTest.test(myHypothesis, myGameData); 
+			
+			
+			Utilities.printInfoInline("\nTesting hypothesis on TRAIN set...");
+			Utilities.printInfo(" (" + (int)(trainFraction * numGames) + " games...)");
+			myGameData.setMode(GameData.Mode.TRAIN);
+			HypothesisTest.test(myHypothesis, myGameData);
 		}
 
 		
@@ -66,24 +78,31 @@ public class MultiNBMain {
 	}
 
 	
-	private static final boolean TEST_TRAINING_SET_SIZES = false;
+	private static final boolean TEST_TRAINING_SET_SIZES = true;
 	private static final int NUM_GAMES = 151;
 	
 	private static final boolean DO_NOT_TEST = false, TEST = true;
 	
+	// Instructions to redirect console output to file:
+	// right click MultiNBMain.java -> Run as -> Run Configurations... -> select "Common" tab
+	// 			 				    -> check "File" under "Standard Input and Output"
+	//      	                    -> enter destination file name :D
 	/** 
 	 * Outputs a MultiNBHypothesis object to a file for later deserialization and use.
 	 * @param args Optional command line arguments (for testing)
 	 */
 	public static void main(String[] args) {
+		
 		if (TEST_TRAINING_SET_SIZES) {
-			testDifferentTrainingSetSizes(args);
-			return;
+			final boolean serializeAfterTest = true;
+			testDifferentTrainingSetSizes(args, serializeAfterTest);
+		}
+		else {
+			// The MultiNBHypothesis contains all of the trained parameters...
+			MultiNBHypothesis mnbh = trainAndTest(NUM_GAMES, DO_NOT_TEST);
+			mnbh.serialize();
 		}
 		
-		// The MultiNBHypothesis contains all of the trained parameters...
-		MultiNBHypothesis mnbh = trainAndTest(NUM_GAMES, DO_NOT_TEST);
-		mnbh.serialize();
 	}
 	
 	
@@ -91,22 +110,22 @@ public class MultiNBMain {
 	
 	/** LEGACY CODE **/
 	
-	private static final boolean RUN_FROM_COMMAND_LINE = true;
+	private static final boolean RUN_FROM_COMMAND_LINE = false;
 	
 	/* These values are used if RUN_FROM_COMMAND_LINE is false. They specify the size
 	 * of the example set for the start round and the end round, and the amount by which
 	 * to increment the size of the example set. E.g. if {START_SIZE, END_SIZE, INCREMENT} 
 	 * == {10, 50, 10}, then the program will train on example sets of size 10, 20, ... 50. 
 	 */
-	private static final int START_SIZE = 10;
-	private static final int END_SIZE = 50;
+	private static final int START_SIZE = 150;
+	private static final int END_SIZE = 150;
 	private static final int INCREMENT = 10;
 	
-	// Instructions to redirect console output to file:
-	// right click MultiNBMain.java -> Run as -> Run Configurations... -> select "Common" tab
-	// 			 				    -> check "File" under "Standard Input and Output"
-	//      	                    -> enter destination file name :D
 	private static void testDifferentTrainingSetSizes(String[] args) {
+		testDifferentTrainingSetSizes(args, false);
+	}
+	
+	private static void testDifferentTrainingSetSizes(String[] args, boolean serialize) {
 		final long totalStartTime = System.currentTimeMillis();
 		
 		if (RUN_FROM_COMMAND_LINE && args.length != 3){
@@ -124,9 +143,13 @@ public class MultiNBMain {
 		int endSize = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[1]) : END_SIZE;
 		int increment = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[2]) : INCREMENT;
 
-		for (int x = startSize; x <= endSize; x += increment) {
-			trainAndTest(x, TEST);
-		}
+		Utilities.printInfoInline(String.format("%n -- Serializing: %s -- %n", serialize ? "true" : "false"));
+		MultiNBHypothesis mnbh = null;
+		for (int x = startSize; x <= endSize; x += increment)
+			mnbh = trainAndTest(x, TEST);
+			
+		if (serialize) 
+			mnbh.serialize();
 		
 		MyDB.close();
 		

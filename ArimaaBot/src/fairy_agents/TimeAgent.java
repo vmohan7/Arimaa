@@ -1,6 +1,5 @@
 package fairy_agents;
 
-import naive_bayes.MultiNBHypothesis;
 import game_phase.FeatureExtractor;
 import montecarlo.AlphaBetaSearchAgent;
 import utilities.helper_classes.ArimaaState;
@@ -26,15 +25,17 @@ public class TimeAgent {
 	};
 	
 	
-	// Instructions to redirect console output to file:
-	// right click TimeAgent.java -> Run as -> Run Configurations... -> select "Common" tab
-	// 						      -> check "File" under "Standard Input and Output"
-	//                            -> enter destination file name :D
+	/**
+	 * <b>Instructions to redirect console output to file:</b> <br>
+	 * Right click TimeAgent.java <br>-> Run as -> Run Configurations... -> select "Common" tab <br>
+	 * 						      	  -> Check "File" under "Standard Input and Output" <br>
+	 *                            	  -> Enter destination file name :D <br>
+	 */
 	public static void main(String[] args) {
 		/* If the (XMeans|MultiNBMain).ser files are not already on your computer: 
 		 * Step 1 -- Run XMeansWrapper to train the clusters.
 		 * Step 2 -- Run MultiNBMain to train move ordering. */
-		FairyMoveOrderingClusteringAgent phaseAgent = new FairyMoveOrderingClusteringAgent(DEPTH, MultiNBHypothesis.getMultiNBHypothesis());
+		FairyMoveOrderingClusteringAgent phaseAgent = new FairyMoveOrderingClusteringAgent(DEPTH);
 		//FairyAgent fairyAgent = new FairyAgent(DEPTH);
 		
 		printTimeForAgent(phaseAgent);
@@ -56,9 +57,9 @@ public class TimeAgent {
 			ArimaaState state = new ArimaaState(board, null);
 			MoveList moves = agent.genRootMovesArrayList(board);
 			
-			double startTime = System.currentTimeMillis();
+			double startTime = System.nanoTime() / 1E6;
 			agent.selectMove(state, moves);
-			double totalTime = System.currentTimeMillis() - startTime;
+			double totalTime = System.nanoTime() / 1E6 - startTime;
 			
 			System.out.println(board.toBoardString() + "\n" 
 								+ "Time to select move (ms): " + totalTime

@@ -79,13 +79,13 @@ public class FeatureExtractor implements Constants {
 		// on the branch FasterAB. These should never be on a master / "production" 
 		// branch!!
 		double[] features = new double[NUM_REDUCED_FEATURES];
-		double start = System.currentTimeMillis();
+		double start = (System.nanoTime() / 1E6);
 		features[0] = extractMinNumPieces(state);
-		double mid1 = System.currentTimeMillis();
+		double mid1 = (System.nanoTime() / 1E6);
 		features[1] = extractMaxNumDisplaced(state);
-		double mid2 = System.currentTimeMillis();
+		double mid2 = (System.nanoTime() / 1E6);
 		features[2] = extractImminentGoalFeature(state);
-		double end = System.currentTimeMillis();
+		double end = (System.nanoTime() / 1E6);
 		extractNumPiecesTime += mid1 - start;
 		extractNumDisplacedTime += mid2 - mid1;
 		extractGoalThreatsTime += end - mid2;

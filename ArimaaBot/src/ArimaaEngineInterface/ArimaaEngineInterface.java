@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.*;
 
 import fairy_agents.*;
-import naive_bayes.MultiNBHypothesis;
 import naive_bayes.NBHypothesis;
 import montecarlo.*;
 import ai_util.LogFile;
@@ -18,17 +17,11 @@ public class ArimaaEngineInterface {
 	 * Step $ -- Profit.
 	 */
 	
-	private MultiNBHypothesis multiNBHyp;
-	
 	/** 
 	 * Reads in the MultiNBHypothesis from an existing serialized file.
 	 * <br><i>-- This requires that MultiNBMain.main(argv) has been run. Make sure to change
 	 * the constants (such as number of games, etc.) to the right values. --</i>
 	 */
-	public ArimaaEngineInterface() {
-		multiNBHyp = MultiNBHypothesis.getMultiNBHypothesis();
-		assert(multiNBHyp != null);
-	}
 	
 	
 	// All messages must by sent thru here so they get logged
@@ -121,7 +114,7 @@ public class ArimaaEngineInterface {
 					else if (bot_type == 7)
 						gc.setAgent( new FairyAgentHeuristicHardcodedReduced(2) );
 					else if (bot_type == 8)
-						gc.setAgent( new FairyMoveOrderingClusteringAgent(2, multiNBHyp) );
+						gc.setAgent( new FairyMoveOrderingClusteringAgent(2) );
 
 				}
 				else if (AEIcommand.command.equals("makemove")) {

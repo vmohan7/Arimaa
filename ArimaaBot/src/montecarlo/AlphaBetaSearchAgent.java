@@ -85,9 +85,9 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 			return score;
 		} else if (depth == 0){
 			numEvals++; //this line is strictly for testing
-			double start = System.currentTimeMillis();
+			double start = (System.nanoTime() / 1E6);
 				double score =  sign*evaluation(nextState);
-			timeToEval += (System.currentTimeMillis() - start);
+			timeToEval += (System.nanoTime() / 1E6) - start;
 			return score; 
 		}
 

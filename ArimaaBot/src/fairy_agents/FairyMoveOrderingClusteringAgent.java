@@ -1,6 +1,7 @@
 package fairy_agents;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Random;
 
 import feature_extractor.FeatureExtractor;
@@ -22,28 +23,30 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 
 	private static final double TOP_K_PERCENT = 0.3;
 
-	private MultiNBHypothesis hyp;
+	private MultiNBHypothesis multiNBHyp;
 	
 	/** For internal time-keeping. */
-	private long timeExtractingInMS = 0L;
-	private long timeSelectingInMS = 0L;
-	private long timeSortingKInMS = 0L;
+	private double timeExtractingInMS = 0;
+	private double timeEvaluatingMultiNBInMS = 0;
+	private double timeSelectingInMS = 0;
+	private double timeSortingKInMS = 0;
 	
 	/** For reporting. */
-	private int depth;
-	public long getTotalExtractTimeMS() { return timeExtractingInMS; }
-	public long getTotalSortTime() { return timeSelectingInMS + timeSortingKInMS; }
-	public long getPartitionTime() { return timeSelectingInMS; }
-	public long getSortingKTime() { return timeSortingKInMS; }
-	public int getNumXMeansGames() { return hyp.getNumXMeansGames(); }
-	public int getNumTrainedGames() { return hyp.getNumTrainedGames(); }
+	private int searchDepth;
+	public double getTotalExtractTimeMS() { return timeExtractingInMS; }
+	public double getTotalEvaluateMultiNBTimeMS() { return timeEvaluatingMultiNBInMS; }
+	public double getTotalSortTime() { return timeSelectingInMS + timeSortingKInMS; }
+	public double getPartitionTime() { return timeSelectingInMS; }
+	public double getSortingKTime() { return timeSortingKInMS; }
+	public int getNumXMeansGames() { return multiNBHyp.getNumXMeansGames(); }
+	public int getNumTrainedGames() { return multiNBHyp.getNumTrainedGames(); }
 	
 	
 	/** Prints human-readable formatted output about the settings of the agent. */
 	public void printSettingsStats() {
 		Utilities.printInfo(String.format("-----%nRunning stats for FairyMoveOrderingClusteringAgent only:"));
 		Utilities.printInfo("Top K percent: " + (TOP_K_PERCENT*100) + "%");
-		Utilities.printInfo("Depth: " + depth);
+		Utilities.printInfo("Depth: " + searchDepth);
 		Utilities.printInfo("XMeans trained on: " + getNumXMeansGames() + " games");
 		Utilities.printInfo("MultiNB trained on: " + getNumTrainedGames() + " games");
 		Utilities.printInfo(String.format("-----%n"));
@@ -51,19 +54,22 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 	
 	/** Prints human-readable formatted output about the agent after being run. */
 	public void printPostRunStats() {
-		Utilities.printInfo(String.format("%n-----%Post-run stats for FairyMoveOrderingClusteringAgent only:"));
-		Utilities.printInfo("Time extracting (ms): " + getTotalExtractTimeMS());
-		Utilities.printInfo("Time partitioning (ms): " + getPartitionTime());
-		Utilities.printInfo("Time sorting (ms): " + getSortingKTime());
-		Utilities.printInfo("Time partitioning + sorting (ms): " + getTotalSortTime());
-		Utilities.printInfo(String.format("%n-----"));
+		Utilities.printInfo(String.format("%n-----%nPost-run stats for FairyMoveOrderingClusteringAgent only:"));
+		Utilities.printInfo(String.format("Time extracting features (ms): %,.0f" , getTotalExtractTimeMS()));
+		Utilities.printInfo(String.format("Time evaluating inside MultiNB model (ms): %,.0f" , getTotalEvaluateMultiNBTimeMS()));
+		Utilities.printInfo(String.format("Time partitioning (ms): %,.0f" , getPartitionTime()));
+		Utilities.printInfo(String.format("Time sorting (ms): %,.0f" , getSortingKTime()));
+		Utilities.printInfo(String.format("Time partitioning + sorting (ms): %,.0f" , getTotalSortTime()));
+		Utilities.printInfo("-----");
 	}
 	
 
-	public FairyMoveOrderingClusteringAgent(int depth, MultiNBHypothesis hyp) {
+	public FairyMoveOrderingClusteringAgent(int depth) {
 		super(depth);
-		this.hyp = hyp;
-		this.depth = depth;
+		multiNBHyp = MultiNBHypothesis.getMultiNBHypothesis();
+		assert(multiNBHyp != null);
+		
+		searchDepth = depth;
 	}
 
 	
@@ -110,18 +116,25 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 		ScoredMove[] topKMoves = new ScoredMove[moves.size()];
 		int i = 0;
 		
-		long extractStart = System.currentTimeMillis();
-			for (ArimaaMove m : moves)
-				topKMoves[i++] = new ScoredMove(m, hyp.evaluate(fe.extractFeatures(m), curr));
-		timeExtractingInMS += System.currentTimeMillis() - extractStart;
-
-		long selectStart = System.currentTimeMillis();
-			select(topKMoves, 0, topKMoves.length-1, k-1);
-		timeSelectingInMS += System.currentTimeMillis() - selectStart;
 		
-		long sortStart = System.currentTimeMillis();
+		for (ArimaaMove m : moves) {
+			double extractStart = (System.nanoTime() / 1E6);
+				BitSet features = fe.extractFeatures(m);
+			timeExtractingInMS += (System.nanoTime() / 1E6) - extractStart;
+			
+			double evaluateStart = (System.nanoTime() / 1E6);
+				topKMoves[i++] = new ScoredMove(m, multiNBHyp.evaluate(features, curr));
+			timeEvaluatingMultiNBInMS += (System.nanoTime() / 1E6) - evaluateStart;
+		}
+		
+
+		double selectStart = (System.nanoTime() / 1E6);
+			select(topKMoves, 0, topKMoves.length-1, k-1);
+		timeSelectingInMS += (System.nanoTime() / 1E6) - selectStart;
+		
+		double sortStart = (System.nanoTime() / 1E6);
 			Arrays.sort(topKMoves, 0, k);
-		timeSortingKInMS += System.currentTimeMillis() - sortStart;
+		timeSortingKInMS += (System.nanoTime() / 1E6) - sortStart;
 		
 		return topKMoves;
 	}
