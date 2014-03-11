@@ -18,8 +18,8 @@ public abstract class MoveOrderingPruning extends AlphaBetaSearchAgent {
 		this.hyp = hyp;
 	}
 	
-	public ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves){
-		return super.selectMove( arimaaState, getMoves(arimaaState) ); //does the limiting for the first set as well
+	public ArimaaMove selectMove(final ArimaaState arimaaState, String move_history){
+		return super.selectMove( arimaaState, move_history ); //does the limiting for the first set as well
 	}
 	
 
