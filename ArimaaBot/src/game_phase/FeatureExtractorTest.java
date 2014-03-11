@@ -27,7 +27,7 @@ public class FeatureExtractorTest implements Constants {
 	    String black = "1b ee7 md7 ch8 ca8 dc7 hb7 hg7 df7 ra7 rh7 rb8 rc8 rd8 re8 rf8 rg8";
 	    GameState startState = new GameState(white,black);
 
-	    double[] features = FeatureExtractor.extractFeatures(startState);
+	    double[] features = FeatureExtractor.extractFeatures(startState, GamePhaseFeatureType.FULL);
 	    
 	    System.out.println(startState.toBoardString());
 	    
@@ -45,7 +45,7 @@ public class FeatureExtractorTest implements Constants {
 	    String black = "1b eg6";
 	    GameState startState = new GameState(white,black);
 
-	    double[] features = FeatureExtractor.extractFeatures(startState);
+	    double[] features = FeatureExtractor.extractFeatures(startState, GamePhaseFeatureType.FULL);
 	    
 	    System.out.println(startState.toBoardString());
 	    
@@ -67,7 +67,7 @@ public class FeatureExtractorTest implements Constants {
 		System.out.println(player + "'s turn");
 
 		
-	    double[] reducedFeatures = FeatureExtractor.extractReducedFeatures(state);
+	    double[] reducedFeatures = FeatureExtractor.extractFeatures(state, GamePhaseFeatureType.REDUCED);
 	   
 	    for(int i = 0; i < reducedFeatures.length; i++){
 	    	System.out.println(i + " : " + reducedFeatures[i]);

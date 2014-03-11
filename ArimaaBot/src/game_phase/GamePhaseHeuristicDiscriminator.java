@@ -86,7 +86,7 @@ public class GamePhaseHeuristicDiscriminator {
 	 * @return 0 for beginning, 1 for middle, 2 for end
 	 */
 	public static GamePhase getStrictGamePhase(GameState gs) {
-		return assignCluster(FeatureExtractor.extractReducedFeatures(gs));
+		return assignCluster(FeatureExtractor.extractFeatures(gs, GamePhaseFeatureType.REDUCED));
 	}
 	
 	/** Uses the test games to assign each GameState to a cluster. Results output to CSV. */
@@ -110,7 +110,7 @@ public class GamePhaseHeuristicDiscriminator {
 //				}
 				
 				// Assign ternary phases and print to csv for plotting
-				GamePhase currPhase = assignCluster(FeatureExtractor.extractReducedFeatures( myParser.getNextGameState().getCurr()));
+				GamePhase currPhase = assignCluster(FeatureExtractor.extractFeatures( myParser.getNextGameState().getCurr(), GamePhaseFeatureType.REDUCED));
 				csv.appendValue(Integer.toString(currPhase.getValue()));
 			}
 			

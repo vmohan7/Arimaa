@@ -67,8 +67,6 @@ public class TimeAgent {
 			agent.printAndResetLeafEvals();
 			System.out.flush();
 			
-			avgTime += totalTime;
-			
 			FeatureExtractor.printFeatureExtractionTimes();
 			
 			avgTime += totalTime;

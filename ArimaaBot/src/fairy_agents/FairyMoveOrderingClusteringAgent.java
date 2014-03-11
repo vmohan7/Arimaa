@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Random;
 
+import com.sun.org.apache.xerces.internal.impl.dv.dtd.NMTOKENDatatypeValidator;
+
 import feature_extractor.FeatureExtractor;
 import naive_bayes.MultiNBHypothesis;
 import utilities.MoveArrayList;
@@ -21,10 +23,12 @@ import arimaa3.MoveList;
  */
 public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 
-	private static final double TOP_K_PERCENT = 0.3;
+	private static final double TOP_K_PERCENT = 0.2;
 
 	private MultiNBHypothesis multiNBHyp;
 	
+	
+	 
 	/** For internal time-keeping. */
 	private double timeExtractingInMS = 0;
 	private double timeEvaluatingMultiNBInMS = 0;
@@ -33,11 +37,13 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 	
 	/** For reporting. */
 	private int searchDepth;
+	private long numMultiNBEvaluateCalls = 0L;
 	public double getTotalExtractTimeMS() { return timeExtractingInMS; }
 	public double getTotalEvaluateMultiNBTimeMS() { return timeEvaluatingMultiNBInMS; }
 	public double getTotalSortTime() { return timeSelectingInMS + timeSortingKInMS; }
 	public double getPartitionTime() { return timeSelectingInMS; }
 	public double getSortingKTime() { return timeSortingKInMS; }
+	public long getNumMultiNBEvaluateCalls() { return numMultiNBEvaluateCalls; }
 	public int getNumXMeansGames() { return multiNBHyp.getNumXMeansGames(); }
 	public int getNumTrainedGames() { return multiNBHyp.getNumTrainedGames(); }
 	
@@ -57,9 +63,12 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 		Utilities.printInfo(String.format("%n-----%nPost-run stats for FairyMoveOrderingClusteringAgent only:"));
 		Utilities.printInfo(String.format("Time extracting features (ms): %,.0f" , getTotalExtractTimeMS()));
 		Utilities.printInfo(String.format("Time evaluating inside MultiNB model (ms): %,.0f" , getTotalEvaluateMultiNBTimeMS()));
+		Utilities.printInfo(String.format("Number of evaluate calls inside MultiNB model: %,d" , getNumMultiNBEvaluateCalls()));
 		Utilities.printInfo(String.format("Time partitioning (ms): %,.0f" , getPartitionTime()));
 		Utilities.printInfo(String.format("Time sorting (ms): %,.0f" , getSortingKTime()));
 		Utilities.printInfo(String.format("Time partitioning + sorting (ms): %,.0f" , getTotalSortTime()));
+		multiNBHyp.printPostRunStats();
+		
 		Utilities.printInfo("-----");
 	}
 	
@@ -124,6 +133,7 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 			
 			double evaluateStart = (System.nanoTime() / 1E6);
 				topKMoves[i++] = new ScoredMove(m, multiNBHyp.evaluate(features, curr));
+				numMultiNBEvaluateCalls++;
 			timeEvaluatingMultiNBInMS += (System.nanoTime() / 1E6) - evaluateStart;
 		}
 		

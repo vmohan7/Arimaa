@@ -38,11 +38,24 @@ public class FeatureExtractor implements Constants {
 
 	//PL_WHITE and PL_BLACK are constants that refer to the index into the features array
 	
+	public static double[] extractFeatures(GameState state, GamePhaseFeatureType type) {
+		switch (type) {
+			case FULL:
+				return extractFeatures(state);
+			case REDUCED:
+				return extractReducedFeatures(state);
+			case REDUCED_NO_GOAL_THREATS:
+			default:
+				return extractReducedFeaturesNoGoalThreats(state);
+				
+		}
+	}
+	
 	/**
 	 * Extracts features for the resulting board after playing a possible legal move.
 	 * current_board is the resulting board after playing current_move on prev game state.
 	 */
-	public static double[] extractFeatures(GameState state) {
+	private static double[] extractFeatures(GameState state) {
 		double[] features = new double[NUM_FEATURES];
 		extractNumPiecesPerPlayer(state, features);
 		extractRank(state, features);
@@ -74,7 +87,7 @@ public class FeatureExtractor implements Constants {
 	 * Extract features to be used in GamePhaseHeuristicDiscriminator. Uses
 	 * heuristic features.
 	 */
-	public static double[] extractReducedFeatures(GameState state){
+	private static double[] extractReducedFeatures(GameState state){
 		// NOTE: we've sprinkled timing commands into this method only for testing
 		// on the branch FasterAB. These should never be on a master / "production" 
 		// branch!!
@@ -97,7 +110,7 @@ public class FeatureExtractor implements Constants {
 	 * Extract features to be used in GamePhaseHeuristicDiscriminatorReduced. Uses
 	 * heuristic features and no goal threat feature. 
 	 */
-	public static double[] extractReducedFeaturesNoGoalThreats(GameState state){
+	private static double[] extractReducedFeaturesNoGoalThreats(GameState state){
 		double[] features = new double[NUM_REDUCED_FEATURES_NO_GOAL_THREATS];
 		features[0] = extractMinNumPieces(state);
 		features[1] = extractMaxNumDisplaced(state);

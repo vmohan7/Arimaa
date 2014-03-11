@@ -3,6 +3,7 @@ package game_phase;
 import java.io.*;
 import java.util.ArrayList;
 
+import arimaa3.GameState;
 import utilities.GameData;
 import utilities.GameParser;
 import utilities.helper_classes.GameInfo;
@@ -27,18 +28,26 @@ import weka.core.Instances;
  */
 public class XMeansWrapper extends XMeans {
 	
-	private static final String FILE_PREFIX = "../Plotting/game_phase/";
-	private static final String SERIALIZED_FILE = FILE_PREFIX + "XMeans.ser";
+	public static final GamePhaseFeatureType EXTRACTION_TYPE = GamePhaseFeatureType.REDUCED;
+	private static final boolean REDUCED_FEATURES = EXTRACTION_TYPE != GamePhaseFeatureType.FULL;
 	
-	private static final int MIN_NUM_CLUSTERS = 2;
+	private static final String FILE_PREFIX = "../Plotting/game_phase/";
+	private static final String SERIALIZED_FILE = FILE_PREFIX + String.format("%s%s%s.ser", 
+										"XMeans_", (REDUCED_FEATURES ? "reduced" : "full"), "_features"); 
+	
+	private static final int MIN_NUM_CLUSTERS = 3; // changed from 2
 	private static final int MAX_NUM_CLUSTERS = 8;
 	
 	// Clustering on 15000 games took ~3GB of RAM -- plan accordingly
 	// (It created a 980MB .ser file.)
 	private final int NUM_GAMES = 15000; // note: non-static since each XMeansWrapper could be trained on a different number of games
+	private final int RATING = GameData.RATING_THRESHOLD;
+	
 	
 	/** For printing info. */
 	public int getNumGames() { return NUM_GAMES; }
+	public int getTrainingThresholdRating() { return RATING; }
+	public boolean usingReducedFeatures() { return REDUCED_FEATURES; }
 	
 	
 	/** Run main to train and output the .ser file */
@@ -204,16 +213,19 @@ public class XMeansWrapper extends XMeans {
 	
 	/** Reads games from GameData, extracts features, and builds the clusters. */
 	private void train() {
-		Utilities.printInfo(String.format("<< Running with %d games, and %d to %d clusters >>", 
-												NUM_GAMES, MIN_NUM_CLUSTERS, MAX_NUM_CLUSTERS));
+		Utilities.printInfo(String.format("<< Running with %d games, and %d to %d clusters -- rating threshold: %d >>", 
+												NUM_GAMES, MIN_NUM_CLUSTERS, MAX_NUM_CLUSTERS, RATING));
 		
+		Utilities.printInfo("Fetching game data...");
 		GameData myGameData = new GameData(NUM_GAMES, ALMOST_ALL); // 1.0 doesn't work? janky
 		Utilities.printInfo("Finished fetching game data");
 		double[][] designMatrix = getFeatureMatrix(myGameData); 
 
 		try {
+			Utilities.printInfo(String.format("%nBuilding the clusterer..."));
 			buildClusterer(designMatrix);
 			Utilities.printInfo("Number of clusters: " + numberOfClusters());
+			printCentroids();
 		} catch (Exception e) {
 			System.err.println("Something went wrong went clustering in XMeansWrapper.");
 			e.printStackTrace();
@@ -221,10 +233,17 @@ public class XMeansWrapper extends XMeans {
 			System.exit(1);
 		}
 		
-		Utilities.printInfo("End training...");
+		Utilities.printInfo("\n---- Done training... ----");
 	}
 
-
+	
+	private void printCentroids() {
+		Instances centroids = getClusterCenters();
+		for (int c = 0; c < centroids.numInstances(); c++)
+			Utilities.printInfo(String.format("Cluster %d: (%s)", c, centroids.instance(c).toString()));
+	}
+	
+	
 	/** Generates the 2D matrix of real-valued features (to be clustered) */
 	private static double[][] getFeatureMatrix(GameData myGameData) {
 		ArrayList<double[]> trainMatrix = new ArrayList<double[]>();
@@ -238,7 +257,10 @@ public class XMeansWrapper extends XMeans {
 			GameParser myParser = new GameParser(trainGameInfo);
 			
 			while (myParser.hasNextGameState()){
-				trainMatrix.add( game_phase.FeatureExtractor.extractFeatures(myParser.getNextGameState().getCurr()) );
+				GameState gs = myParser.getNextGameState().getCurr();
+				double[] features = game_phase.FeatureExtractor.extractFeatures(gs, EXTRACTION_TYPE);
+				
+				trainMatrix.add(features);
 			}
 			
 			final long endTime = System.currentTimeMillis();

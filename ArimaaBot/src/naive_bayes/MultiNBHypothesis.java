@@ -1,5 +1,6 @@
 package naive_bayes;
 
+import game_phase.GamePhaseFeatureType;
 import game_phase.XMeansWrapper;
 
 import java.io.BufferedInputStream;
@@ -17,6 +18,7 @@ import java.util.BitSet;
 
 import arimaa3.GameState;
 import utilities.AbstractHypothesis;
+import utilities.helper_classes.Utilities;
 
 public final class MultiNBHypothesis extends AbstractHypothesis 
 									implements java.io.Serializable {
@@ -46,15 +48,43 @@ public final class MultiNBHypothesis extends AbstractHypothesis
 		numGamesTrained = numGamesTrainedOn;
 	}
 
+	
+	/** For logging info. */
+	private double clusterTimeInMS = 0.0;
+	private double evaluateTimeInMS = 0.0;
+	private double extractTimeInMS = 0.0;
+	
+	public double getExtractTimeInMS() { return extractTimeInMS; }
+	public double getClusterTimeInMS() { return clusterTimeInMS; }
+	public double getEvaluateTimeInMS() { return evaluateTimeInMS; }
+	
+	public void printPostRunStats() {
+		Utilities.printInfo(String.format("%n--MultiNBHypothesis post run stats:"));
+		Utilities.printInfo(String.format("Time extracting Game Phase features (ms): %,.0f" , getExtractTimeInMS()));
+		Utilities.printInfo(String.format("Time assigning Game Phase feature clusters (ms): %,.0f" , getClusterTimeInMS()));
+		Utilities.printInfo(String.format("Time in NB (not multi!) evaluate (ms): %,.0f" , getEvaluateTimeInMS()));
+		Utilities.printInfo(String.format("--%n"));
+	}
+	
 	/**
 	 * @param bs The bitset to be evaluated
 	 * @param state The GameState that was the source of the move from which bs was generated.
 	 */
 	@Override
 	public double evaluate(BitSet bs, GameState state) {
-		double[] phaseVector = game_phase.FeatureExtractor.extractFeatures(state);
-		int cluster = xMeansWrapper.clusterInstance(phaseVector); 
-		return nbHypotheses[cluster].evaluate(bs, state);
+		double extractStart = System.nanoTime() / 1E6;
+			double[] phaseVector = game_phase.FeatureExtractor.extractFeatures(state, XMeansWrapper.EXTRACTION_TYPE);
+		extractTimeInMS += System.nanoTime() / 1E6 - extractStart;
+			
+		double clusterStart = System.nanoTime() / 1E6;
+			int cluster = xMeansWrapper.clusterInstance(phaseVector);
+		clusterTimeInMS += System.nanoTime() / 1E6 - clusterStart;
+		
+		double evaluateStart = System.nanoTime() / 1E6;
+			double evalResult = nbHypotheses[cluster].evaluate(bs, state);
+		evaluateTimeInMS += System.nanoTime() / 1E6 - evaluateStart;
+		
+		return evalResult;
 	}
 	
 	
@@ -120,4 +150,5 @@ public final class MultiNBHypothesis extends AbstractHypothesis
 			return false;
 		return true;
 	}
+	
 }

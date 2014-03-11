@@ -60,7 +60,7 @@ public class GamePhaseClusterer {
 			GameParser myParser = new GameParser(trainGameInfo);
 			
 			while (myParser.hasNextGameState()){
-				trainMatrix.add( FeatureExtractor.extractFeatures(myParser.getNextGameState().getCurr()) );
+				trainMatrix.add( FeatureExtractor.extractFeatures(myParser.getNextGameState().getCurr(), XMeansWrapper.EXTRACTION_TYPE) );
 			}
 			
 			final long endTime = System.currentTimeMillis();
@@ -87,7 +87,7 @@ public class GamePhaseClusterer {
 			while (myParser.hasNextGameState()){
 				csv.appendValue(Integer.toString(
 						kmeans.assignCluster(
-								FeatureExtractor.extractFeatures( myParser.getNextGameState().getCurr() )
+								FeatureExtractor.extractFeatures( myParser.getNextGameState().getCurr(), XMeansWrapper.EXTRACTION_TYPE )
 						)
 				));
 			}

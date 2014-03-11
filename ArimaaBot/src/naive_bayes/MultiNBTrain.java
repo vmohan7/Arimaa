@@ -105,7 +105,7 @@ public class MultiNBTrain {
 	 * @throws Exception Thrown if some issue occurs in assigning clusters
 	 */
 	private int getTableIndexFromState(GameState curr) {
-		double[] features = game_phase.FeatureExtractor.extractFeatures(curr);
+		double[] features = game_phase.FeatureExtractor.extractFeatures(curr, XMeansWrapper.EXTRACTION_TYPE);
 		return xMeansWrapper.clusterInstance(features);
 	}
 

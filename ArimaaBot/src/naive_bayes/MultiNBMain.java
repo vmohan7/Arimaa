@@ -21,7 +21,7 @@ public class MultiNBMain {
 
 	/* If set to true, then the percentile of each expert move evaluated will be printed
 	 * in a csv-importable format. */
-	public static final boolean PRINT_PERCENTILES = true;
+	public static final boolean PRINT_PERCENTILES = false;
 	
 	/* ===================================================== */
 	
@@ -78,7 +78,7 @@ public class MultiNBMain {
 	}
 
 	
-	private static final boolean TEST_TRAINING_SET_SIZES = true;
+	private static final boolean TEST_TRAINING_SET_SIZES = false;
 	private static final int NUM_GAMES = 151;
 	
 	private static final boolean DO_NOT_TEST = false, TEST = true;
