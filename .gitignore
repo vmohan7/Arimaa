@@ -15,6 +15,7 @@ Testing/*.m~
 Plotting/*.csv
 Plotting/*.jpg
 Plotting/*.fig
+Plotting/game_phase/*.ser
 
 # Python (compiled python files?)
 *.pyc
