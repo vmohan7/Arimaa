@@ -26,7 +26,7 @@ public abstract class AbstractAgent {
 	 * @param arimaaState - We assume that the nextMove field is null and use that to test out moves
 	 * @return The best move that the computer can think of.
 	 */
-	public abstract ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves);
+	public abstract ArimaaMove selectMove(final ArimaaState arimaaState, String move_history);
 	
 	/**
 	 * 
