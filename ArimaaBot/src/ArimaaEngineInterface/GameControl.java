@@ -12,8 +12,7 @@ import arimaa3.MoveList;
 
 public class GameControl {
 	
-	private ArimaaState state;
-	private ArimaaEngine engine;
+	public ArimaaState state;
 	private boolean isFirst;
 	private AbstractAgent agent;
 	
@@ -26,7 +25,6 @@ public class GameControl {
 	}
 	
 	public void reset(){
-		engine = new ArimaaEngine();
 		state = new ArimaaState(new GameState(), null);
 		isFirst = true;
 		w_state = null;

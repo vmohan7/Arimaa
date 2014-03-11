@@ -18,7 +18,7 @@ public class ArimaaEngineInterface {
 	 * Step $ -- Profit.
 	 */
 	
-	private MultiNBHypothesis multiNBHyp;
+	//private MultiNBHypothesis multiNBHyp;
 	
 	/** 
 	 * Reads in the MultiNBHypothesis from an existing serialized file.
@@ -26,8 +26,8 @@ public class ArimaaEngineInterface {
 	 * the constants (such as number of games, etc.) to the right values. --</i>
 	 */
 	public ArimaaEngineInterface() {
-		multiNBHyp = MultiNBHypothesis.getMultiNBHypothesis();
-		assert(multiNBHyp != null);
+	//	multiNBHyp = MultiNBHypothesis.getMultiNBHypothesis();
+	//	assert(multiNBHyp != null);
 	}
 	
 	
@@ -62,7 +62,7 @@ public class ArimaaEngineInterface {
 	private void control() {
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));	
-		GameControl gc = new GameControl( new ReflexAgent(weights, false) );
+		GameControl gc = new GameControl( new FairyAgent(1) );
 
 		while (true) {
 			try {
@@ -100,6 +100,9 @@ public class ArimaaEngineInterface {
 				else if (AEIcommand.command.equals("stop")) {
 
 				}
+				else if (AEIcommand.command.equals("print")) {
+					System.out.println( gc.state.getCurr().toBoardString() );
+				}
 				else if (AEIcommand.command.equals("newgame")) {
 					send_message("log starting new game using bot " + bot_type);
 					
@@ -120,8 +123,8 @@ public class ArimaaEngineInterface {
 						gc.setAgent( new FairyAgentHeuristicHardcoded(2) );
 					else if (bot_type == 7)
 						gc.setAgent( new FairyAgentHeuristicHardcodedReduced(2) );
-					else if (bot_type == 8)
-						gc.setAgent( new FairyMoveOrderingClusteringAgent(2, multiNBHyp) );
+					//else if (bot_type == 8)
+						//gc.setAgent( new FairyMoveOrderingClusteringAgent(2, multiNBHyp) );
 
 				}
 				else if (AEIcommand.command.equals("makemove")) {
