@@ -29,12 +29,12 @@ public class NAVVClueless extends MoveOrderingPruning implements Constants {
 		return Constants.SCORE_MATE;
 	}
 	
-	public ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves){
+	public ArimaaMove selectMove(final ArimaaState arimaaState, String move_history){
 		if (firstMove){
 			eval.PreProcessRootPosition(arimaaState.getCurr());
 			firstMove = false;
 		}
-		return super.selectMove( arimaaState, getMoves(arimaaState) ); //does the limiting for the first set as well
+		return super.selectMove( arimaaState, move_history ); //does the limiting for the first set as well
 	}
 
 	@Override

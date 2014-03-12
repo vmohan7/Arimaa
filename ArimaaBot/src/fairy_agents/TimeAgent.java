@@ -42,7 +42,7 @@ public class TimeAgent {
 			MoveList moves = agent.genRootMovesArrayList(board);
 			
 			double startTime = System.currentTimeMillis();
-			agent.selectMove(state, moves);
+			agent.selectMove(state, ""); // "" is to disregard repetitions
 			double totalTime = System.currentTimeMillis() - startTime;
 			
 			System.out.println( board.toBoardString() );

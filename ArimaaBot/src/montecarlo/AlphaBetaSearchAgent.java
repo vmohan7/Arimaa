@@ -5,6 +5,7 @@ import arimaa3.ArimaaEngine;
 import arimaa3.ArimaaMove;
 import arimaa3.GameState;
 import arimaa3.MoveList;
+import arimaa3.ThreeFoldRepetition;
 
 public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 
@@ -34,15 +35,23 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 	
 	//use ArimaaState such that the next move is filled in by this function
 	//we assume that the next move is null
-	public ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves){
+	@Override
+	public ArimaaMove selectMove(final ArimaaState arimaaState, String move_history){
+		MoveList moves = getMoves(arimaaState);
 		ArimaaMove bestMove = trainRandomly( moves );
 		if (bestMove != null)
 			return bestMove;
 		
 		double maxAlpha = Double.NEGATIVE_INFINITY;
+		long[] dup_positions = ThreeFoldRepetition.setup(move_history);
 		
 		for(ArimaaMove move : moves){
-			//new ArimaaState(state.getPrev(), state.getCurr(), next, state.getPrevMove(), move, null);
+			GameState gs = new GameState();
+			gs.playFullClear(move, arimaaState.getCurr());
+			
+			if ( isRepetitionBanned(gs.getPositionHash(), dup_positions) )
+				continue;
+			
 			double a = AlphaBeta(new ArimaaState(arimaaState.getPrevPrev(), arimaaState.getPrev(), arimaaState.getCurr(), 
 							arimaaState.getPrevPrevMove(), arimaaState.getPrevMove(), move) , maxDepth - 1, maxAlpha, Double.POSITIVE_INFINITY, false);
 			if (maxAlpha < a){
@@ -111,4 +120,15 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 			return beta;
 		}
 	}
+	
+	  private boolean isRepetitionBanned(long hash_code, long[] duplicate_positions) {
+
+		    for (long banned_hash : duplicate_positions) {
+		      if (banned_hash == hash_code) {
+		        return true;
+		      }
+		    }
+
+		    return false;
+	  }
 }

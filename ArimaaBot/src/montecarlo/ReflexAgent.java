@@ -17,7 +17,8 @@ public class ReflexAgent extends AbstractAgent {
 	}
 
 	@Override
-	public ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves) {
+	public ArimaaMove selectMove(final ArimaaState arimaaState, String move_history) {
+		MoveList moves = getMoves(arimaaState);
 		ArimaaMove bestMove = trainRandomly( moves );
 		if (bestMove != null)
 			return bestMove;
@@ -33,6 +34,10 @@ public class ReflexAgent extends AbstractAgent {
 		}
 		
 		return bestMove;
+	}
+
+	private MoveList getMoves(ArimaaState arimaaState) {
+		return genRootMovesArrayList(arimaaState.getCurr());
 	}
 
 }

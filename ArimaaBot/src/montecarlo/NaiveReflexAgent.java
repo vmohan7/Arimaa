@@ -19,7 +19,8 @@ public class NaiveReflexAgent extends MoveOrderingPruning {
 	}
 
 	@Override
-	public ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves) {
+	public ArimaaMove selectMove(final ArimaaState arimaaState, String move_history) {
+		MoveList moves = getMoves(arimaaState);
 		ArimaaMove bestMove = trainRandomly( moves );
 		if (bestMove != null)
 			return bestMove;

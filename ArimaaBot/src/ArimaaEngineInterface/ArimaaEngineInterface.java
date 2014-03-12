@@ -27,8 +27,8 @@ public class ArimaaEngineInterface {
 	 */
 	/*
 	public ArimaaEngineInterface() {
-		multiNBHyp = MultiNBHypothesis.getMultiNBHypothesis();
-		assert(multiNBHyp != null);
+	//	multiNBHyp = MultiNBHypothesis.getMultiNBHypothesis();
+	//	assert(multiNBHyp != null);
 	}
 	*/
 	
@@ -63,7 +63,7 @@ public class ArimaaEngineInterface {
 	private void control() {
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));	
-		GameControl gc = new GameControl( new ReflexAgent(weights, false) );
+		GameControl gc = new GameControl( new FairyAgent(1) );
 
 		while (true) {
 			try {
@@ -100,6 +100,9 @@ public class ArimaaEngineInterface {
 
 				else if (AEIcommand.command.equals("stop")) {
 
+				}
+				else if (AEIcommand.command.equals("print")) {
+					System.out.println( gc.state.getCurr().toBoardString() );
 				}
 				else if (AEIcommand.command.equals("newgame")) {
 					send_message("log starting new game using bot " + bot_type);

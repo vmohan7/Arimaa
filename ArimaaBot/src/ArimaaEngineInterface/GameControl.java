@@ -12,10 +12,14 @@ import arimaa3.MoveList;
 
 public class GameControl {
 	
-	private ArimaaState state;
-	private ArimaaEngine engine;
+	//Dummy move number to satisfy the Three Fold Rep parser
+	public static final String MOVE_NUMBER = "MOVENO"; 
+	
+	public ArimaaState state;
 	private boolean isFirst;
 	private AbstractAgent agent;
+	
+	private String move_history;
 	
 	private String w_state, b_state;
 	public GameControl(AbstractAgent agent){
@@ -24,11 +28,11 @@ public class GameControl {
 	}
 	
 	public void reset(){
-		engine = new ArimaaEngine();
 		state = new ArimaaState(new GameState(), null);
 		isFirst = true;
 		w_state = null;
 		b_state = null;
+		move_history = "";
 	}
 	
 	public void setAgent(AbstractAgent a){
@@ -37,8 +41,10 @@ public class GameControl {
 	
 	public void getMove(String move){
 		LogFile.message("Recieved Move: " + move);
-		
+
+
 		if (isFirst){
+			move_history += (move + "%13");
 			if (w_state == null){
 				w_state = move;
 				return;
@@ -50,6 +56,7 @@ public class GameControl {
 			}
 		}
 		
+		move_history += (MOVE_NUMBER + " " + move + "%13");
 		ArimaaMove bestMove = new ArimaaMove(move);
 		bestMove.steps = 4;
 		updateBoard(bestMove);
@@ -69,9 +76,7 @@ public class GameControl {
 			}
 		}
 		
-		//TODO change this to call genRootMovesArrayList
-		MoveList moves = engine.genRootMoves(state.getCurr());
-		ArimaaMove bestMove = agent.selectMove(state, moves);
+		ArimaaMove bestMove = agent.selectMove(state, move_history);
 		
 		// remove any pass words, as arimaa-online doesn't want them
 		GenTurn gt = new GenTurn();
