@@ -13,17 +13,33 @@ public class Utilities {
 	
 	/** If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
-	public static boolean PARSEABLE_OUTPUT = false;
+	private static boolean parseableOutput = false;
 	
 	/** If set to true, then the percentile of each expert move evaluated will be printed
 	 * in a csv-importable format. */
-	public static boolean PRINT_PERCENTILES = false;
+	private static boolean printPercentiles = false;
 	
+	public static boolean isParseableOutput() {
+		return parseableOutput;
+	}
+
+	public static void setParseableOutput(boolean parseableOutput) {
+		Utilities.parseableOutput = parseableOutput;
+	}
+
+	public static boolean isPrintPercentiles() {
+		return printPercentiles;
+	}
+
+	public static void setPrintPercentiles(boolean printPercentiles) {
+		Utilities.printPercentiles = printPercentiles;
+	}
+
 	/** Prints message without appending a new line. Use this for any message logging 
 	 * that is not meant to be machine-parseable. 
 	 * @param msg Message for human to read */
 	public static void printInfoInline(String msg){
-		if (!PARSEABLE_OUTPUT)
+		if (!parseableOutput)
 			System.out.print(msg);
 	}
 
@@ -31,7 +47,7 @@ public class Utilities {
 	 * that is not meant to be machine-parseable. 
 	 * @param msg Message for human to read */
 	public static void printInfo(String msg){
-		if (!PARSEABLE_OUTPUT)
+		if (!parseableOutput)
 			System.out.println(msg);
 	}
 
@@ -39,14 +55,14 @@ public class Utilities {
 	 * meant to be machine-parseable. 
 	 * @param msg Message for parser to read */	
 	public static void printParseable(String msg){
-		if (PARSEABLE_OUTPUT)
+		if (parseableOutput)
 			System.out.println(msg);		
 	}
 	
 	/** Prints percentile report of percentile of evaluated expert move and appends a new line.
 	 * @param msg Percentile report for parser to read */	
 	public static void printPercentile(String msg){
-		if (PRINT_PERCENTILES)
+		if (printPercentiles)
 			System.out.println(msg);		
 	}
 	

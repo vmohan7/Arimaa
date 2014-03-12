@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import naive_bayes.MultiNBMain;
 import naive_bayes.NBMain;
 import libsvm.svm;
 import libsvm.svm_model;
@@ -43,8 +44,8 @@ public class SVMMain {
 		if (args.length < 4){
 			printErrorMessage();
 		} else{
-			Utilities.PARSEABLE_OUTPUT = SVMMain.PARSEABLE_OUTPUT;
-			Utilities.PRINT_PERCENTILES = SVMMain.PRINT_PERCENTILES;
+			Utilities.setParseableOutput(SVMMain.PARSEABLE_OUTPUT);
+			Utilities.setPrintPercentiles(SVMMain.PRINT_PERCENTILES);
 			
 			File gameFile = new File( args[GAMEIDS] );
 			int num_games = Integer.parseInt(args[NUM_GAMES]); 

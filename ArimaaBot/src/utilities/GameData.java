@@ -12,7 +12,14 @@ public class GameData implements AbstractGameData {
 	private int numGames;
 	
 	public static final boolean USING_EXPERT = true;
-	public static final int RATING_THRESHOLD = 2100;
+	private static int ratingThreshold = 2100;
+	
+	public static int getRatingThreshold() { return ratingThreshold; }
+
+	public static void setRatingThreshold(int threshold) {
+		assert(threshold > 1300);
+		ratingThreshold = threshold;
+	}
 	
 	// For reference, there are 279K total games, and 5K where both players are rated > 2100. 
 	
@@ -32,7 +39,7 @@ public class GameData implements AbstractGameData {
 		this.firstTestGame = (int) (trainFraction * numGames) + 1;
 		
 		if (myQuery == EXPERT_QUERY)
-			filteredGames = MyDB.executeQuery(String.format(myQuery, RATING_THRESHOLD, RATING_THRESHOLD, numGames));
+			filteredGames = MyDB.executeQuery(String.format(myQuery, ratingThreshold, ratingThreshold, numGames));
 		else if (myQuery == ANY_QUERY)
 			filteredGames = MyDB.executeQuery(String.format(myQuery, numGames));
 		

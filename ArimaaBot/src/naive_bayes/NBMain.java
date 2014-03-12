@@ -86,8 +86,8 @@ public class NBMain {
 			return;
 		}
 		
-		Utilities.PARSEABLE_OUTPUT = NBMain.PARSEABLE_OUTPUT;
-		Utilities.PRINT_PERCENTILES = NBMain.PRINT_PERCENTILES;
+		Utilities.setParseableOutput(NBMain.PARSEABLE_OUTPUT);
+		Utilities.setPrintPercentiles(NBMain.PRINT_PERCENTILES);
 		
 		int startSize = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[0]) : START_SIZE;
 		int endSize = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[1]) : END_SIZE;

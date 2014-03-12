@@ -41,7 +41,7 @@ public class XMeansWrapper extends XMeans {
 	// Clustering on 15000 games took ~3GB of RAM -- plan accordingly
 	// (It created a 980MB .ser file.)
 	private final int NUM_GAMES = 15000; // note: non-static since each XMeansWrapper could be trained on a different number of games
-	private final int RATING = GameData.RATING_THRESHOLD;
+	private final int RATING = 1600;
 	
 	
 	/** For printing info. */
@@ -217,6 +217,7 @@ public class XMeansWrapper extends XMeans {
 												NUM_GAMES, MIN_NUM_CLUSTERS, MAX_NUM_CLUSTERS, RATING));
 		
 		Utilities.printInfo("Fetching game data...");
+		GameData.setRatingThreshold(RATING);
 		GameData myGameData = new GameData(NUM_GAMES, ALMOST_ALL); // 1.0 doesn't work? janky
 		Utilities.printInfo("Finished fetching game data");
 		double[][] designMatrix = getFeatureMatrix(myGameData); 

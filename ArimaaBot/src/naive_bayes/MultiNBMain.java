@@ -17,13 +17,53 @@ public class MultiNBMain {
 	
 	/* If set to false, then log statements will be printed. If set to true, then only 
 	 * results will be reported, in a csv-importable format. */
-	public static final boolean PARSEABLE_OUTPUT = false;
+	public static final boolean PARSEABLE_OUTPUT = true;
 
 	/* If set to true, then the percentile of each expert move evaluated will be printed
 	 * in a csv-importable format. */
-	public static final boolean PRINT_PERCENTILES = false;
+	public static final boolean PRINT_PERCENTILES = true;
+	
+	private static final boolean TEST_TRAINING_SET_SIZES = true;
+	private static final int NUM_GAMES = 151;
+	
+	private static final boolean DO_NOT_TEST = false, TEST = true;
+	
+	private static final int RATING = 2100;
+	
+	private static final boolean RUN_FROM_COMMAND_LINE = false;
+	
+	/* These values are used if RUN_FROM_COMMAND_LINE is false. They specify the size
+	 * of the example set for the start round and the end round, and the amount by which
+	 * to increment the size of the example set. E.g. if {START_SIZE, END_SIZE, INCREMENT} 
+	 * == {10, 50, 10}, then the program will train on example sets of size 10, 20, ... 50. 
+	 */
+	private static final int START_SIZE = 10;
+	private static final int END_SIZE = 10;
+	private static final int INCREMENT = 10;
 	
 	/* ===================================================== */
+	
+	// Instructions to redirect console output to file:
+	// right click MultiNBMain.java -> Run as -> Run Configurations... -> select "Common" tab
+	// 			 				    -> check "File" under "Standard Input and Output"
+	//      	                    -> enter destination file name :D
+	/** 
+	 * Outputs a MultiNBHypothesis object to a file for later deserialization and use.
+	 * @param args Optional command line arguments (for testing)
+	 */
+	public static void main(String[] args) {
+		
+		if (TEST_TRAINING_SET_SIZES) {
+			final boolean serializeAfterTest = false;
+			testDifferentTrainingSetSizes(args, serializeAfterTest);
+		}
+		else {
+			// The MultiNBHypothesis contains all of the trained parameters...
+			MultiNBHypothesis mnbh = trainAndTest(NUM_GAMES, DO_NOT_TEST);
+			mnbh.serialize();
+		}
+		
+	}
 	
 	private static MultiNBHypothesis trainAndTest(int numGames, boolean testing){
 		Utilities.printInfo("-------------------------------");
@@ -35,11 +75,11 @@ public class MultiNBMain {
 		Utilities.printInfo("Train fraction: " + trainFraction);
 		Utilities.printInfo("Game data rating threshold <" +
 							(GameData.USING_EXPERT ? "using" : "not using") +
-							">: " + GameData.RATING_THRESHOLD);
+							">: " + RATING);
 		
 		
 		Utilities.printInfo("Training on " + (int)(trainFraction * numGames) + " games...");
-		
+		GameData.setRatingThreshold(RATING);
 		GameData myGameData = new GameData(numGames, trainFraction);
 		Utilities.printInfo("Finished fetching game data");
 		
@@ -76,50 +116,6 @@ public class MultiNBMain {
 		myGameData.close();
 		return myHypothesis;
 	}
-
-	
-	private static final boolean TEST_TRAINING_SET_SIZES = false;
-	private static final int NUM_GAMES = 151;
-	
-	private static final boolean DO_NOT_TEST = false, TEST = true;
-	
-	// Instructions to redirect console output to file:
-	// right click MultiNBMain.java -> Run as -> Run Configurations... -> select "Common" tab
-	// 			 				    -> check "File" under "Standard Input and Output"
-	//      	                    -> enter destination file name :D
-	/** 
-	 * Outputs a MultiNBHypothesis object to a file for later deserialization and use.
-	 * @param args Optional command line arguments (for testing)
-	 */
-	public static void main(String[] args) {
-		
-		if (TEST_TRAINING_SET_SIZES) {
-			final boolean serializeAfterTest = true;
-			testDifferentTrainingSetSizes(args, serializeAfterTest);
-		}
-		else {
-			// The MultiNBHypothesis contains all of the trained parameters...
-			MultiNBHypothesis mnbh = trainAndTest(NUM_GAMES, DO_NOT_TEST);
-			mnbh.serialize();
-		}
-		
-	}
-	
-	
-	
-	
-	/** LEGACY CODE **/
-	
-	private static final boolean RUN_FROM_COMMAND_LINE = false;
-	
-	/* These values are used if RUN_FROM_COMMAND_LINE is false. They specify the size
-	 * of the example set for the start round and the end round, and the amount by which
-	 * to increment the size of the example set. E.g. if {START_SIZE, END_SIZE, INCREMENT} 
-	 * == {10, 50, 10}, then the program will train on example sets of size 10, 20, ... 50. 
-	 */
-	private static final int START_SIZE = 150;
-	private static final int END_SIZE = 150;
-	private static final int INCREMENT = 10;
 	
 	private static void testDifferentTrainingSetSizes(String[] args) {
 		testDifferentTrainingSetSizes(args, false);
@@ -136,8 +132,8 @@ public class MultiNBMain {
 			return;
 		}
 		
-		Utilities.PARSEABLE_OUTPUT = MultiNBMain.PARSEABLE_OUTPUT;
-		Utilities.PRINT_PERCENTILES = MultiNBMain.PRINT_PERCENTILES;
+		Utilities.setParseableOutput(MultiNBMain.PARSEABLE_OUTPUT);
+		Utilities.setPrintPercentiles(MultiNBMain.PRINT_PERCENTILES);
 		
 		int startSize = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[0]) : START_SIZE;
 		int endSize = RUN_FROM_COMMAND_LINE ? Integer.parseInt(args[1]) : END_SIZE;
