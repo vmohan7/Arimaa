@@ -130,5 +130,5 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 		    }
 
 		    return false;
-		  }
+	  }
 }

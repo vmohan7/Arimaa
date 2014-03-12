@@ -12,6 +12,9 @@ import arimaa3.MoveList;
 
 public class GameControl {
 	
+	//Dummy move number to satisfy the Three Fold Rep parser
+	public static final String MOVE_NUMBER = "MOVENO"; 
+	
 	public ArimaaState state;
 	private boolean isFirst;
 	private AbstractAgent agent;
@@ -38,8 +41,10 @@ public class GameControl {
 	
 	public void getMove(String move){
 		LogFile.message("Recieved Move: " + move);
-		move_history += (move + "%13");
+
+
 		if (isFirst){
+			move_history += (move + "%13");
 			if (w_state == null){
 				w_state = move;
 				return;
@@ -51,6 +56,7 @@ public class GameControl {
 			}
 		}
 		
+		move_history += (MOVE_NUMBER + " " + move + "%13");
 		ArimaaMove bestMove = new ArimaaMove(move);
 		bestMove.steps = 4;
 		updateBoard(bestMove);
