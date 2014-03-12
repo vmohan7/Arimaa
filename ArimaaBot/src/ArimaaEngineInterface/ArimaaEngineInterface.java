@@ -18,18 +18,19 @@ public class ArimaaEngineInterface {
 	 * Step $ -- Profit.
 	 */
 	
-	private MultiNBHypothesis multiNBHyp;
+	//private MultiNBHypothesis multiNBHyp;
 	
 	/** 
 	 * Reads in the MultiNBHypothesis from an existing serialized file.
 	 * <br><i>-- This requires that MultiNBMain.main(argv) has been run. Make sure to change
 	 * the constants (such as number of games, etc.) to the right values. --</i>
 	 */
+	/*
 	public ArimaaEngineInterface() {
 		multiNBHyp = MultiNBHypothesis.getMultiNBHypothesis();
 		assert(multiNBHyp != null);
 	}
-	
+	*/
 	
 	// All messages must by sent thru here so they get logged
 	private static void send_message(String text) {
@@ -117,11 +118,11 @@ public class ArimaaEngineInterface {
 					else if (bot_type == 5)
 						gc.setAgent( new FairyAgent(2) );
 					else if (bot_type == 6)
-						gc.setAgent( new FairyAgentHeuristicHardcoded(1) );
+						gc.setAgent( new FairyAgentHeuristicHardcoded(2) );
 					else if (bot_type == 7)
 						gc.setAgent( new FairyAgentHeuristicHardcodedReduced(2) );
-					else if (bot_type == 8)
-						gc.setAgent( new FairyMoveOrderingClusteringAgent(2, multiNBHyp) );
+					//else if (bot_type == 8)
+						//gc.setAgent( new FairyMoveOrderingClusteringAgent(2, multiNBHyp) );
 
 				}
 				else if (AEIcommand.command.equals("makemove")) {
