@@ -96,7 +96,9 @@ public class MonteCarlo {
 		MoveList possibleMoves = engine.genRootMoves(state.getCurr());
 		
 		//white needs to make the first move to initialize the state for TD
-		ArimaaMove move = agent.selectMove(state, possibleMoves);
+		
+		//TODO: the NAVVCarlo and reflex agents may or may not support the changes to selectMove
+		ArimaaMove move = agent.selectMove(state, "");
 		state = new ArimaaState(gameBoard, move); 
 		
 		int moveCount = 1;
@@ -109,7 +111,7 @@ public class MonteCarlo {
 			if (possibleMoves.size() == 0) break; //Game Over does not seem to capture this
 			
 			ArimaaState nextState = new ArimaaState(state.getPrev(), state.getCurr(), gameBoard, state.getPrevMove(), state.getNextMove(), null);
-			move = agent.selectMove(nextState, possibleMoves);
+			move = agent.selectMove(nextState, ""); //Same TODO as above
 			nextState = new ArimaaState(state.getPrev(), state.getCurr(), gameBoard, state.getPrevMove(), state.getNextMove(), move);
 			
 			Utilities.TDUpdate(state, nextState, 0, ETA, weights);
