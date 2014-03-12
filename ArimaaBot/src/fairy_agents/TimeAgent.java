@@ -4,7 +4,6 @@ import game_phase.FeatureExtractor;
 import montecarlo.AlphaBetaSearchAgent;
 import utilities.helper_classes.ArimaaState;
 import arimaa3.GameState;
-import arimaa3.MoveList;
 
 public class TimeAgent {
 
@@ -55,10 +54,10 @@ public class TimeAgent {
 		for(String test_pos : test_positions){
 			GameState board = new GameState(test_pos);
 			ArimaaState state = new ArimaaState(board, null);
-			MoveList moves = agent.genRootMovesArrayList(board);
+			//MoveList moves = agent.genRootMovesArrayList(board);
 			
 			double startTime = System.nanoTime() / 1E6;
-			agent.selectMove(state, moves);
+			agent.selectMove(state, ""); // "" is to disregard repetitions
 			double totalTime = System.nanoTime() / 1E6 - startTime;
 			
 			System.out.println(board.toBoardString() + "\n" 

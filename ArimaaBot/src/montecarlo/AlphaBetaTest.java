@@ -93,7 +93,10 @@ public class AlphaBetaTest {
 
 		
 		@Override
-		public ArimaaMove selectMove(final ArimaaState arimaaState, MoveList moves){
+		public ArimaaMove selectMove(final ArimaaState arimaaState, String move_history){
+			//TODO: Use move_history as in AlphaBetaSearchAgent?
+			MoveList moves = getMoves(arimaaState);
+			
 			if (firstMove){
 				eval.PreProcessRootPosition(arimaaState.getCurr());
 				firstMove = false;
@@ -196,7 +199,7 @@ public class AlphaBetaTest {
 
 		double time = System.currentTimeMillis();
 		
-		ArimaaMove move = agent.selectMove(game, agent.getMoves(game) );
+		ArimaaMove move = agent.selectMove(game, "");
 		System.out.println(game.getCurr().toBoardString());
 		System.out.println( System.currentTimeMillis() - time + " ms elapsed");
 	}

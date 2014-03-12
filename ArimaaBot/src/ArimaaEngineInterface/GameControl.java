@@ -17,6 +17,8 @@ public class GameControl {
 	private boolean isFirst;
 	private AbstractAgent agent;
 	
+	private String move_history;
+	
 	private String w_state, b_state;
 	public GameControl(AbstractAgent agent){
 		this.agent = agent;
@@ -29,6 +31,7 @@ public class GameControl {
 		isFirst = true;
 		w_state = null;
 		b_state = null;
+		move_history = "";
 	}
 	
 	public void setAgent(AbstractAgent a){
@@ -37,7 +40,7 @@ public class GameControl {
 	
 	public void getMove(String move){
 		LogFile.message("Recieved Move: " + move);
-		
+		move_history += (move + "%13");
 		if (isFirst){
 			if (w_state == null){
 				w_state = move;
@@ -69,9 +72,7 @@ public class GameControl {
 			}
 		}
 		
-		//TODO change this to call genRootMovesArrayList
-		MoveList moves = engine.genRootMoves(state.getCurr());
-		ArimaaMove bestMove = agent.selectMove(state, moves);
+		ArimaaMove bestMove = agent.selectMove(state, move_history);
 		
 		// remove any pass words, as arimaa-online doesn't want them
 		GenTurn gt = new GenTurn();
