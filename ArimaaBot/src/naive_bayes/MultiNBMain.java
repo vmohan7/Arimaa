@@ -8,8 +8,10 @@ import utilities.helper_classes.Utilities;
 public class MultiNBMain {
 
 	private static final boolean DO_NOT_TEST = false, TEST = true;
-	private static final int IGNORED = -1; 			// value is unimportant -- used for the English
-	private static final boolean IGNORED_B = false; // value is unimportant -- _B is for boolean
+	/** This value is not used. It is used for the English / readability. */
+	private static final int IGNORED = -1;
+	/** This value is not used. It is used for the English / readability. */
+	private static final boolean IGNORED_B = false;
 	
 	
 	/* ================ VALUES TO CONFIGURE ================ */
@@ -39,21 +41,29 @@ public class MultiNBMain {
 	private static final boolean TEST_TRAINING_SET_SIZES = true;
 	
 	
+	/* NOTE TO THE CONFIGURER: All of the ternary operators are to bring to the forefront
+	 * the dependencies of constants. Simply modify the hard-coded value 
+	 * (e.g. "true" or "START_SIZE = ... 10 [<-- change this] ..."). IGNORED and IGNORED_B
+	 * are simply English to show that the constant value will not matter (if the ternary
+	 * operator evaluates to return IGNORED*).
+	 */
+	
+	/** Running from the command line only matters if testing. */
+	private static final boolean RUN_FROM_COMMAND_LINE = TEST_TRAINING_SET_SIZES ? true : IGNORED_B;
+	
 	/* These values are used if RUN_FROM_COMMAND_LINE is false. They specify the size
 	 * of the example set for the start round and the end round, and the amount by which
 	 * to increment the size of the example set. E.g. if {START_SIZE, END_SIZE, INCREMENT} 
 	 * == {10, 50, 10}, then the program will train on example sets of size 10, 20, ... 50. 
 	 */
 	/** Values to configure the set: { x = START_SIZE + k*INCREMENT | START_SIZE <= x <= END_SIZE, k natural } */
-	private static final int START_SIZE = 	TEST_TRAINING_SET_SIZES ? 10 : IGNORED;
-	private static final int END_SIZE = 	TEST_TRAINING_SET_SIZES ? 10 : IGNORED;
-	private static final int INCREMENT = 	TEST_TRAINING_SET_SIZES ? 10 : IGNORED;
+	private static final int START_SIZE = 	TEST_TRAINING_SET_SIZES ? (RUN_FROM_COMMAND_LINE ? IGNORED : 10) : IGNORED;
+	private static final int END_SIZE = 	TEST_TRAINING_SET_SIZES ? (RUN_FROM_COMMAND_LINE ? IGNORED : 10) : IGNORED;
+	private static final int INCREMENT = 	TEST_TRAINING_SET_SIZES ? (RUN_FROM_COMMAND_LINE ? IGNORED : 10) : IGNORED;
+	
 	
 	/** Set to true if you want a serialized model with END_SIZE games. */
-	private static final boolean SERIALIZE_AFTER_TEST = TEST_TRAINING_SET_SIZES ? false : IGNORED_B;
-	
-	/** Running from the command line only matters if testing. */
-	private static final boolean RUN_FROM_COMMAND_LINE = TEST_TRAINING_SET_SIZES ? false : IGNORED_B;
+	private static final boolean SERIALIZE_AFTER_TEST = TEST_TRAINING_SET_SIZES ? true : IGNORED_B;
 	
 	/** 
 	 * This variable is used when training only (and not testing). 
