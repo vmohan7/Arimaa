@@ -54,7 +54,7 @@ public class XMeansWrapper extends XMeans {
 	public static void main(String[] unused) {
 		XMeansWrapper xmw = new XMeansWrapper(MIN_NUM_CLUSTERS, MAX_NUM_CLUSTERS);
 		xmw.train(); 
-		xmw.serialize();
+//		xmw.serialize();
 	}
 	
 	
