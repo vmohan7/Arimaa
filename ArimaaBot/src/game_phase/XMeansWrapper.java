@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import arimaa3.GameState;
 import utilities.GameData;
 import utilities.GameParser;
+import utilities.helper_classes.CSVDataFormatter;
 import utilities.helper_classes.GameInfo;
 import utilities.helper_classes.Utilities;
 import weka.clusterers.XMeans;
@@ -35,13 +36,23 @@ public class XMeansWrapper extends XMeans {
 	private static final String SERIALIZED_FILE = FILE_PREFIX + String.format("%s%s%s.ser", 
 										"XMeans_", (REDUCED_FEATURES ? "reduced" : "full"), "_features"); 
 	
-	private static final int MIN_NUM_CLUSTERS = 3; // changed from 2
+	private static final int MIN_NUM_CLUSTERS = 5; // changed from 2
 	private static final int MAX_NUM_CLUSTERS = 8;
 	
 	// Clustering on 15000 games took ~3GB of RAM -- plan accordingly
 	// (It created a 980MB .ser file.)
 	private final int NUM_GAMES = 15000; // note: non-static since each XMeansWrapper could be trained on a different number of games
 	private final int RATING = 1600;
+	
+	/** Don't use GameData, and instead read in from the csv at DATA_FILE_PATH. */
+	private static final boolean READ_DATA_FROM_CSV_FILE = true;
+																								//          |
+	/** These constants are for printing the data into a CSV file. */							// change  \|/ only
+	private static final boolean PRINT_DATA_TO_CSV_FILE_BEFORE_CLUSTER = READ_DATA_FROM_CSV_FILE ? false : true;
+	private static final String DATA_FILE_PATH = FILE_PREFIX + "XMeans_designMatrix.csv";
+	private static CSVDataFormatter csvWriter;
+	
+	
 	
 	
 	/** For printing info. */
@@ -52,6 +63,8 @@ public class XMeansWrapper extends XMeans {
 	
 	/** Run main to train and output the .ser file */
 	public static void main(String[] unused) {
+		if (PRINT_DATA_TO_CSV_FILE_BEFORE_CLUSTER) csvWriter = new CSVDataFormatter();
+		
 		XMeansWrapper xmw = new XMeansWrapper(MIN_NUM_CLUSTERS, MAX_NUM_CLUSTERS);
 		xmw.train(); 
 //		xmw.serialize();
@@ -196,7 +209,11 @@ public class XMeansWrapper extends XMeans {
 		for (int i = 0; i < designMatrix.length; i++){
 			Instance datapoint = new Instance(DEFAULT_WEIGHT, designMatrix[i]);
 			dataset.add(datapoint);
+			
+			if (PRINT_DATA_TO_CSV_FILE_BEFORE_CLUSTER) printDoubleArrayToCSV(designMatrix[i]);
 		}
+		
+		if (PRINT_DATA_TO_CSV_FILE_BEFORE_CLUSTER) csvWriter.finalizeFile(DATA_FILE_PATH);
 		
 		
 		// Cluster using settings from the constructor
@@ -207,8 +224,19 @@ public class XMeansWrapper extends XMeans {
 	
 	
 	
-	
-	
+	/** 
+	 * Prints a double array in a CSV format to the static CSVWriter: 
+	 * [1.0, 2.3, 4.1] becomes "1.0, 2.3, 4.1"
+	 * */
+	private void printDoubleArrayToCSV(double[] ds) {
+		for (int i = 0; i < ds.length; i++)
+			csvWriter.appendValue(String.format("%.5f", ds[i]));
+		
+		csvWriter.nextLine();
+	}
+
+
+
 	private static final double ALMOST_ALL = 0.99999;
 	
 	/** Reads games from GameData, extracts features, and builds the clusters. */
@@ -216,11 +244,15 @@ public class XMeansWrapper extends XMeans {
 		Utilities.printInfo(String.format("<< Running with %d games, and %d to %d clusters -- rating threshold: %d >>", 
 												NUM_GAMES, MIN_NUM_CLUSTERS, MAX_NUM_CLUSTERS, RATING));
 		
-		Utilities.printInfo("Fetching game data...");
-		GameData.setRatingThreshold(RATING);
-		GameData myGameData = new GameData(NUM_GAMES, ALMOST_ALL); // 1.0 doesn't work? janky
-		Utilities.printInfo("Finished fetching game data");
-		double[][] designMatrix = getFeatureMatrix(myGameData); 
+		GameData myGameData;
+		if (!READ_DATA_FROM_CSV_FILE) {
+			Utilities.printInfo("Fetching game data...");
+			GameData.setRatingThreshold(RATING);
+			myGameData = new GameData(NUM_GAMES, ALMOST_ALL); // 1.0 doesn't work? janky
+			Utilities.printInfo("Finished fetching game data");
+		}
+		double[][] designMatrix = 
+				READ_DATA_FROM_CSV_FILE ? getFeatureMatrix(DATA_FILE_PATH) : getFeatureMatrix(myGameData); 
 
 		try {
 			Utilities.printInfo(String.format("%nBuilding the clusterer..."));
@@ -270,7 +302,37 @@ public class XMeansWrapper extends XMeans {
 		
 		return trainMatrix.toArray(new double[0][0]);
 	}
+	
+	/** Recovers the 2D matrix of real-valued features (to be clustered) from a CSV file. */
+	private static double[][] getFeatureMatrix(String csvFilename) {
+		ArrayList<double[]> trainMatrix = new ArrayList<double[]>();
+		
+		try {
+			BufferedReader rd = new BufferedReader(new FileReader(csvFilename));
+			String line;
+			while (true) {
+				line = rd.readLine();
+				if (line == null || line.isEmpty()) break;
+				trainMatrix.add(stringToDoubleArray(line));
+			}
+			rd.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return trainMatrix.toArray(new double[0][0]);
+	}
 
+	/** "1.0, 2.0, 3.1" becomes the double array [1.0, 2.0, 3.1] */
+	private static double[] stringToDoubleArray(String line) {
+		String[] values = line.split(", ");
+		double[] arr = new double[values.length];
+		
+		for (int i = 0; i < values.length; i++) 
+			arr[i] = Double.parseDouble(values[i]);
+		
+		return arr;
+	}
 	
 	/** Outputs the XMeansWrapper object to a specific file. */
 	private void serialize() {
