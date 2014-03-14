@@ -31,8 +31,8 @@ from threading import Thread, Event
 from Queue import Queue, Empty
 from subprocess import Popen, PIPE
 
-START_TIME = 5.0
-INIT_TIME = 15.0
+START_TIME = 50.0
+INIT_TIME = 50.0
 
 class EngineException(Exception):
     pass
