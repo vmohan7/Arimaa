@@ -29,13 +29,11 @@ public class MonteCarloTest {
 	
 	@Ignore
 	public void testMoveOrderingAndPruning() {
-		NaiveReflexAgent temp = new NaiveReflexAgent(null, false, null);
-		PriorityQueue<MoveOrder> minPQ = new PriorityQueue<MoveOrder>( 3, temp.new MoveOrder(true) );
-		minPQ.add(temp.new MoveOrder(null, 0.5) );
-		minPQ.add(temp.new MoveOrder(null, 0.6) );
+		PriorityQueue<MoveOrder> minPQ = new PriorityQueue<MoveOrder>( 3, new MoveOrder(true) );
+		minPQ.add(new MoveOrder(null, 0.5));
+		minPQ.add(new MoveOrder(null, 0.6));
 		
 		assertEquals(minPQ.remove(), 0.5);
 		assertEquals(minPQ.remove(), 0.6);
-
 	}
 }

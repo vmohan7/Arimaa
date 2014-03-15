@@ -4,7 +4,6 @@ import java.util.BitSet;
 import java.util.PriorityQueue;
 
 import montecarlo.MoveOrderingPruning.MoveOrder;
-
 import arimaa3.ArimaaMove;
 import arimaa3.GameState;
 import arimaa3.GenTurn;
@@ -12,6 +11,7 @@ import feature_extractor.FeatureExtractor;
 import utilities.GameData;
 import utilities.GameParser;
 import utilities.MoveArrayList;
+import utilities.AbstractGameData.Mode;
 import utilities.helper_classes.ArimaaState;
 import utilities.helper_classes.GameInfo;
 import utilities.helper_classes.Utilities;
@@ -23,41 +23,43 @@ import utilities.helper_classes.Utilities;
  */
 public class NBvsMulti {
 	
-	/* Fractions of GameData games used for training the model. */
-	private static final double TRAIN_FRACTION = 0.5;
+	/** Fractions of GameData games used for training the model. */
+	private static final double TRAIN_FRACTION = 0.9;
 	
 	/** Rating of the games in the GameData. */
 	private static final int RATING = 2100;
 
-	private static final int NUM_GAMES = 2;
-	private static final int NUM_VISIBLE_MOVE_ORDERINGS = 1;
+	private static final int NUM_GAMES = 300;
+	private static final int NUM_VISIBLE_MOVE_ORDERINGS = 5;
 	private static final int SKIP_INTERVAL = 25;
 	
+	/** Redirect output to file -- too much output otherwise. */
 	public static void main(String[] args) {
-		
+		// fetch data
 		GameData.setRatingThreshold(RATING);
 		GameData myGameData = new GameData(NUM_GAMES, TRAIN_FRACTION);
 		Utilities.printInfo("Finished fetching game data");
 		
+		// initialize models
 		NBTrain trainingModel = new NBTrain();
 		Utilities.printInfo("Created the NB model");
-		
-		NBHypothesis nbHypothesis = trainNB(trainingModel, myGameData);
-		
-		myGameData.setMode(GameData.Mode.TRAIN);
-		
 		MultiNBTrain multiNBTrainingModel = new MultiNBTrain();
 		Utilities.printInfo("Created the MultiNB model");
-		MultiNBHypothesis multiNBHypothesis = trainMultiNB(multiNBTrainingModel, myGameData);
 		
+		// train and test
+		NBHypothesis nbHypothesis = trainNB(trainingModel, myGameData);
+		MultiNBHypothesis multiNBHypothesis = trainMultiNB(multiNBTrainingModel, myGameData);
 		test(multiNBHypothesis, nbHypothesis, myGameData);
 		
+		// clean up
 		myGameData.close();
 	}
-	
+
+
 	private static void test(MultiNBHypothesis multiNBHypothesis, NBHypothesis nbHypothesis, GameData myGameData) {
 		
 		GenTurn gen_turn = new GenTurn();
+		myGameData.setMode(Mode.TEST);
 		 
 		for (int count = 0; count < NUM_VISIBLE_MOVE_ORDERINGS && myGameData.hasNextGame(); count++) {
 			GameInfo gi = myGameData.getNextGame();
@@ -79,6 +81,7 @@ public class NBvsMulti {
 				FeatureExtractor fe = new feature_extractor.FeatureExtractor( curr, state.getPrev(), state.getPrevPrev(),
 						state.getPrevMove(), state.getPrevPrevMove() );
 			    
+				// generate moves and order using max-queue
 				MoveArrayList moves = new MoveArrayList(10000);
 				gen_turn.genAllTurns(curr, moves);
 				
@@ -91,62 +94,78 @@ public class NBvsMulti {
 					multiNBQueue.add(new MoveOrder(m, multiNBHypothesis.evaluate(features, curr)));
 				}
 				
+				// print output
 				System.out.println("NB Ordering...");
 				printAllMovesUpToExpert(nbQueue, state.getNextMove());
 				
 				System.out.println("MultiNB Ordering...");
 				printAllMovesUpToExpert(multiNBQueue, state.getNextMove());
 				
-				System.out.println(String.format("%n%n%n%n ******* NEXT ORDERING ******* %n%n%n"));
+				if (gp.hasNextGameState())
+					System.out.println(String.format("%n%n%n%n ******* NEXT ORDERING ******* %n%n%n"));
 			}
+			
+			System.out.println(String.format("%n%n%n%n ********** NEXT GAME ********** %n%n%n"));
 		}
 
 	}
 
+	/** Prints to System.out all of the moves up to and including the expert move in the ranking. */
 	private static void printAllMovesUpToExpert(PriorityQueue<MoveOrder> queue, ArimaaMove expertMove) {
+		int numTotalMoves = queue.size();
 		boolean flag = true;
 		System.out.println(String.format("--------------------------------------%n"));
 		
 		for (int pos = 1; flag; pos++) {
 			MoveOrder move = queue.poll();
 			assert(move != null);
-			if (move.move == expertMove) flag = false;
+			if (move.move.equals(expertMove)) flag = false;
 			
 			System.out.println(String.format("Move %5d: %s", pos, move.move.toString()));
 		}
-		
+		System.out.println("^^^---- This move is the move played by the expert (others below not printed).");
+		System.out.println("\t\t [There were " + numTotalMoves + " total moves in the ordering.]");
 		System.out.println(String.format("--------------------------------------%n%n"));
 	}
 
+	
 	private static MultiNBHypothesis trainMultiNB(MultiNBTrain multiNBTrainingModel, GameData myGameData) {
+		Utilities.printInfo(String.format("%n--------------------------------------"));
+		Utilities.printInfo("Training MultiNB on " + (int)(TRAIN_FRACTION * NUM_GAMES) + " games...");
 		Utilities.printInfo("Train fraction: " + TRAIN_FRACTION);
 		Utilities.printInfo("Game data rating threshold <" +
 							(GameData.USING_EXPERT ? "using" : "not using") +
 							">: " + RATING);
-		Utilities.printInfo("Training on " + (int)(TRAIN_FRACTION * NUM_GAMES) + " games...");
+
 		
+		myGameData.setMode(Mode.TRAIN);
 		NBHypothesis[] nbParameters = multiNBTrainingModel.train(myGameData);
 		Utilities.printInfo("Just finished training!");
 		
 		Utilities.printInfo("Creating a hypothesis...");
-		MultiNBHypothesis myHypothesis = new MultiNBHypothesis(nbParameters, (int)(NUM_GAMES * TRAIN_FRACTION)); 
+		MultiNBHypothesis myHypothesis = new MultiNBHypothesis(nbParameters, (int)(NUM_GAMES * TRAIN_FRACTION));
+		Utilities.printInfo(String.format("--------------------------------------%n"));
 
 		return myHypothesis;
 	}
 
 	private static NBHypothesis trainNB(NBTrain trainingModel, GameData myGameData) {
+		Utilities.printInfo(String.format("%n--------------------------------------"));
+		Utilities.printInfo("Training Naive Bayes on " + (int)(TRAIN_FRACTION * NUM_GAMES) + " games...");
 		Utilities.printInfo("Train fraction: " + TRAIN_FRACTION);
 		Utilities.printInfo("Game data rating threshold <" +
 							(GameData.USING_EXPERT ? "using" : "not using") +
 							">: " + RATING);
-		Utilities.printInfo("Training on " + (int)(TRAIN_FRACTION * NUM_GAMES) + " games...");		
+				
 
+		myGameData.setMode(Mode.TRAIN);
 		long[][] frequencyTable = trainingModel.train(myGameData);
 		Utilities.printInfo("Just finished training!");
 		
 		Utilities.printInfo("Creating a hypothesis...");
 		NBHypothesis myHypothesis = new NBHypothesis( frequencyTable, 
 				trainingModel.getNumNonExpertMoves(), trainingModel.getNumExpertMoves() );
+		Utilities.printInfo(String.format("--------------------------------------%n"));
 		
 		return myHypothesis;
 	}
