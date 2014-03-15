@@ -67,7 +67,7 @@ public abstract class MoveOrderingPruning extends AlphaBetaSearchAgent {
 		return maxPQ;
 	}
 
-	class MoveOrder implements Comparator<MoveOrder>{
+	public static class MoveOrder implements Comparator<MoveOrder>{
 		
 		public ArimaaMove move;
 		public double weight;
