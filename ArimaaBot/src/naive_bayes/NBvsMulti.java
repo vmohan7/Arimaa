@@ -77,7 +77,6 @@ public class NBvsMulti {
 				if (state == null) break;
 				
 				GameState curr = state.getCurr();
-				System.out.println(curr.toBoardString());
 				FeatureExtractor fe = new feature_extractor.FeatureExtractor( curr, state.getPrev(), state.getPrevPrev(),
 						state.getPrevMove(), state.getPrevPrevMove() );
 			    
@@ -95,17 +94,22 @@ public class NBvsMulti {
 				}
 				
 				// print output
+				ArimaaMove expertMove = state.getNextMove();
+				System.out.println(String.format("[Expert move, for reference: %s]%n", expertMove.toString()));
+				System.out.println(curr.toBoardString());
+				
 				System.out.println("NB Ordering...");
-				printAllMovesUpToExpert(nbQueue, state.getNextMove());
+				printAllMovesUpToExpert(nbQueue, expertMove);
 				
 				System.out.println("MultiNB Ordering...");
-				printAllMovesUpToExpert(multiNBQueue, state.getNextMove());
+				printAllMovesUpToExpert(multiNBQueue, expertMove);
 				
 				if (gp.hasNextGameState())
 					System.out.println(String.format("%n%n%n%n ******* NEXT ORDERING ******* %n%n%n"));
 			}
 			
-			System.out.println(String.format("%n%n%n%n ********** NEXT GAME ********** %n%n%n"));
+			if (count < NUM_VISIBLE_MOVE_ORDERINGS && myGameData.hasNextGame())
+				System.out.println(String.format("%n%n%n%n ********** NEXT GAME ********** %n%n%n"));
 		}
 
 	}
@@ -121,7 +125,11 @@ public class NBvsMulti {
 			assert(move != null);
 			if (move.move.equals(expertMove)) flag = false;
 			
-			System.out.println(String.format("Move %5d: %s", pos, move.move.toString()));
+			/* Note on format (for weight) -- "% 7.3f": 
+			 * ->  ' ' makes negative and positive numbers align, 
+			 * ->  '7' is the width of the field (1 for sign, <=2 before '.', 1 for '.', 3 after '.'),
+			 * -> ".3" is 3 places after the decimal */
+			System.out.println(String.format("Move %5d (log odds = % 7.3f): %s", pos, move.weight, move.move.toString()));
 		}
 		System.out.println("^^^---- This move is the move played by the expert (others below not printed).");
 		System.out.println("\t\t [There were " + numTotalMoves + " total moves in the ordering.]");
