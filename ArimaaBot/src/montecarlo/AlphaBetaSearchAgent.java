@@ -79,7 +79,7 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 
 	
 	private double AlphaBeta(final ArimaaState state, int depth, double alpha, double beta, boolean isMaxPlayer){
-		numNodes++;
+//		numNodes++;
 		GameState next = new GameState();
 		next.playFullClear(state.getNextMove(), state.getCurr());
 		
@@ -93,10 +93,10 @@ public abstract class AlphaBetaSearchAgent extends AbstractAgent{
 			double score =  sign*(next.getGameResult() < 0 ? 1 : -1)*(this.getGameOverScore(next)); 
 			return score;
 		} else if (depth == 0){
-			numEvals++; //this line is strictly for testing
-			double start = (System.nanoTime() / 1E6);
-				double score =  sign*evaluation(nextState);
-			timeToEval += (System.nanoTime() / 1E6) - start;
+//			numEvals++; //this line is strictly for testing
+//			double start = (System.nanoTime() / 1E6);
+			double score =  sign*evaluation(nextState);
+//			timeToEval += (System.nanoTime() / 1E6) - start;
 			return score; 
 		}
 

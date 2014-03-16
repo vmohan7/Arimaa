@@ -66,6 +66,7 @@ public class FeatureExtractor implements Constants {
 	private static double extractNumPiecesTime, extractNumDisplacedTime, extractGoalThreatsTime;
 	private static int numTimesFeaturesExtracted;
 	
+	
 	public static void printFeatureExtractionTimes(){
 		// NOTE: we've added this timing code for testing on the branch 
 		// FasterAB. These should never be on a master / "production" 
@@ -92,17 +93,17 @@ public class FeatureExtractor implements Constants {
 		// on the branch FasterAB. These should never be on a master / "production" 
 		// branch!!
 		double[] features = new double[NUM_REDUCED_FEATURES];
-		double start = (System.nanoTime() / 1E6);
+//		double start = (System.nanoTime() / 1E6);
 		features[0] = extractMinNumPieces(state);
-		double mid1 = (System.nanoTime() / 1E6);
+//		double mid1 = (System.nanoTime() / 1E6);
 		features[1] = extractMaxNumDisplaced(state);
-		double mid2 = (System.nanoTime() / 1E6);
+//		double mid2 = (System.nanoTime() / 1E6);
 		features[2] = extractImminentGoalFeature(state);
-		double end = (System.nanoTime() / 1E6);
-		extractNumPiecesTime += mid1 - start;
-		extractNumDisplacedTime += mid2 - mid1;
-		extractGoalThreatsTime += end - mid2;
-		numTimesFeaturesExtracted++;
+//		double end = (System.nanoTime() / 1E6);
+//		extractNumPiecesTime += mid1 - start;
+//		extractNumDisplacedTime += mid2 - mid1;
+//		extractGoalThreatsTime += end - mid2;
+//		numTimesFeaturesExtracted++;
 		return features;
 	}
 
