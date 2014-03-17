@@ -127,24 +127,24 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 		
 		
 		for (ArimaaMove m : moves) {
-//			double extractStart = (System.nanoTime() / 1E6);
+			double extractStart = (System.nanoTime() / 1E6);
 				BitSet features = fe.extractFeatures(m);
-//			timeExtractingInMS += (System.nanoTime() / 1E6) - extractStart;
+			timeExtractingInMS += (System.nanoTime() / 1E6) - extractStart;
 			
-//			double evaluateStart = (System.nanoTime() / 1E6);
+			double evaluateStart = (System.nanoTime() / 1E6);
 				topKMoves[i++] = new ScoredMove(m, multiNBHyp.evaluate(features, curr));
-//				numMultiNBEvaluateCalls++;
-//			timeEvaluatingMultiNBInMS += (System.nanoTime() / 1E6) - evaluateStart;
+				numMultiNBEvaluateCalls++;
+			timeEvaluatingMultiNBInMS += (System.nanoTime() / 1E6) - evaluateStart;
 		}
 		
 
-//		double selectStart = (System.nanoTime() / 1E6);
+		double selectStart = (System.nanoTime() / 1E6);
 			select(topKMoves, 0, topKMoves.length-1, k-1);
-//		timeSelectingInMS += (System.nanoTime() / 1E6) - selectStart;
+		timeSelectingInMS += (System.nanoTime() / 1E6) - selectStart;
 		
-//		double sortStart = (System.nanoTime() / 1E6);
+		double sortStart = (System.nanoTime() / 1E6);
 			Arrays.sort(topKMoves, 0, k);
-//		timeSortingKInMS += (System.nanoTime() / 1E6) - sortStart;
+		timeSortingKInMS += (System.nanoTime() / 1E6) - sortStart;
 		
 		return topKMoves;
 	}

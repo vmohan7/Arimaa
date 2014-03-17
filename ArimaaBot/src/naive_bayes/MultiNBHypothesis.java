@@ -72,17 +72,17 @@ public final class MultiNBHypothesis extends AbstractHypothesis
 	 */
 	@Override
 	public double evaluate(BitSet bs, GameState state) {
-//		double extractStart = System.nanoTime() / 1E6;
+		double extractStart = System.nanoTime() / 1E6;
 			double[] phaseVector = game_phase.FeatureExtractor.extractFeatures(state, XMeansWrapper.EXTRACTION_TYPE);
-//		extractTimeInMS += System.nanoTime() / 1E6 - extractStart;
+		extractTimeInMS += System.nanoTime() / 1E6 - extractStart;
 			
-//		double clusterStart = System.nanoTime() / 1E6;
+		double clusterStart = System.nanoTime() / 1E6;
 			int cluster = xMeansWrapper.clusterInstance(phaseVector);
-//		clusterTimeInMS += System.nanoTime() / 1E6 - clusterStart;
+		clusterTimeInMS += System.nanoTime() / 1E6 - clusterStart;
 		
-//		double evaluateStart = System.nanoTime() / 1E6;
+		double evaluateStart = System.nanoTime() / 1E6;
 			double evalResult = nbHypotheses[cluster].evaluate(bs, state);
-//		evaluateTimeInMS += System.nanoTime() / 1E6 - evaluateStart;
+		evaluateTimeInMS += System.nanoTime() / 1E6 - evaluateStart;
 		
 		return evalResult;
 	}
