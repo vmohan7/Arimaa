@@ -21,7 +21,7 @@ public class FairyDeepMoveOrderingAgent extends FairyMoveOrderingClusteringAgent
 	public void printSettingsStats() {
 		Utilities.printInfo(String.format("-----%nRunning stats for FairyDeepMoveOrderingAgent only:"));
 		Utilities.printInfo("Moves considered: " + MAX_MOVES);
-		//Utilities.printInfo("Depth: " searchDepth);
+		Utilities.printInfo("Depth: " + searchDepth);
 		Utilities.printInfo("XMeans trained on: " + getNumXMeansGames() + " games");
 		Utilities.printInfo("MultiNB trained on: " + getNumTrainedGames() + " games");
 		Utilities.printInfo(String.format("-----%n"));

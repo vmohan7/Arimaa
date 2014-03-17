@@ -36,7 +36,7 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 	private double timeSortingKInMS = 0;
 	
 	/** For reporting. */
-	private int searchDepth;
+	protected int searchDepth;
 	private long numMultiNBEvaluateCalls = 0L;
 	public double getTotalExtractTimeMS() { return timeExtractingInMS; }
 	public double getTotalEvaluateMultiNBTimeMS() { return timeEvaluatingMultiNBInMS; }
