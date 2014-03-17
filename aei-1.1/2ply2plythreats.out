@@ -1,0 +1,50 @@
+Number of rounds:  1
+At timecontrol 120m/30s/100/0/0/0
+Giving these settings to all bots:
+hash: 50
+59g
+ +-----------------+
+8| . . . . . . . . |
+7| . . r r . M . c |
+6| r h R E h x d . |
+5| R R d . R r c . |
+4| . m D . r H r r |
+3| . . R C C D e R |
+2| . . R . . . R H |
+1| r . . . . . . . |
+ +-----------------+
+   a b c d e f g h  
+DebugFairyHeuristic wins because of g playing side s
+After round 1 and 2h33m21s:
+Fairy has 0 wins and 0 timeouts
+DebugFairyHeuristic has 1 wins and 0 timeouts
+    1 by g
+Number of rounds:  1
+At timecontrol 120m/30s/100/0/0/0
+Giving these settings to all bots:
+hash: 50
+34g
+ +-----------------+
+8| . . . . . . . . |
+7| . . H . . d . . |
+6| . h x . c r r . |
+5| . . . r c E r . |
+4| r R . R r d R r |
+3| R e x . . x h R |
+2| . . m . . . R . |
+1| . . H r . . . . |
+ +-----------------+
+   a b c d e f g h  
+Fairy wins because of g playing side s
+After round 1 and 1h22m26s:
+DebugFairyHeuristic has 0 wins and 0 timeouts
+Fairy has 1 wins and 0 timeouts
+    1 by g
+Number of rounds:  1
+At timecontrol 120m/30s/100/0/0/0
+Giving these settings to all bots:
+hash: 50
+Number of rounds:  1
+At timecontrol 120m/30s/100/0/0/0
+Giving these settings to all bots:
+hash: 50

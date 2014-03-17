@@ -135,7 +135,7 @@ public class AlphaBetaTest {
 		}
 		
 		//TOOD add prints
-		private double AlphaBeta(final ArimaaState state, int depth, double alpha, double beta, boolean isMaxPlayer){
+		protected double AlphaBeta(final ArimaaState state, int depth, double alpha, double beta, boolean isMaxPlayer){
 			GameState next = new GameState();
 			next.playFullClear(state.getNextMove(), state.getCurr());
 			

@@ -34,7 +34,7 @@ public class TimeAgent {
 		/* If the (XMeans|MultiNBMain).ser files are not already on your computer: 
 		 * Step 1 -- Run XMeansWrapper to train the clusters.
 		 * Step 2 -- Run MultiNBMain to train move ordering. */
-		FairyMoveOrderingClusteringAgent phaseAgent = new FairyMoveOrderingClusteringAgent(DEPTH);
+		FairyDeepMoveOrderingAgent phaseAgent = new FairyDeepMoveOrderingAgent(DEPTH);
 		//FairyAgent fairyAgent = new FairyAgent(DEPTH);
 		
 		printTimeForAgent(phaseAgent);

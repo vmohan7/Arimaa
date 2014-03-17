@@ -36,7 +36,7 @@ public class XMeansWrapper extends XMeans {
 	private static final String SERIALIZED_FILE = FILE_PREFIX + String.format("%s%s%s.ser", 
 										"XMeans_", (REDUCED_FEATURES ? "reduced" : "full"), "_features"); 
 	
-	private static final int MIN_NUM_CLUSTERS = 5; // changed from 2
+	private static final int MIN_NUM_CLUSTERS = 3; // changed from 2
 	private static final int MAX_NUM_CLUSTERS = 8;
 	
 	// Clustering on 15000 games took ~3GB of RAM -- plan accordingly
@@ -45,10 +45,10 @@ public class XMeansWrapper extends XMeans {
 	private final int RATING = 1600;
 	
 	/** Don't use GameData, and instead read in from the csv at DATA_FILE_PATH. */
-	private static final boolean READ_DATA_FROM_CSV_FILE = true;
+	private static final boolean READ_DATA_FROM_CSV_FILE = false;
 																								//          |
 	/** These constants are for printing the data into a CSV file. */							// change  \|/ only
-	private static final boolean PRINT_DATA_TO_CSV_FILE_BEFORE_CLUSTER = READ_DATA_FROM_CSV_FILE ? false : true;
+	private static final boolean PRINT_DATA_TO_CSV_FILE_BEFORE_CLUSTER = READ_DATA_FROM_CSV_FILE ? false : false;
 	private static final String DATA_FILE_PATH = FILE_PREFIX + "XMeans_designMatrix.csv";
 	private static CSVDataFormatter csvWriter;
 	
@@ -67,7 +67,7 @@ public class XMeansWrapper extends XMeans {
 		
 		XMeansWrapper xmw = new XMeansWrapper(MIN_NUM_CLUSTERS, MAX_NUM_CLUSTERS);
 		xmw.train(); 
-//		xmw.serialize();
+		xmw.serialize();
 	}
 	
 	

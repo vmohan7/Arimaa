@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Random;
 
-import com.sun.org.apache.xerces.internal.impl.dv.dtd.NMTOKENDatatypeValidator;
+//import com.sun.org.apache.xerces.internal.impl.dv.dtd.NMTOKENDatatypeValidator;
 
 import feature_extractor.FeatureExtractor;
 import naive_bayes.MultiNBHypothesis;
@@ -87,6 +87,10 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 		return super.selectMove( arimaaState, move_history ); //does the limiting for the first set as well
 	}
 
+	
+	protected int getPrunedSize(int numMoves){
+		return (int) Math.ceil(numMoves * TOP_K_PERCENT);
+	}
 
 	/**
 	 * NOTE: MoveList returned has its internal cursor set to past the last element.
@@ -98,7 +102,7 @@ public class FairyMoveOrderingClusteringAgent extends FairyAgent {
 				state.getPrevMove(), state.getPrevPrevMove() );
 
 		MoveArrayList moves = genRootMovesArrayList(state.getCurr());
-		int k = (int) Math.ceil(moves.size() * TOP_K_PERCENT);
+		int k = getPrunedSize(moves.size()); //(int) Math.ceil(moves.size() * TOP_K_PERCENT);
 		ScoredMove[] sortedMoves = topKMoves(fe, moves, state.getCurr(), k);
 		// NOTE: moves' internal count for .getMove() has been modified...
 

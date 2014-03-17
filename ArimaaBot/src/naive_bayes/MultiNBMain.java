@@ -38,7 +38,7 @@ public class MultiNBMain {
 	public static final boolean PRINT_PERCENTILES = true;
 	
 	/** Run testing on a range of game-set sizes. */
-	private static final boolean TEST_TRAINING_SET_SIZES = true;
+	private static final boolean TEST_TRAINING_SET_SIZES = false;
 	
 	
 	/* NOTE TO THE CONFIGURER: All of the ternary operators are to bring to the forefront
@@ -69,7 +69,7 @@ public class MultiNBMain {
 	 * This variable is used when training only (and not testing). 
 	 * ALMOST_ALL * NUM_GAMES games will be trained on. 
 	 */
-	private static final int NUM_GAMES = TEST_TRAINING_SET_SIZES ? IGNORED : 151;
+	private static final int NUM_GAMES = TEST_TRAINING_SET_SIZES ? IGNORED : 101;
 	
 	/* ===================================================== */
 	
